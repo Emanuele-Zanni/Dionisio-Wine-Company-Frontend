@@ -7,7 +7,7 @@ interface IProduct {
     imgUrl: string;
     type: string;
     store: string;
-    offer: number;
+    offer?: number | null
 }
 
 export type {IProduct}

@@ -1,10 +1,12 @@
-export const arrayProducts = [{
+import { IProduct } from "./interfaces";
+
+export const arrayProducts: IProduct[] = [{
     "id": "55340875-2865-424a-9b31-d9195a1dda04",
     "name": "Sapphire Dream",
     "description": "bold and spicy with notes of blackberry",
     "price": 444.4,
     "stock": 13,
-    "imgUrl": "http://dummyimage.com/226x100.png/cc0000/ffffff",
+    "imgUrl": "https://bacoclub.com.ar/wp-content/uploads/2024/06/Cabernet-sauvignon.png",
     "type": "Chardonnay",
     "store": "Barrel & Bottle",
     "offer": 22
