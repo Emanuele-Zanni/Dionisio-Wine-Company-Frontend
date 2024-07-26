@@ -1,6 +1,7 @@
 import { IProductProps } from "@/interface/index";
 import Image from "next/image";
 
+
 function ProductsCard({ product }: IProductProps) {
     return (
         <div className="border-2 border-[#800020] p-4 rounded-lg w-[300px] h-[400px] flex flex-col mx-auto bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a]">
