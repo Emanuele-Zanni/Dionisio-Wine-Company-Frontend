@@ -13,6 +13,14 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
+      colors: {
+        champagne: {
+        DEFAULT: '#D4AF37',
+        },
+      },
+      animation: {
+        'bounce-slow': 'bounce 3s infinite', 
+      },
     },
   },
   plugins: [],
