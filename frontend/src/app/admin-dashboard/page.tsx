@@ -1,33 +1,19 @@
 "use client";
-import React, { useState } from 'react';
-import { Product, User } from "../interfaces/interfaces";
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Product, User } from "../interfaces/interfaces";
 
 const AdminDashboard: React.FC = () => {
-  const user: User = {
-    id: "4b4d327c-9f14-4423-9513-ec2142dc4e46",
-    name: "Brittni",
-    email: "bmcculloch0@macromedia.com",
-    password: "rL9_)Lxy`@",
-    phone: "766-355-8233",
-    country: "China",
-    address: "45 Everett Junction",
-    city: "Hebu",
-    date: "1/24/2024",
-    isAdmin: true,
-    orders: "\""
-  };
-
+  const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
+  const [newProduct, setNewProduct] = useState<Product>({
     name: '',
     description: '',
     price: 0,
     stock: 0,
     imgUrl: '',
-    type: '',
+    category: '',
     store: '',
-    offer: 0,
   });
 
   const [errors, setErrors] = useState({
@@ -36,10 +22,25 @@ const AdminDashboard: React.FC = () => {
     price: '',
     stock: '',
     imgUrl: '',
-    type: '',
+    category: '',
     store: '',
-    offer: '',
   });
+
+
+  /*
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get('https://dionisio-wine-company-backend.onrender.com/users');
+        setUser(response.data[0]); // Suponiendo que solo hay un usuario
+        console.log(response)
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+    fetchUser();
+  }, []);
+*/
 
   const validate = (name: string, value: string | number): string => {
     switch (name) {
@@ -50,7 +51,6 @@ const AdminDashboard: React.FC = () => {
         return typeof value === 'string' && value.length > 25 ? `${name} no puede exceder 25 caracteres` : '';
       case 'price':
       case 'stock':
-      case 'offer':
         return typeof value === 'number' && value <= 0 ? 'Debe ser un número positivo mayor que 0' : '';
       default:
         return '';
@@ -80,37 +80,44 @@ const AdminDashboard: React.FC = () => {
         formData
       );
       setNewProduct({ ...newProduct, imgUrl: response.data.secure_url });
+      console.log(response.data.secure_url); // Verifica la URL de la imagen
       setErrors({ ...errors, imgUrl: '' });
-      console.log(formData)
-      console.log(response)
+
     } catch (error) {
       setErrors({ ...errors, imgUrl: 'Error subiendo la imagen' });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(errors).some(error => error)) return;
-    const id = crypto.randomUUID();
-    setProducts([...products, { ...newProduct, id }]);
-    setNewProduct({
-      name: '',
-      description: '',
-      price: 0,
-      stock: 0,
-      imgUrl: '',
-      type: '',
-      store: '',
-      offer: 0,
-    });
+  
+    try {
+      const response = await axios.post('/api/products', newProduct);
+      setProducts([...products, response.data]);
+      setNewProduct({
+        name: '',
+        description: '',
+        price: 0,
+        stock: 0,
+        imgUrl: '',
+        category: '',
+        store: '',
+      });
+      console.log(response);
+    } catch (error) {
+      console.error('Error creating product:', error);
+    }
   };
-
+  
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold text-center">Admin Dashboard</h1>
-      <section className="text-center my-4">
-        <h2 className="text-xl">Bienvenido, {user.name}</h2>
-      </section>
+      {user && (
+        <section className="text-center my-4">
+          <h2 className="text-xl">Bienvenido, {user.name}</h2>
+        </section>
+      )}
       <section className="my-4">
         <h2 className="text-xl text-center">Crear Producto</h2>
         <form onSubmit={handleSubmit} className="max-w-md mx-auto">
@@ -185,19 +192,19 @@ const AdminDashboard: React.FC = () => {
             {errors.imgUrl && <p className="text-red-500">{errors.imgUrl}</p>}
           </div>
           <div className="mb-2">
-            <label htmlFor="type" className="block text-left">Varietal</label>
+            <label htmlFor="type" className="block text-left">Categoría</label>
             <input
               type="text"
               id="type"
               name="type"
-              value={newProduct.type}
+              value={newProduct.category}
               onChange={handleChange}
               placeholder="Varietal"
               className="w-full p-2 border border-gray-300 rounded"
               maxLength={25}
               required
             />
-            {errors.type && <p className="text-red-500">{errors.type}</p>}
+            {errors.category && <p className="text-red-500">{errors.category}</p>}
           </div>
           <div className="mb-2">
             <label htmlFor="store" className="block text-left">Bodega</label>
@@ -214,22 +221,7 @@ const AdminDashboard: React.FC = () => {
             />
             {errors.store && <p className="text-red-500">{errors.store}</p>}
           </div>
-          <div className="mb-2">
-            <label htmlFor="offer" className="block text-left">Descuento/Oferta</label>
-            <input
-              type="number"
-              id="offer"
-              name="offer"
-              value={newProduct.offer}
-              onChange={handleChange}
-              placeholder="Oferta"
-              className="w-full p-2 border border-gray-300 rounded"
-              min={1}
-              required
-            />
-            {errors.offer && <p className="text-red-500">{errors.offer}</p>}
-          </div>
-          <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">
+          <button type="submit" className="rounded-lg bg-red-950 hover:bg-red-900 text-white px-4 py-2 mt-8">
             Crear Producto
           </button>
         </form>
@@ -249,16 +241,15 @@ const AdminDashboard: React.FC = () => {
             <p className="text-center">No hay productos creados aún.</p>
           ) : (
             <ul>
-              {products.map(product => (
-                <li key={product.id} className="border p-2 my-2 rounded">
-                  <h3 className="font-bold">{product.name}</h3>
-                  <p>{product.description}</p>
-                  <p>Precio: ${product.price}</p>
-                  <p>Stock: {product.stock}</p>
-                  <p>Varietal: {product.type}</p>
-                  <p>Bodega: {product.store}</p>
-                  <p>Descuento/Oferta: {product.offer}%</p>
-                  <img src={product.imgUrl} alt={product.name} className="w-full"/>
+              {products.map((product, index) => (
+                <li key={product.id ?? index} className="border p-4 my-2 rounded-lg shadow-lg">
+                  <h3 className="text-xl font-bold text-gray-700 underline underline-offset-8 mb-4 mt-8">{product.name}</h3>
+                  <p className="text-gray-700">{product.description}</p>
+                  <p className="text-gray-700">Precio: ${product.price}</p>
+                  <p className="text-gray-700">Stock: {product.stock}</p>
+                  <img src={product.imgUrl} alt={product.name} className="w-full h-48 object-cover mt-4" />
+                  <p className="text-gray-700">Varietal: {product.category}</p>
+                  <p className="text-gray-700">Bodega: {product.store}</p>
                 </li>
               ))}
             </ul>

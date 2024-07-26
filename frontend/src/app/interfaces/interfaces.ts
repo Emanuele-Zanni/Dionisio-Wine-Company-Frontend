@@ -1,16 +1,16 @@
 
 export interface Product {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    imgUrl: string;
-    type: string;
-    store: string;
-    offer: number;
-  }
-  
+  id?: string; 
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  imgUrl: string;
+  category: string;
+  store: string;
+}
+
+
 export interface User {
   id: string;
   name: string;
