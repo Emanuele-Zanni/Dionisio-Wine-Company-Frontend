@@ -1,41 +1,59 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
  import { IProduct } from "./interfaces"
  import { arrayProducts } from "./data"
 
-// export async function getProductsDB() {
-//     try {
-//         const res = await fetch(`${apiUrl}`, {
-//             method: 'GET',
-//             next: { revalidate: 3600 }
-//         });
-//         if (!res.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-//         const data = await res.json();
-//         console.log('API Response:', data); 
-//         const products: IProduct[] = data.results;
-//         console.log('Products:', products); 
-//         return products;
-//     } catch (error: any) {
-//         throw new Error(error.message);
-//     }
-// }
 
-// export async function getProductById(id:string)  {
-//     try {
-//         const products = await getProductsDB()
-//         const product = products.find((product) => product.id.toString() === id)
-//         if(!product) throw new Error("Product not found")
-//             return product;
-//     } catch (error: any) {
-//         throw new Error(error)
-//     }
-// }
+ const apiUrl = 'https://dionisio-wine-company-backend.onrender.com';
 
-export function getProductsDB(): IProduct[] {
-    return arrayProducts;
-  }
-  
-  export function getProductById(id: string): IProduct | undefined {
-    return arrayProducts.find(product => product.id === id);
-  }
+
+ export async function getProductsDB(): Promise<IProduct[]> {
+    try {
+        const res = await fetch(`${apiUrl}/products`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json', 
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`Network response was not ok: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        if (!data || !data.results) {
+            throw new Error('Unexpected response structure or empty response');
+        }
+
+        console.log('API Response:', data); 
+        const products: IProduct[] = data.results;
+        console.log('Products:', products); 
+        return products;
+    } catch (error: any) {
+        console.error('Error fetching products:', error.message);
+        throw new Error(error.message);
+    }
+}
+export async function getProductById(id: string): Promise<IProduct> {
+    try {
+        const res = await fetch(`${apiUrl}/products/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json', // Asegúrate de enviar el tipo de contenido correcto
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`Network response was not ok: ${res.statusText}`);
+        }
+
+        const product = await res.json();
+        if (!product) {
+            throw new Error('Unexpected response structure or empty response');
+        }
+
+        return product;
+    } catch (error: any) {
+        console.error('Error fetching product:', error.message);
+        throw new Error(error.message);
+    }
+}
