@@ -26,27 +26,26 @@ const AdminDashboard: React.FC = () => {
     store: '',
   });
 
-
   /*
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get('https://dionisio-wine-company-backend.onrender.com/users');
         setUser(response.data[0]); // Suponiendo que solo hay un usuario
-        console.log(response)
+        console.log(response);
       } catch (error) {
         console.error('Error fetching user:', error);
       }
     };
     fetchUser();
   }, []);
-*/
+  */
 
   const validate = (name: string, value: string | number): string => {
     switch (name) {
       case 'description':
         return typeof value === 'string' && value.length > 250 ? 'Descripción no puede exceder 250 caracteres' : '';
-      case 'type':
+      case 'category':
       case 'store':
         return typeof value === 'string' && value.length > 25 ? `${name} no puede exceder 25 caracteres` : '';
       case 'price':
@@ -80,9 +79,8 @@ const AdminDashboard: React.FC = () => {
         formData
       );
       setNewProduct({ ...newProduct, imgUrl: response.data.secure_url });
-      console.log(response.data.secure_url); // Verifica la URL de la imagen
       setErrors({ ...errors, imgUrl: '' });
-
+      console.log(response)
     } catch (error) {
       setErrors({ ...errors, imgUrl: 'Error subiendo la imagen' });
     }
@@ -91,7 +89,24 @@ const AdminDashboard: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(errors).some(error => error)) return;
-  
+
+    /* PRODUCTO TIPO
+    const producto1 = {
+      "id": "55340875-2865-424a-9b31-d9195a1dda04",
+      "name": "Sapphire Dream",
+      "description": "bold and spicy with notes of blackberry",
+      "price": "444.40",
+      "stock": 13,
+      "imgUrl": "http://dummyimage.com/226x100.png/cc0000/ffffff",
+      "store": "Barrel & Bottle",
+      "isActive": true,
+      "category": {
+        "categoryId": "6835eee5-fa28-4136-9dfb-9df777da299e",
+        "name": "Merlot"
+      }}
+ */
+
+   
     try {
       const response = await axios.post('/api/products', newProduct);
       setProducts([...products, response.data]);
@@ -109,7 +124,8 @@ const AdminDashboard: React.FC = () => {
       console.error('Error creating product:', error);
     }
   };
-  
+ 
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold text-center">Admin Dashboard</h1>
@@ -179,7 +195,7 @@ const AdminDashboard: React.FC = () => {
             {errors.stock && <p className="text-red-500">{errors.stock}</p>}
           </div>
           <div className="mb-2">
-            <label htmlFor="imgUrl" className="block text-left">URL de la imagen</label>
+            <label htmlFor="imgUrl" className="block text-left">Imagen</label>
             <input
               type="file"
               id="imgUrl"
@@ -192,14 +208,14 @@ const AdminDashboard: React.FC = () => {
             {errors.imgUrl && <p className="text-red-500">{errors.imgUrl}</p>}
           </div>
           <div className="mb-2">
-            <label htmlFor="type" className="block text-left">Categoría</label>
+            <label htmlFor="category" className="block text-left">Categoría</label>
             <input
               type="text"
-              id="type"
-              name="type"
+              id="category"
+              name="category"
               value={newProduct.category}
               onChange={handleChange}
-              placeholder="Varietal"
+              placeholder="Categoría"
               className="w-full p-2 border border-gray-300 rounded"
               maxLength={25}
               required
@@ -241,14 +257,14 @@ const AdminDashboard: React.FC = () => {
             <p className="text-center">No hay productos creados aún.</p>
           ) : (
             <ul>
-              {products.map((product, index) => (
-                <li key={product.id ?? index} className="border p-4 my-2 rounded-lg shadow-lg">
+              {products.map((product) => (
+                <li key={product.id} className="border p-4 my-2 rounded-lg shadow-lg">
                   <h3 className="text-xl font-bold text-gray-700 underline underline-offset-8 mb-4 mt-8">{product.name}</h3>
                   <p className="text-gray-700">{product.description}</p>
                   <p className="text-gray-700">Precio: ${product.price}</p>
                   <p className="text-gray-700">Stock: {product.stock}</p>
                   <img src={product.imgUrl} alt={product.name} className="w-full h-48 object-cover mt-4" />
-                  <p className="text-gray-700">Varietal: {product.category}</p>
+                  <p className="text-gray-700">Categoría: {product.category}</p>
                   <p className="text-gray-700">Bodega: {product.store}</p>
                 </li>
               ))}
