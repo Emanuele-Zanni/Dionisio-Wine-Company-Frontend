@@ -14,7 +14,7 @@ function Detail({ params }: { params: { id: string } }) {
             setLoading(true);
             setError(null);
             try {
-                const product = await getProductById(params.id); // Asegúrate de que esta línea espera la promesa
+                const product = await getProductById(params.id); 
                 if (product) {
                     setProduct(product);
                 } else {
