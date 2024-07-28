@@ -4,12 +4,7 @@ import { useState, useEffect } from 'react';
 import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
-
-async function getProducts(): Promise<IProduct[]> {
-    const res = await fetch('https://jsebastianvanegasl.github.io/json-api/products.json');
-    const products = await res.json();
-    return products;
-}
+import { getProductsDB } from '@/components/helpers/product.peticion';
 
 const Products = () => {
     const [products, setProducts] = useState<IProduct[]>([]);
@@ -18,8 +13,12 @@ const Products = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const products = await getProducts();
-            setProducts(products);
+            try {
+                const products = await getProductsDB();
+                setProducts(products);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
         };
 
         fetchData();

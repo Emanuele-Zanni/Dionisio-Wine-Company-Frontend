@@ -19,7 +19,7 @@ async function Home() {
                 <Carrusel />
             </div>
             <div className="text-center pt-28">
-                <h5 className="text-xl font-semibold">BEST SELLERS</h5>
+                <h5 className="text-xl font-semibold">VINOS MAS VENDIDOS</h5>
                 <div className="text-center pt-7 ">
                 <ProductsList products={products} />
                 </div>

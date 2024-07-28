@@ -2,12 +2,17 @@ export interface IProduct {
     id: string;
     name: string;
     description: string;
-    price: number;
+    price: string; 
     stock: number;
     imgUrl: string;
     type: string;
     store: string;
-    offer: number;
+    isActive: boolean;
+    category: {
+        categoryId: string;
+        name: string;
+    };
+    offer?: number; 
 }
 export interface IProductProps {
     product: IProduct;
