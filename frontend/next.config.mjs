@@ -1,4 +1,8 @@
-/** @type {import('next').NextConfig} */
+// next.config.mjs
+
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
   images: {
     domains: ['dummyimage.com'], // Permite imágenes desde dummyimage.com
@@ -13,8 +17,7 @@ const nextConfig = {
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_UPLOAD_PRESET: process.env.CLOUDINARY_UPLOAD_PRESET,
   },
-  
-   async rewrites() {
+  async rewrites() {
     return [
       {
         source: '/api/:path*',
@@ -22,7 +25,6 @@ const nextConfig = {
       },
     ];
   },
-  
 };
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 
  import { IProduct } from "./interfaces"
- import { arrayProducts } from "./data"
+ 
 
 
  const apiUrl = 'https://dionisio-wine-company-backend.onrender.com';
