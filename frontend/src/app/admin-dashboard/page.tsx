@@ -10,13 +10,12 @@ const AdminDashboard: React.FC = () => {
   const [newProduct, setNewProduct] = useState<Product>({
     name: '',
     description: '',
-    price: 0, // Cambiado a número
-    stock: 0, // Número
+    price: 0,
+    stock: 0,
     imgUrl: '',
     category: '', // ID de la categoría
     store: '',
   });
-  
 
   const [errors, setErrors] = useState({
     name: '',
@@ -33,6 +32,7 @@ const AdminDashboard: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get('/api/categories');
+        console.log('Categorías:', response.data.data); // Verifica la respuesta
         setCategories(response.data.data); // Ajusta según la respuesta real del endpoint
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -64,9 +64,9 @@ const AdminDashboard: React.FC = () => {
       case 'store':
         return typeof value === 'string' && value.length > 25 ? 'Bodega no puede exceder 25 caracteres' : '';
       case 'price':
-        return isNaN(parseFloat(value as string)) || parseFloat(value as string) <= 0 ? 'Precio debe ser un número positivo' : '';
+        return isNaN(Number(value)) || Number(value) <= 0 ? 'Precio debe ser un número positivo' : '';
       case 'stock':
-        return isNaN(parseInt(value as string, 10)) || parseInt(value as string, 10) <= 0 ? 'Stock debe ser un número positivo' : '';
+        return isNaN(Number(value)) || Number(value) <= 0 ? 'Stock debe ser un número positivo' : '';
       default:
         return '';
     }
@@ -78,10 +78,8 @@ const AdminDashboard: React.FC = () => {
       ...prevState,
       [name]: name === 'price' ? parseFloat(value) : name === 'stock' ? Number(value) : value
     }));
-    setErrors({ ...errors, [name]: validate(name, value) });
+    setErrors({ ...errors, [name]: validate(name, name === 'price' ? parseFloat(value) : name === 'stock' ? Number(value) : value) });
   };
-  
-  
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -110,38 +108,38 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (Object.values(errors).some(error => error)) return;
-  
-    try {
-      const response = await axios.post('/api/products', {
-        ...newProduct,
-        price: parseFloat(newProduct.price as unknown as string), // Asegúrate de que price sea un número
-        stock: Number(newProduct.stock), // Asegúrate de que stock sea un número
-      });
-      console.log('Producto creado:', response.data);
-      setProducts([...products, response.data]);
-      setNewProduct({
-        name: '',
-        description: '',
-        price: 0, // Cambiado a número
-        stock: 0, // Número
-        imgUrl: '',
-        category: '',
-        store: '',
-      });
-    } catch (error) {
-      // Manejo genérico de errores
-      if (axios.isAxiosError(error)) {
-        console.error('Error creando el producto:', error.response?.data || error.message);
-      } else {
-        console.error('Error creando el producto:', error);
-      }
+  e.preventDefault();
+  if (Object.values(errors).some(error => error)) return;
+
+  try {
+    const response = await axios.post('/api/products', {
+      ...newProduct,
+      price: newProduct.price,
+      stock: newProduct.stock,
+    });
+    console.log('Producto creado:', response.data);
+    setProducts(prevProducts => [...prevProducts, response.data]); // Agrega el nuevo producto
+    setNewProduct({
+      name: '',
+      description: '',
+      price: 0,
+      stock: 0,
+      imgUrl: '',
+      category: '',
+      store: '',
+    });
+    console.log('Productos:', products);
+    console.log('Productos:', newProduct);
+    console.log('Categorías:', categories);
+    setProducts(prevProducts => [...prevProducts, newProduct])
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error creando el producto:', error.response?.data || error.message);
+    } else {
+      console.error('Error creando el producto:', error);
     }
-  };
-  
-  
-  
+  }
+};
 
   return (
     <div className="container mx-auto p-4">
@@ -185,13 +183,14 @@ const AdminDashboard: React.FC = () => {
           <div className="mb-2">
             <label htmlFor="price" className="block text-left">Precio</label>
             <input
-              type="text"
+              type="number"
               id="price"
               name="price"
               value={newProduct.price}
               onChange={handleChange}
               placeholder="Precio"
               className="w-full p-2 border border-gray-300 rounded"
+              step="0.01"
               required
             />
             {errors.price && <p className="text-red-500">{errors.price}</p>}
@@ -267,24 +266,37 @@ const AdminDashboard: React.FC = () => {
         </form>
       </section>
       <section className="my-4">
-        <h2 className="text-xl text-center">Productos</h2>
-        {products.map((product) => (
-  <div key={product.id} className="p-4 border border-gray-300 rounded-lg shadow-md">
-    <h3 className="text-lg font-bold mb-2">{product.name}</h3>
-    <p className="text-gray-700 mb-2">{product.description}</p>
-    <p className="font-bold text-champagne mb-2">
-      ${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : 'N/A'}
-    </p>
-    <p className="font-bold text-champagne mb-2">Stock: {product.stock}</p>
-    <p className="font-bold text-champagne">
-      Categoría: {categories.find(cat => cat.categoryId === product.category)?.name}
-    </p>
-  </div>
-))}
+  <h2 className="text-xl text-center">Productos</h2>
+  {products.length === 0 ? (
+    <p>No hay productos disponibles.</p>
+  ) : (
+    products.map((product) => (
+      <div key={product.id} className="p-4 border border-gray-300 rounded-lg shadow-md flex flex-col lg:flex-row lg:items-center">
+        {/* Datos del producto */}
+        <div className="lg:w-1/2 lg:pr-4">
+          <h3 className="text-lg font-bold mb-2">{product.name}</h3>
+          <p className="text-gray-700 mb-2">{product.description}</p>
+          <p className="font-bold text-champagne mb-2">
+            ${product.price} {/* Mostrar precio como número */}
+          </p>
+          <p className="font-bold text-champagne mb-2">Stock: {product.stock}</p>
+          <p className="font-bold text-champagne">
+            Categoría: {categories.find(cat => cat.categoryId === product.category)?.name || 'Desconocida'}
+          </p>
+        </div>
+        {/* Imagen del producto */}
+        {product.imgUrl && (
+          <img src={product.imgUrl} alt={product.name} className="w-full h-48 object-cover mt-2 lg:mt-0 lg:w-1/2 lg:ml-4" />
+        )}
+      </div>
+    ))
+  )}
+</section>
 
-      </section>
+
     </div>
   );
 };
 
 export default AdminDashboard;
+
