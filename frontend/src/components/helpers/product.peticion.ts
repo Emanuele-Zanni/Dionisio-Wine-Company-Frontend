@@ -57,3 +57,19 @@ export async function getProductById(id: string): Promise<IProduct> {
         throw new Error(error.message);
     }
 }
+
+
+// src/components/helpers/product.peticion.ts REVISAR CUANDO ANDE
+
+/*
+import { IProduct } from "@/components/helpers/interfaces";
+
+export const getProductById = async (id: string): Promise<IProduct> => {
+    const response = await fetch(`/api/products/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch product');
+    }
+    return response.json();
+};
+
+*/

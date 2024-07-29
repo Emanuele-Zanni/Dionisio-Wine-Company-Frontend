@@ -2,6 +2,7 @@
 
 import { IProductProps } from "@/interface";
 import Image from "next/image";
+import Link from "next/link";
 
 function ProductsCard({ product }: IProductProps) {
   return (
@@ -30,7 +31,9 @@ function ProductsCard({ product }: IProductProps) {
           </span>
         </div>
         <div className="flex w-full justify-end">
-          <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">Detalles</button>
+          <Link href={`/detail/${product.id}`} passHref>
+            <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">Detalles</button>
+          </Link>
         </div>
       </div>
     </div>

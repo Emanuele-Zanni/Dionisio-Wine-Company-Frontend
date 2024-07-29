@@ -1,20 +1,22 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Product, User } from "../interfaces/interfaces";
+import { Product, User, Category } from "../interfaces/interfaces"; // Asegúrate de definir y exportar Category
 
 const AdminDashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newProduct, setNewProduct] = useState<Product>({
     name: '',
     description: '',
-    price: 0,
-    stock: 0,
+    price: 0, // Cambiado a número
+    stock: 0, // Número
     imgUrl: '',
-    category: '',
+    category: '', // ID de la categoría
     store: '',
   });
+  
 
   const [errors, setErrors] = useState({
     name: '',
@@ -26,41 +28,60 @@ const AdminDashboard: React.FC = () => {
     store: '',
   });
 
-  /*
   useEffect(() => {
+    // Fetch categories
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/api/categories');
+        setCategories(response.data.data); // Ajusta según la respuesta real del endpoint
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    // Fetch user information
     const fetchUser = async () => {
       try {
-        const response = await axios.get('https://dionisio-wine-company-backend.onrender.com/users');
-        setUser(response.data[0]); // Suponiendo que solo hay un usuario
-        console.log(response);
+        const response = await axios.get('/api/users');
+        const fetchedUser = response.data.data[0] || null; // Obtén el primer usuario si existe
+        setUser(fetchedUser);
       } catch (error) {
         console.error('Error fetching user:', error);
       }
     };
     fetchUser();
   }, []);
-  */
 
   const validate = (name: string, value: string | number): string => {
     switch (name) {
       case 'description':
         return typeof value === 'string' && value.length > 250 ? 'Descripción no puede exceder 250 caracteres' : '';
       case 'category':
+        return typeof value === 'string' && value.length > 250 ? 'Categoría no puede exceder 250 caracteres' : '';
       case 'store':
-        return typeof value === 'string' && value.length > 25 ? `${name} no puede exceder 25 caracteres` : '';
+        return typeof value === 'string' && value.length > 25 ? 'Bodega no puede exceder 25 caracteres' : '';
       case 'price':
+        return isNaN(parseFloat(value as string)) || parseFloat(value as string) <= 0 ? 'Precio debe ser un número positivo' : '';
       case 'stock':
-        return typeof value === 'number' && value <= 0 ? 'Debe ser un número positivo mayor que 0' : '';
+        return isNaN(parseInt(value as string, 10)) || parseInt(value as string, 10) <= 0 ? 'Stock debe ser un número positivo' : '';
       default:
         return '';
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value });
+    setNewProduct(prevState => ({
+      ...prevState,
+      [name]: name === 'price' ? parseFloat(value) : name === 'stock' ? Number(value) : value
+    }));
     setErrors({ ...errors, [name]: validate(name, value) });
   };
+  
+  
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -78,9 +99,11 @@ const AdminDashboard: React.FC = () => {
         `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
         formData
       );
-      setNewProduct({ ...newProduct, imgUrl: response.data.secure_url });
+      setNewProduct(prevState => ({
+        ...prevState,
+        imgUrl: response.data.secure_url
+      }));
       setErrors({ ...errors, imgUrl: '' });
-      console.log(response)
     } catch (error) {
       setErrors({ ...errors, imgUrl: 'Error subiendo la imagen' });
     }
@@ -89,51 +112,45 @@ const AdminDashboard: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Object.values(errors).some(error => error)) return;
-
-    /* PRODUCTO TIPO
-    const producto1 = {
-      "id": "55340875-2865-424a-9b31-d9195a1dda04",
-      "name": "Sapphire Dream",
-      "description": "bold and spicy with notes of blackberry",
-      "price": "444.40",
-      "stock": 13,
-      "imgUrl": "http://dummyimage.com/226x100.png/cc0000/ffffff",
-      "store": "Barrel & Bottle",
-      "isActive": true,
-      "category": {
-        "categoryId": "6835eee5-fa28-4136-9dfb-9df777da299e",
-        "name": "Merlot"
-      }}
- */
-
-   
+  
     try {
-      const response = await axios.post('/api/products', newProduct);
+      const response = await axios.post('/api/products', {
+        ...newProduct,
+        price: parseFloat(newProduct.price as unknown as string), // Asegúrate de que price sea un número
+        stock: Number(newProduct.stock), // Asegúrate de que stock sea un número
+      });
+      console.log('Producto creado:', response.data);
       setProducts([...products, response.data]);
       setNewProduct({
         name: '',
         description: '',
-        price: 0,
-        stock: 0,
+        price: 0, // Cambiado a número
+        stock: 0, // Número
         imgUrl: '',
         category: '',
         store: '',
       });
-      console.log(response);
     } catch (error) {
-      console.error('Error creating product:', error);
+      // Manejo genérico de errores
+      if (axios.isAxiosError(error)) {
+        console.error('Error creando el producto:', error.response?.data || error.message);
+      } else {
+        console.error('Error creando el producto:', error);
+      }
     }
   };
- 
+  
+  
+  
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold text-center">Admin Dashboard</h1>
-      {user && (
-        <section className="text-center my-4">
-          <h2 className="text-xl">Bienvenido, {user.name}</h2>
-        </section>
-      )}
+      <section className="text-center my-4">
+        <h2 className="text-xl">
+          Bienvenido, {user ? user.name : 'Nombre de Usuario Predeterminado'}
+        </h2>
+      </section>
       <section className="my-4">
         <h2 className="text-xl text-center">Crear Producto</h2>
         <form onSubmit={handleSubmit} className="max-w-md mx-auto">
@@ -149,6 +166,7 @@ const AdminDashboard: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded"
               required
             />
+            {errors.name && <p className="text-red-500">{errors.name}</p>}
           </div>
           <div className="mb-2">
             <label htmlFor="description" className="block text-left">Descripción</label>
@@ -167,14 +185,13 @@ const AdminDashboard: React.FC = () => {
           <div className="mb-2">
             <label htmlFor="price" className="block text-left">Precio</label>
             <input
-              type="number"
+              type="text"
               id="price"
               name="price"
               value={newProduct.price}
               onChange={handleChange}
               placeholder="Precio"
               className="w-full p-2 border border-gray-300 rounded"
-              min={1}
               required
             />
             {errors.price && <p className="text-red-500">{errors.price}</p>}
@@ -206,20 +223,25 @@ const AdminDashboard: React.FC = () => {
               required
             />
             {errors.imgUrl && <p className="text-red-500">{errors.imgUrl}</p>}
+            {newProduct.imgUrl && <img src={newProduct.imgUrl} alt="Vista previa" className="mt-2 w-full h-48 object-cover" />}
           </div>
           <div className="mb-2">
             <label htmlFor="category" className="block text-left">Categoría</label>
-            <input
-              type="text"
+            <select
               id="category"
               name="category"
               value={newProduct.category}
-              onChange={handleChange}
-              placeholder="Categoría"
+              onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
               className="w-full p-2 border border-gray-300 rounded"
-              maxLength={25}
               required
-            />
+            >
+              <option value="">Seleccionar categoría</option>
+              {categories.map(cat => (
+                <option key={cat.categoryId} value={cat.categoryId}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
             {errors.category && <p className="text-red-500">{errors.category}</p>}
           </div>
           <div className="mb-2">
@@ -232,45 +254,34 @@ const AdminDashboard: React.FC = () => {
               onChange={handleChange}
               placeholder="Bodega"
               className="w-full p-2 border border-gray-300 rounded"
-              maxLength={25}
               required
             />
             {errors.store && <p className="text-red-500">{errors.store}</p>}
           </div>
-          <button type="submit" className="rounded-lg bg-red-950 hover:bg-red-900 text-white px-4 py-2 mt-8">
+          <button
+            type="submit"
+            className="rounded-lg bg-red-950 hover:bg-red-900 text-white px-4 py-2 mt-8"
+          >
             Crear Producto
           </button>
         </form>
       </section>
       <section className="my-4">
-        <h2 className="text-xl text-center">Searchbar Productos</h2>
-        {/* Placeholder for future implementation */}
-      </section>
-      <section className="my-4">
-        <h2 className="text-xl text-center">Searchbar Usuarios</h2>
-        {/* Placeholder for future implementation */}
-      </section>
-      <section className="my-4">
-        <h2 className="text-xl text-center">Productos Creados</h2>
-        <div className="max-w-md mx-auto">
-          {products.length === 0 ? (
-            <p className="text-center">No hay productos creados aún.</p>
-          ) : (
-            <ul>
-              {products.map((product) => (
-                <li key={product.id} className="border p-4 my-2 rounded-lg shadow-lg">
-                  <h3 className="text-xl font-bold text-gray-700 underline underline-offset-8 mb-4 mt-8">{product.name}</h3>
-                  <p className="text-gray-700">{product.description}</p>
-                  <p className="text-gray-700">Precio: ${product.price}</p>
-                  <p className="text-gray-700">Stock: {product.stock}</p>
-                  <img src={product.imgUrl} alt={product.name} className="w-full h-48 object-cover mt-4" />
-                  <p className="text-gray-700">Categoría: {product.category}</p>
-                  <p className="text-gray-700">Bodega: {product.store}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <h2 className="text-xl text-center">Productos</h2>
+        {products.map((product) => (
+  <div key={product.id} className="p-4 border border-gray-300 rounded-lg shadow-md">
+    <h3 className="text-lg font-bold mb-2">{product.name}</h3>
+    <p className="text-gray-700 mb-2">{product.description}</p>
+    <p className="font-bold text-champagne mb-2">
+      ${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : 'N/A'}
+    </p>
+    <p className="font-bold text-champagne mb-2">Stock: {product.stock}</p>
+    <p className="font-bold text-champagne">
+      Categoría: {categories.find(cat => cat.categoryId === product.category)?.name}
+    </p>
+  </div>
+))}
+
       </section>
     </div>
   );
