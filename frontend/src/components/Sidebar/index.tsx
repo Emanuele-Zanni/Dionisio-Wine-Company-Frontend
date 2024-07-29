@@ -23,9 +23,9 @@ const Sidebar = ({ filters, setFilters }) => {
 
     return (
         <div className="p-4 border-r border-gray-200 flex flex-col items-center">
-            <h2 className="text-xl font-bold mb-4">Filters</h2>
+            <h2 className="text-xl font-bold mb-4">Filtros</h2>
             <div className="w-full mb-4">
-                <label className="block mb-2 text-center">Type</label>
+                <label className="block mb-2 text-center">Tipo</label>
                 <input 
                     type="text" 
                     value={filters.type} 
@@ -35,7 +35,7 @@ const Sidebar = ({ filters, setFilters }) => {
                 />
             </div>
             <div className="w-full mb-4">
-                <label className="block mb-2 text-center">Store</label>
+                <label className="block mb-2 text-center">Bodega</label>
                 <input 
                     type="text" 
                     value={filters.store} 
@@ -45,7 +45,7 @@ const Sidebar = ({ filters, setFilters }) => {
                 />
             </div>
             <div className="w-full mb-4">
-                <label className="block mb-2 text-center">Name</label>
+                <label className="block mb-2 text-center">Nombre</label>
                 <input 
                     type="text" 
                     value={filters.name} 
@@ -55,7 +55,7 @@ const Sidebar = ({ filters, setFilters }) => {
                 />
             </div>
             <div className="w-full mb-4">
-                <label className="block mb-2 text-center">Price Min</label>
+                <label className="block mb-2 text-center">Precio Min</label>
                 <input 
                     type="number" 
                     value={filters.priceMin} 
@@ -65,7 +65,7 @@ const Sidebar = ({ filters, setFilters }) => {
                 />
             </div>
             <div className="w-full mb-4">
-                <label className="block mb-2 text-center">Price Max</label>
+                <label className="block mb-2 text-center">Precio Max</label>
                 <input 
                     type="number" 
                     value={filters.priceMax} 

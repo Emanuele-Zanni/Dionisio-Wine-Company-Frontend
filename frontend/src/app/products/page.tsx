@@ -5,10 +5,10 @@ import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
 
-async function getProducts(): Promise<IProduct[]> {
-    const res = await fetch('https://jsebastianvanegasl.github.io/json-api/products.json');
+async function getProducts() {
+    const res = await fetch('/api/products');
     const products = await res.json();
-    return products;
+    return products.data;
 }
 
 const Products = () => {

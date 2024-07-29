@@ -1,13 +1,16 @@
 interface IProduct {
-    id: string;
+    id?: string;
     name: string;
     description: string;
     price: number;
     stock: number;
     imgUrl: string;
-    type: string;
+    category: {
+      categoryId: string;
+      name: string;
+    };
     store: string;
-    offer?: number | null
-}
+  }
+  
 
 export type {IProduct}
