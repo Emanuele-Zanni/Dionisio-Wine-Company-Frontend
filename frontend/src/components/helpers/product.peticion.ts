@@ -33,36 +33,34 @@
         throw new Error(error.message);
     }
 }
-export async function getProductById(id: string): Promise<IProduct> {
-    try {
-        const res = await fetch(`${apiUrl}/products/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json', // Asegúrate de enviar el tipo de contenido correcto
-            },
-        });
+// export async function getProductById(id: string): Promise<IProduct> {
+//     try {
+//         const res = await fetch(`${apiUrl}/products/${id}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json', // Asegúrate de enviar el tipo de contenido correcto
+//             },
+//         });
 
-        if (!res.ok) {
-            throw new Error(`Network response was not ok: ${res.statusText}`);
-        }
+//         if (!res.ok) {
+//             throw new Error(`Network response was not ok: ${res.statusText}`);
+//         }
 
-        const product = await res.json();
-        if (!product) {
-            throw new Error('Unexpected response structure or empty response');
-        }
+//         const product = await res.json();
+//         if (!product) {
+//             throw new Error('Unexpected response structure or empty response');
+//         }
 
-        return product;
-    } catch (error: any) {
-        console.error('Error fetching product:', error.message);
-        throw new Error(error.message);
-    }
-}
+//         return product;
+//     } catch (error: any) {
+//         console.error('Error fetching product:', error.message);
+//         throw new Error(error.message);
+//     }
+// }
 
 
 // src/components/helpers/product.peticion.ts REVISAR CUANDO ANDE
 
-/*
-import { IProduct } from "@/components/helpers/interfaces";
 
 export const getProductById = async (id: string): Promise<IProduct> => {
     const response = await fetch(`/api/products/${id}`);
@@ -72,4 +70,3 @@ export const getProductById = async (id: string): Promise<IProduct> => {
     return response.json();
 };
 
-*/
