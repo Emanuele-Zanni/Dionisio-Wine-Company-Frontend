@@ -6,7 +6,7 @@ import ProductList from "@/components/ProductList";
 import { IProduct } from "@/interface";
 
 async function getProducts(): Promise<IProduct[]> {
-  const res = await fetch("/api/products");
+  const res = await fetch("/api-vinos/products");
   const data = await res.json();
   return data.data;
 }

@@ -31,7 +31,7 @@ const AdminDashboard: React.FC = () => {
     // Fetch categories
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('/api/categories');
+        const response = await axios.get('/api-vinos/categories');
         console.log('Categorías:', response.data.data); // Verifica la respuesta
         setCategories(response.data.data); // Ajusta según la respuesta real del endpoint
       } catch (error) {
@@ -45,7 +45,7 @@ const AdminDashboard: React.FC = () => {
     // Fetch user information
     const fetchUser = async () => {
       try {
-        const response = await axios.get('/api/users');
+        const response = await axios.get('/api-vinos/users');
         const fetchedUser = response.data.data[0] || null; // Obtén el primer usuario si existe
         setUser(fetchedUser);
       } catch (error) {
@@ -112,7 +112,7 @@ const AdminDashboard: React.FC = () => {
   if (Object.values(errors).some(error => error)) return;
 
   try {
-    const response = await axios.post('/api/products', {
+    const response = await axios.post('/api-vinos/products', {
       ...newProduct,
       price: newProduct.price,
       stock: newProduct.stock,
