@@ -34,7 +34,7 @@ const Home = () => {
         <Carrusel />
       </div>
       <div className="text-center pt-28">
-      <h5 className="text-xl font-semibold">Nuestros Vinos Más Vendidos</h5>
+      <h5 className="text-2xl font-bold mb-4 text-center text-red-900">Nuestros Vinos Más Vendidos</h5>
         <div className="text-center pt-7">
           <ProductList products={products} />
         </div>
