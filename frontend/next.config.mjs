@@ -20,7 +20,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+        source: '/api-vinos/:path*',
         destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
       },
     ];

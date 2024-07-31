@@ -47,6 +47,16 @@ function Navbar() {
                                 Mi perfil
                             </a>
                         </li>
+                        <li>
+                            <a href="/api/auth/login" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 ">
+                                Login
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/api/auth/logout" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 ">
+                                Logout
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

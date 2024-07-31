@@ -63,7 +63,7 @@
 
 
 export const getProductById = async (id: string): Promise<IProduct> => {
-    const response = await fetch(`/api/products/${id}`);
+    const response = await fetch(`/api-vinos/products/${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch product');
     }

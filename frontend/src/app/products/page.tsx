@@ -6,7 +6,7 @@ import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
 
 async function getProducts() {
-    const res = await fetch('/api/products');
+    const res = await fetch('/api-vinos/products');
     const products = await res.json();
     return products.data;
 }
