@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Carrusel from "@/components/Carrusel";
 import ProductList from "@/components/ProductList";
 import { IProduct } from "@/interface";
+import Map from '@/components/Map';
 
 async function getProducts(): Promise<IProduct[]> {
   const res = await fetch("/api/products");
@@ -37,6 +38,7 @@ const Home = () => {
       <h5 className="text-2xl font-bold mb-4 text-center text-red-900">Nuestros Vinos Más Vendidos</h5>
         <div className="text-center pt-7">
           <ProductList products={products} />
+          
         </div>
       </div>
     </div>
