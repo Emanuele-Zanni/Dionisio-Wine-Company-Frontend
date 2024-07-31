@@ -31,14 +31,20 @@ function Navbar() {
                                 Servicios
                             </a>
                         </li>
+                       
                         <li>
-                            <a href="#" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 ">
-                                Mi perfil
+                            <a href="/about-us" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 ">
+                                Sobre Nosotros
                             </a>
                         </li>
                         <li>
                             <a href="#" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 ">
-                                Contactanos
+                                Contacto
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 ">
+                                Mi perfil
                             </a>
                         </li>
                     </ul>
