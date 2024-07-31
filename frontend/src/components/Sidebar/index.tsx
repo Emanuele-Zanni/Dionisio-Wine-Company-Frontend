@@ -52,15 +52,15 @@ const Sidebar: React.FC<SidebarProps> = ({ filters, setFilters, sortOrder, setSo
     };
 
     return (
-        <div className="p-4 border-r border-gray-200 flex flex-col items-center">
-            <h2 className="text-xl font-bold mb-4">Filtros</h2>
+        <div className="p-4 border-r border-gray-200 flex flex-col items-center ">
+            <h2 className="text-xl font-bold mb-4 ">Filtros</h2>
 
             <div className="w-full mb-4">
-                <label className="block mb-2 text-center">Ordenar por precio</label>
+                <label className="block mb-2 text-center">Ordenar por Precio</label>
                 <select
                     value={sortOrder}
                     onChange={handleSortOrderChange}
-                    className="w-full p-2 rounded"
+                    className="w-full p-1 rounded-lg"
                     style={{ border: '1px solid #800000' }} // Vino tinto
                 >
                     <option value="asc">Menor a mayor</option>
@@ -95,9 +95,9 @@ const Sidebar: React.FC<SidebarProps> = ({ filters, setFilters, sortOrder, setSo
                             className="range-slider max-range"
                             style={{ zIndex: 2 }} 
                         />
-                        <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 rounded pointer-events-none" style={{ zIndex: 0 }}></div>
+                        <div className=" absolute top-1/2 left-0 w-full h-1 bg-gray-200 rounded pointer-events-none" style={{ zIndex: 0 }}></div>
                         <div
-                            className="absolute top-1/2 bg-red-600 rounded pointer-events-none"
+                            className="absolute top-1/2 bg-red-600 pointer-events-none rounded-lg"
                             style={{
                                 left: `${(localFilters.priceMin / 100000) * 100}%`,
                                 right: `${100 - (localFilters.priceMax / 100000) * 100}%`,
@@ -115,7 +115,7 @@ const Sidebar: React.FC<SidebarProps> = ({ filters, setFilters, sortOrder, setSo
                     type="text"
                     value={localFilters.name}
                     onChange={handleNameChange}
-                    className="w-full p-2 rounded"
+                    className="w-full p-1 rounded-lg"
                     style={{ border: '1px solid #800000' }} // Vino tinto
                 />
             </div>
@@ -125,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({ filters, setFilters, sortOrder, setSo
                     type="text"
                     value={localFilters.category.name}
                     onChange={handleTypeChange}
-                    className="w-full p-2 rounded"
+                    className="w-full p-1 rounded-lg"
                     style={{ border: '1px solid #800000' }} // Vino tinto
                 />
             </div>
@@ -135,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ filters, setFilters, sortOrder, setSo
                     type="text"
                     value={localFilters.store}
                     onChange={handleStoreChange}
-                    className="w-full p-2 rounded"
+                    className="w-full p-1 rounded-lg"
                     style={{ border: '1px solid #800000' }} // Vino tinto
                 />
             </div>
