@@ -1,33 +1,72 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-import { IProduct } from "./interfaces";
 
-export async function getProductsDB(): Promise<IProduct[]> {
+ import { IProduct } from "./interfaces"
+ 
+
+
+ const apiUrl = 'https://dionisio-wine-company-backend.onrender.com';
+
+
+ export async function getProductsDB(): Promise<IProduct[]> {
     try {
-        const res = await fetch('/api/products', {
+        const res = await fetch(`${apiUrl}/products`, {
             method: 'GET',
-            next: { revalidate: 3600 }
+            headers: {
+                'Content-Type': 'application/json', 
+            },
         });
+
         if (!res.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok: ${res.statusText}`);
         }
+
         const data = await res.json();
-        console.log('API Response:', data);
-        const products: IProduct[] = data.data || []; 
-        console.log('Products:', products);
+        if (!data || !data.results) {
+            throw new Error('Unexpected response structure or empty response');
+        }
+
+        console.log('API Response:', data); 
+        const products: IProduct[] = data.results;
+        console.log('Products:', products); 
         return products;
     } catch (error: any) {
-        console.error('Failed to fetch products:', error.message);
-        return []; 
-    }
-}
-
-export async function getProductById(id: string): Promise<IProduct | undefined> {
-    try {
-        const products = await getProductsDB();
-        const product = products.find((product) => product.id === id);
-        if (!product) throw new Error("Product not found");
-        return product;
-    } catch (error: any) {
+        console.error('Error fetching products:', error.message);
         throw new Error(error.message);
     }
 }
+// export async function getProductById(id: string): Promise<IProduct> {
+//     try {
+//         const res = await fetch(`${apiUrl}/products/${id}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json', // Asegúrate de enviar el tipo de contenido correcto
+//             },
+//         });
+
+//         if (!res.ok) {
+//             throw new Error(`Network response was not ok: ${res.statusText}`);
+//         }
+
+//         const product = await res.json();
+//         if (!product) {
+//             throw new Error('Unexpected response structure or empty response');
+//         }
+
+//         return product;
+//     } catch (error: any) {
+//         console.error('Error fetching product:', error.message);
+//         throw new Error(error.message);
+//     }
+// }
+
+
+// src/components/helpers/product.peticion.ts REVISAR CUANDO ANDE
+
+
+export const getProductById = async (id: string): Promise<IProduct> => {
+    const response = await fetch(`/api-vinos/products/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch product');
+    }
+    return response.json();
+};
+

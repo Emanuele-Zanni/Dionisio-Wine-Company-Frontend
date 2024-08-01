@@ -1,13 +1,15 @@
-/** @type {import('next').NextConfig} */
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
   images: {
-    domains: ['http://dummyimage.com', 'dummyimage.com' ],
-      remotePatterns: [
-          {
-              protocol: 'https',
-              hostname: '**',
-          },
-      ],
+    domains: ['dummyimage.com'], // Permite imágenes desde dummyimage.com
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // Permite cualquier subdominio de cualquier dominio
+      },
+    ],
   },
   env: {
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,7 +18,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+  
+
+        source: '/api-vinos/:path*',
+
         destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
       },
     ];

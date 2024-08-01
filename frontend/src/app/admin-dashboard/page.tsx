@@ -1,33 +1,20 @@
 "use client";
-import React, { useState } from 'react';
-import { Product, User } from "../interfaces/interfaces";
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Product, User, Category } from "../interfaces/interfaces"; // Asegúrate de definir y exportar Category
 
 const AdminDashboard: React.FC = () => {
-  const user: User = {
-    id: "4b4d327c-9f14-4423-9513-ec2142dc4e46",
-    name: "Brittni",
-    email: "bmcculloch0@macromedia.com",
-    password: "rL9_)Lxy`@",
-    phone: "766-355-8233",
-    country: "China",
-    address: "45 Everett Junction",
-    city: "Hebu",
-    date: "1/24/2024",
-    isAdmin: true,
-    orders: "\""
-  };
-
+  const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [newProduct, setNewProduct] = useState<Product>({
     name: '',
     description: '',
     price: 0,
     stock: 0,
     imgUrl: '',
-    type: '',
+    category: '', // ID de la categoría
     store: '',
-    offer: 0,
   });
 
   const [errors, setErrors] = useState({
@@ -36,31 +23,62 @@ const AdminDashboard: React.FC = () => {
     price: '',
     stock: '',
     imgUrl: '',
-    type: '',
+    category: '',
     store: '',
-    offer: '',
   });
+
+  useEffect(() => {
+    // Fetch categories
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/api-vinos/categories');
+        console.log('Categorías:', response.data.data); // Verifica la respuesta
+        setCategories(response.data.data); // Ajusta según la respuesta real del endpoint
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    // Fetch user information
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get('/api-vinos/users');
+        const fetchedUser = response.data.data[0] || null; // Obtén el primer usuario si existe
+        setUser(fetchedUser);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const validate = (name: string, value: string | number): string => {
     switch (name) {
       case 'description':
         return typeof value === 'string' && value.length > 250 ? 'Descripción no puede exceder 250 caracteres' : '';
-      case 'type':
+      case 'category':
+        return typeof value === 'string' && value.length > 250 ? 'Categoría no puede exceder 250 caracteres' : '';
       case 'store':
-        return typeof value === 'string' && value.length > 25 ? `${name} no puede exceder 25 caracteres` : '';
+        return typeof value === 'string' && value.length > 25 ? 'Bodega no puede exceder 25 caracteres' : '';
       case 'price':
+        return isNaN(Number(value)) || Number(value) <= 0 ? 'Precio debe ser un número positivo' : '';
       case 'stock':
-      case 'offer':
-        return typeof value === 'number' && value <= 0 ? 'Debe ser un número positivo mayor que 0' : '';
+        return isNaN(Number(value)) || Number(value) <= 0 ? 'Stock debe ser un número positivo' : '';
       default:
         return '';
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value });
-    setErrors({ ...errors, [name]: validate(name, value) });
+    setNewProduct(prevState => ({
+      ...prevState,
+      [name]: name === 'price' ? parseFloat(value) : name === 'stock' ? Number(value) : value
+    }));
+    setErrors({ ...errors, [name]: validate(name, name === 'price' ? parseFloat(value) : name === 'stock' ? Number(value) : value) });
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,37 +97,57 @@ const AdminDashboard: React.FC = () => {
         `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
         formData
       );
-      setNewProduct({ ...newProduct, imgUrl: response.data.secure_url });
+      setNewProduct(prevState => ({
+        ...prevState,
+        imgUrl: response.data.secure_url
+      }));
       setErrors({ ...errors, imgUrl: '' });
-      console.log(formData)
-      console.log(response)
     } catch (error) {
       setErrors({ ...errors, imgUrl: 'Error subiendo la imagen' });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (Object.values(errors).some(error => error)) return;
-    const id = crypto.randomUUID();
-    setProducts([...products, { ...newProduct, id }]);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  if (Object.values(errors).some(error => error)) return;
+
+  try {
+    const response = await axios.post('/api-vinos/products', {
+      ...newProduct,
+      price: newProduct.price,
+      stock: newProduct.stock,
+    });
+    console.log('Producto creado:', response.data);
+    setProducts(prevProducts => [...prevProducts, response.data]); // Agrega el nuevo producto
     setNewProduct({
       name: '',
       description: '',
       price: 0,
       stock: 0,
       imgUrl: '',
-      type: '',
+      category: '',
       store: '',
-      offer: 0,
     });
-  };
+    console.log('Productos:', products);
+    console.log('Productos:', newProduct);
+    console.log('Categorías:', categories);
+    setProducts(prevProducts => [...prevProducts, newProduct])
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Error creando el producto:', error.response?.data || error.message);
+    } else {
+      console.error('Error creando el producto:', error);
+    }
+  }
+};
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold text-center">Admin Dashboard</h1>
       <section className="text-center my-4">
-        <h2 className="text-xl">Bienvenido, {user.name}</h2>
+        <h2 className="text-xl">
+          Bienvenido, {user ? user.name : 'Nombre de Usuario Predeterminado'}
+        </h2>
       </section>
       <section className="my-4">
         <h2 className="text-xl text-center">Crear Producto</h2>
@@ -126,6 +164,7 @@ const AdminDashboard: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded"
               required
             />
+            {errors.name && <p className="text-red-500">{errors.name}</p>}
           </div>
           <div className="mb-2">
             <label htmlFor="description" className="block text-left">Descripción</label>
@@ -151,7 +190,7 @@ const AdminDashboard: React.FC = () => {
               onChange={handleChange}
               placeholder="Precio"
               className="w-full p-2 border border-gray-300 rounded"
-              min={1}
+              step="0.01"
               required
             />
             {errors.price && <p className="text-red-500">{errors.price}</p>}
@@ -172,7 +211,7 @@ const AdminDashboard: React.FC = () => {
             {errors.stock && <p className="text-red-500">{errors.stock}</p>}
           </div>
           <div className="mb-2">
-            <label htmlFor="imgUrl" className="block text-left">URL de la imagen</label>
+            <label htmlFor="imgUrl" className="block text-left">Imagen</label>
             <input
               type="file"
               id="imgUrl"
@@ -183,21 +222,26 @@ const AdminDashboard: React.FC = () => {
               required
             />
             {errors.imgUrl && <p className="text-red-500">{errors.imgUrl}</p>}
+            {newProduct.imgUrl && <img src={newProduct.imgUrl} alt="Vista previa" className="mt-2 w-full h-48 object-cover" />}
           </div>
           <div className="mb-2">
-            <label htmlFor="type" className="block text-left">Varietal</label>
-            <input
-              type="text"
-              id="type"
-              name="type"
-              value={newProduct.type}
-              onChange={handleChange}
-              placeholder="Varietal"
+            <label htmlFor="category" className="block text-left">Categoría</label>
+            <select
+              id="category"
+              name="category"
+              value={newProduct.category}
+              onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
               className="w-full p-2 border border-gray-300 rounded"
-              maxLength={25}
               required
-            />
-            {errors.type && <p className="text-red-500">{errors.type}</p>}
+            >
+              <option value="">Seleccionar categoría</option>
+              {categories.map(cat => (
+                <option key={cat.categoryId} value={cat.categoryId}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            {errors.category && <p className="text-red-500">{errors.category}</p>}
           </div>
           <div className="mb-2">
             <label htmlFor="store" className="block text-left">Bodega</label>
@@ -209,64 +253,50 @@ const AdminDashboard: React.FC = () => {
               onChange={handleChange}
               placeholder="Bodega"
               className="w-full p-2 border border-gray-300 rounded"
-              maxLength={25}
               required
             />
             {errors.store && <p className="text-red-500">{errors.store}</p>}
           </div>
-          <div className="mb-2">
-            <label htmlFor="offer" className="block text-left">Descuento/Oferta</label>
-            <input
-              type="number"
-              id="offer"
-              name="offer"
-              value={newProduct.offer}
-              onChange={handleChange}
-              placeholder="Oferta"
-              className="w-full p-2 border border-gray-300 rounded"
-              min={1}
-              required
-            />
-            {errors.offer && <p className="text-red-500">{errors.offer}</p>}
-          </div>
-          <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">
+          <button
+            type="submit"
+            className="rounded-lg bg-red-950 hover:bg-red-900 text-white px-4 py-2 mt-8"
+          >
             Crear Producto
           </button>
         </form>
       </section>
       <section className="my-4">
-        <h2 className="text-xl text-center">Searchbar Productos</h2>
-        {/* Placeholder for future implementation */}
-      </section>
-      <section className="my-4">
-        <h2 className="text-xl text-center">Searchbar Usuarios</h2>
-        {/* Placeholder for future implementation */}
-      </section>
-      <section className="my-4">
-        <h2 className="text-xl text-center">Productos Creados</h2>
-        <div className="max-w-md mx-auto">
-          {products.length === 0 ? (
-            <p className="text-center">No hay productos creados aún.</p>
-          ) : (
-            <ul>
-              {products.map(product => (
-                <li key={product.id} className="border p-2 my-2 rounded">
-                  <h3 className="font-bold">{product.name}</h3>
-                  <p>{product.description}</p>
-                  <p>Precio: ${product.price}</p>
-                  <p>Stock: {product.stock}</p>
-                  <p>Varietal: {product.type}</p>
-                  <p>Bodega: {product.store}</p>
-                  <p>Descuento/Oferta: {product.offer}%</p>
-                  <img src={product.imgUrl} alt={product.name} className="w-full"/>
-                </li>
-              ))}
-            </ul>
-          )}
+  <h2 className="text-xl text-center">Productos</h2>
+  {products.length === 0 ? (
+    <p>No hay productos disponibles.</p>
+  ) : (
+    products.map((product) => (
+      <div key={product.id} className="p-4 border border-gray-300 rounded-lg shadow-md flex flex-col lg:flex-row lg:items-center">
+        {/* Datos del producto */}
+        <div className="lg:w-1/2 lg:pr-4">
+          <h3 className="text-lg font-bold mb-2">{product.name}</h3>
+          <p className="text-gray-700 mb-2">{product.description}</p>
+          <p className="font-bold text-champagne mb-2">
+            ${product.price} {/* Mostrar precio como número */}
+          </p>
+          <p className="font-bold text-champagne mb-2">Stock: {product.stock}</p>
+          <p className="font-bold text-champagne">
+            Categoría: {categories.find(cat => cat.categoryId === product.category)?.name || 'Desconocida'}
+          </p>
         </div>
-      </section>
+        {/* Imagen del producto */}
+        {product.imgUrl && (
+          <img src={product.imgUrl} alt={product.name} className="w-full h-48 object-cover mt-2 lg:mt-0 lg:w-1/2 lg:ml-4" />
+        )}
+      </div>
+    ))
+  )}
+</section>
+
+
     </div>
   );
 };
 
 export default AdminDashboard;
+

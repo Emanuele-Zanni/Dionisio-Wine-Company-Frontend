@@ -1,31 +1,67 @@
+"use client";
 
+import { useEffect, useState } from 'react';
 import Carrusel from "@/components/Carrusel";
-import ProductsList from "@/components/ProductList";
+import ProductList from "@/components/ProductList";
 import { IProduct } from "@/interface";
 
-async function getProducts(startIndex: number, endIndex: number): Promise<IProduct[]> {
-  const res = await fetch('https://jsebastianvanegasl.github.io/json-api/products.json');
-  const products = await res.json();
-    const selectedProducts = products.slice(startIndex, endIndex);
-    return selectedProducts;
+
+async function getProducts(): Promise<IProduct[]> {
+  const res = await fetch("/api-vinos/products");
+  const data = await res.json();
+  return data.data;
 }
 
-async function Home() {
-    const products = await getProducts(2, 10);
+const Home = () => {
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <div >
-            <div>
-                <Carrusel />
-            </div>
-            <div className="text-center pt-28">
-                <h5 className="text-xl font-semibold">VINOS MAS VENDIDOS</h5>
-                <div className="text-center pt-7 ">
-                <ProductsList products={products} />
-                </div>
-            </div>
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchData() {
+      try {
+        const products = await getProducts();
+        if (isMounted) {
+          setProducts(products);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+      setProducts([]); 
+      setLoading(true); 
+    };
+  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      <div>
+        <Carrusel />
+      </div>
+      <div className="text-center pt-28">
+        <h5 className="text-2xl font-bold mb-4 text-center text-red-900">
+          Nuestros Vinos Más Vendidos
+        </h5>
+        <div className="text-center pt-7">
+          <ProductList products={products} />
         </div>
-    );
+      </div>
+      <div className="text-center pt-28">
+        
+      </div>
+    </div>
+  );
 }
 
 export default Home;
+
