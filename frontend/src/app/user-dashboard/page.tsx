@@ -1,8 +1,9 @@
-'use client';
+"use client"
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import axios from 'axios';
+
 
 interface Filters {
   category: string;
@@ -194,4 +195,4 @@ const UserDashboard: React.FC = () => {
   );
 };
 
-export default UserDashboard;
+export default withPageAuthRequired(UserDashboard);
