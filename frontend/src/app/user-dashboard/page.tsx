@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import axios from 'axios';
 
 interface Filters {
   category: string;
@@ -22,11 +23,16 @@ const UserDashboard: React.FC = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
 
+
+
+  useEffect(() => {console.log(user?.data);},[])
+
   useEffect(() => {
-    // Fetch orders
+    
     const fetchOrders = async () => {
+      // Fetch orders from API endpoint using user's ID
       try {
-        const response = await fetch('/orders/your_user_id');
+        const response = await fetch(`/api-vinos/orders/:${user?.id}`);
         const data = await response.json();
         setOrders(data.orders);
         setFilteredOrders(data.orders);
@@ -39,7 +45,27 @@ const UserDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Apply sorting
+    const postUser = async () => {
+      try {
+        const response = await axios.post('/api-vinos/auth/user', {
+          id: user?.sub,
+          name: user?.name,
+          email: user?.email,
+          //picture: user?.picture,
+        });
+        console.log(response)
+      } catch (error) {
+        console.error('Error posting user:', error);
+      }
+    };
+
+    if (user) {
+      postUser();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    
     const applySorting = () => {
       const sortedOrders = [...filteredOrders].sort((a, b) => {
         if (sortOrder === 'asc') {
@@ -48,6 +74,7 @@ const UserDashboard: React.FC = () => {
           return b.total - a.total;
         }
       });
+    
       setFilteredOrders(sortedOrders);
     };
 
