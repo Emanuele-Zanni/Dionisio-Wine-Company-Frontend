@@ -1,3 +1,11 @@
+
+
+import { handleAuth } from '@auth0/nextjs-auth0';
+
+export const GET = handleAuth();
+
+// ver cual es la que va 
+
 import { handleAuth, handleLogin } from "@auth0/nextjs-auth0";
 
 export const GET = handleAuth({
@@ -13,6 +21,7 @@ export const GET = handleAuth({
   }),
   
 });
+
 
 
 // VERSION SIN POST DE BACK
