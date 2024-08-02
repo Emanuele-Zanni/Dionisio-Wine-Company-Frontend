@@ -8,6 +8,15 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 function Navbar() {
   const router = useRouter();
   const { user, error, isLoading } = useUser();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      setIsAdmin(tokenPayload.isAdmin);
+    }
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -62,36 +71,39 @@ function Navbar() {
               </a>
             </li>
             <li>
-            {user ? (
-              <Link href="/user-dashboard" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
-                Mi perfil
-              </Link>
+              {user ? (
+                <Link href={isAdmin ? "/admin-dashboard" : "/user-dashboard"} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+                  {user.picture ? (
+                    <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
+                  ) : (
+                    "Mi perfil"
+                  )}
+                </Link>
               ) : (
                 <></>
-            )}    
-              </li>
-              <li>
-            <div className="flex items-center px-4">
-              <Link href="/cart">
-                <Image src="/carrito2.png" alt="cart" width={30} height={30} className="cursor-pointer" />
-              </Link>    
-            </div>
             </li>
-            <li>
-            {user ? (
-                
-              <button
-                onClick={handleLogout}
-                className="text-white p-2 rounded hover:bg-[#800020]"
-              >
-                Logout
-              </button>
-             
-            ) : (
-              <Link className="text-white p-2 rounded hover:bg-[#800020]" href="/api/auth/login">
-                Login
-              </Link>
+            {!isAdmin && (
+              <li>
+                <div className="flex items-center px-4">
+                  <Link href="/cart">
+                    <Image src="/carrito.png" alt="cart" width={30} height={30} className="cursor-pointer" />
+                  </Link>    
+                </div>
+              </li>
             )}
+            <li>
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="text-white p-2 rounded hover:bg-[#800020]"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link className="text-white p-2 rounded hover:bg-[#800020]" href="/api/auth/login">
+                  Login
+                </Link>
+              )}
             </li>
           </ul>
         </div>

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Carrusel from "@/components/Carrusel";
 import ProductList from "@/components/ProductList";
 import { IProduct } from "@/interface";
-
+import { useUser } from '@auth0/nextjs-auth0/client';
+import axios from 'axios';
 
 async function getProducts(): Promise<IProduct[]> {
   const res = await fetch("/api-vinos/products");
@@ -15,6 +16,34 @@ async function getProducts(): Promise<IProduct[]> {
 const Home = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user, error, isLoading } = useUser();
+
+  useEffect(() => {
+    const postUser = async () => {
+      try {
+        const response = await axios.post('/api-vinos/auth/user', {
+          id: user?.sub,
+          name: user?.name,
+          email: user?.email,
+        });
+
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        const isAdmin = tokenPayload.isAdmin;
+        
+        // Guardar isAdmin en localStorage
+        localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+      } catch (error) {
+        console.error('Error posting user:', error);
+      }
+    };
+
+    if (user) {
+      postUser();
+    }
+  }, [user]);
 
   useEffect(() => {
     let isMounted = true;
@@ -39,8 +68,9 @@ const Home = () => {
       setLoading(true); 
     };
   }, []);
+
   if (loading) {
-    return <div >Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   return (
@@ -64,4 +94,3 @@ const Home = () => {
 }
 
 export default Home;
-
