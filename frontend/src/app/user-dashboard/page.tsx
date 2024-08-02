@@ -2,11 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import {Filters, Order} from "../interfaces/interfaces"
 import axios from 'axios';
 
 
+interface Filters {
+  category: string;
+  store: string;
+  name: string;
+}
 
+interface Order {
+  id: string;
+  total: number;
+  items: Array<{ name: string; quantity: number; price: number }>;
+}
 
 const UserDashboard: React.FC = () => {
   const { user, error, isLoading } = useUser();
@@ -94,7 +103,7 @@ const UserDashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center p-4 space-y-6">
-       {user && (
+      {user && (
         <div className="flex flex-col items-center mb-6">
           <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
           <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
@@ -181,7 +190,7 @@ const UserDashboard: React.FC = () => {
             ))}
           </div>
         )}
-      </div> 
+      </div>
     </div>
   );
 };
