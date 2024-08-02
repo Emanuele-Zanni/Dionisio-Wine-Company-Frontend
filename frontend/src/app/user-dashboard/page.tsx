@@ -2,11 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import {Filters, Order} from "../interfaces/interfaces"
+import { Filters, Order } from "../interfaces/interfaces"
 import axios from 'axios';
-
-
-
 
 const UserDashboard: React.FC = () => {
   const { user, error, isLoading } = useUser();
@@ -15,26 +12,26 @@ const UserDashboard: React.FC = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
 
-
-
-  useEffect(() => {console.log(user?.data);},[])
+  useEffect(() => {
+    console.log(user?.data);
+  }, [])
 
   useEffect(() => {
-    
     const fetchOrders = async () => {
-      // Fetch orders from API endpoint using user's ID
       try {
         const response = await fetch(`/api-vinos/orders/:${user?.id}`);
         const data = await response.json();
-        setOrders(data.orders);
-        setFilteredOrders(data.orders);
+        setOrders(data.orders || []);
+        setFilteredOrders(data.orders || []);
       } catch (error) {
         console.error('Error fetching orders:', error);
       }
     };
 
-    fetchOrders();
-  }, []);
+    if (user) {
+      fetchOrders();
+    }
+  }, [user]);
 
   useEffect(() => {
     const postUser = async () => {
@@ -43,7 +40,6 @@ const UserDashboard: React.FC = () => {
           id: user?.sub,
           name: user?.name,
           email: user?.email,
-          //picture: user?.picture,
         });
         console.log(response)
       } catch (error) {
@@ -57,7 +53,6 @@ const UserDashboard: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    
     const applySorting = () => {
       const sortedOrders = [...filteredOrders].sort((a, b) => {
         if (sortOrder === 'asc') {
@@ -66,7 +61,7 @@ const UserDashboard: React.FC = () => {
           return b.total - a.total;
         }
       });
-    
+
       setFilteredOrders(sortedOrders);
     };
 
@@ -157,11 +152,11 @@ const UserDashboard: React.FC = () => {
       </div>
 
       <div className="flex-1 w-full">
-        {filteredOrders.length === 0 ? (
+        {filteredOrders && filteredOrders.length === 0 ? (
           <div className="text-center text-gray-500">Aún no hay órdenes</div>
         ) : (
           <div className="space-y-4">
-            {filteredOrders.map((order) => (
+            {filteredOrders?.map((order) => (
               <div
                 key={order.id}
                 className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition cursor-pointer"
