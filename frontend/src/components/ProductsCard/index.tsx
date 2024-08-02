@@ -10,12 +10,12 @@ function ProductsCard({ product }: IProductProps) {
   const { user } = useUser();
 
   const handleAddToCart = (e: any) => {
-    if (!user) {
-      alert("You must be logged in to buy");
-    } else {
+    if (user) {
+     
+   
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
       const productExist = cart.some((cartProduct: IProduct) => cartProduct.id === product.id);
-
+    
       if (!productExist) {
         cart.push(product);
         localStorage.setItem("cart", JSON.stringify(cart));
@@ -53,7 +53,7 @@ function ProductsCard({ product }: IProductProps) {
         </div>
 
         <div className="flex w-full justify-between mt-auto space-x-2">
-          {user ? (
+          {user ? ( 
             <button
               className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
               id={product?.id.toString()}
@@ -61,18 +61,16 @@ function ProductsCard({ product }: IProductProps) {
             >
               Comprar
             </button>
-          ) : (
-            <Link href="/api/auth/login">
-              <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">
-                Comprar
-              </button>
-            </Link>
+          ) : ( 
+          <Link className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg" href="/cart">
+            Comprar
+          </Link>
           )}
           <Link href={`/detail/${product.id}`} passHref>
             <button className="flex-1 px-2 py-2 text-white underline">
               Detalles
             </button>
-          </Link>
+          </Link> 
         </div>
       </div>
     </div>
