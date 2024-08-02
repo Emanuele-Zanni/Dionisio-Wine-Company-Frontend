@@ -2,20 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import {Filters, Order} from "../interfaces/interfaces"
 import axios from 'axios';
 
 
-interface Filters {
-  category: string;
-  store: string;
-  name: string;
-}
 
-interface Order {
-  id: string;
-  total: number;
-  items: Array<{ name: string; quantity: number; price: number }>;
-}
 
 const UserDashboard: React.FC = () => {
   const { user, error, isLoading } = useUser();
