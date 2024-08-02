@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getProductById } from "@/components/helpers/product.peticion";
 import Image from "next/image";
 import Plantilla from "@/components/Plantilla";
+import Link from "next/link";
 
 function Detail({ params }: { params: { id: string } }) {
     const [product, setProduct] = useState<IProduct | null>(null);
@@ -86,7 +87,11 @@ function Detail({ params }: { params: { id: string } }) {
                         <p className="text-gray-700 mb-4 text-left mt-8">{product?.description}</p>
                         <p className="text-gray-700 font-bold underline underline-offset-8 mb-4 mt-8">$ {product?.price}</p>
                         <p className="text-red-900 mb-4 text-center mt-4">{product?.stock} disponibles</p>
-                        <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">Agregar al carrito</button>
+                        <Link href="/cart">
+                            <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">
+                              Agregar al Carrito
+                            </button>
+                        </Link>
                     </div>
              </div>
                 <Plantilla/>
