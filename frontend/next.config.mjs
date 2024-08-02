@@ -1,5 +1,3 @@
-// next.config.mjs
-
 /**
  * @type {import('next').NextConfig}
  */
@@ -21,6 +19,7 @@ const nextConfig = {
     return [
       {
         source: '/api-vinos/:path*',
+
         destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
       },
     ];

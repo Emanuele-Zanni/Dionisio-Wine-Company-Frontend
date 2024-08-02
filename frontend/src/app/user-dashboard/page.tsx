@@ -33,25 +33,7 @@ const UserDashboard: React.FC = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const postUser = async () => {
-      try {
-        const response = await axios.post('/api-vinos/auth/user', {
-          id: user?.sub,
-          name: user?.name,
-          email: user?.email,
-        });
-        console.log(response)
-      } catch (error) {
-        console.error('Error posting user:', error);
-      }
-    };
-
-    if (user) {
-      postUser();
-    }
-  }, [user]);
-
+  
   useEffect(() => {
     const applySorting = () => {
       const sortedOrders = [...filteredOrders].sort((a, b) => {
