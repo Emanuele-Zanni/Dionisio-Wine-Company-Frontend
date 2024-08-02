@@ -2,7 +2,7 @@ export interface IProduct {
     id?: string;
     name: string;
     description: string;
-    price: number;
+    price: string; 
     stock: number;
     imgUrl: string;
     category: {
@@ -12,17 +12,11 @@ export interface IProduct {
     store: string;
   }
 
-  export interface UserSession {
-    token: string;
-    userData: {
-        address: string;
-        email: string;
-        id: number;
-        name: string;
-        phone: string;
-        role: string;
-        orders: []
-    }
+  export interface AppSession {
+    data: {
+      message: string;
+      token: string;
+    };
   }
   
   export interface IOrder {

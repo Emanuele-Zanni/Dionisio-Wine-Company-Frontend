@@ -49,3 +49,15 @@ export interface IOrder {
  date: Date,
  products: Product[]
 }
+
+export  interface Filters {
+  category: string;
+  store: string;
+  name: string;
+}
+
+export  interface Order {
+  id: string;
+  total: number;
+  items: Array<{ name: string; quantity: number; price: number }>;
+}
