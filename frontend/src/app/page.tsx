@@ -7,24 +7,17 @@ import { IProduct } from "@/interface";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import axios from 'axios';
 
-
-
 async function getProducts(): Promise<IProduct[]> {
   const res = await fetch("/api-vinos/products");
   const data = await res.json();
   return data.data;
 }
 
-
 const Home = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, error, isLoading } = useUser();
 
-  useEffect(() => {
-    console.log(user?.data);
-  }, [])
-  
   useEffect(() => {
     const postUser = async () => {
       try {
@@ -33,7 +26,15 @@ const Home = () => {
           name: user?.name,
           email: user?.email,
         });
-        console.log(response)
+
+        const { token } = response.data;
+        localStorage.setItem('token', token);
+
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        const isAdmin = tokenPayload.isAdmin;
+        
+        // Guardar isAdmin en localStorage
+        localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
       } catch (error) {
         console.error('Error posting user:', error);
       }
@@ -67,8 +68,9 @@ const Home = () => {
       setLoading(true); 
     };
   }, []);
+
   if (loading) {
-    return <div >Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   return (
@@ -92,4 +94,3 @@ const Home = () => {
 }
 
 export default Home;
-
