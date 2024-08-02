@@ -81,7 +81,6 @@ function Navbar() {
                 </Link>
               ) : (
                 <></>
-              )}
             </li>
             {!isAdmin && (
               <li>
