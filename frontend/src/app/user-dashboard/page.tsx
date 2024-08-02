@@ -94,7 +94,7 @@ const UserDashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center p-4 space-y-6">
-      {user && (
+       {user && (
         <div className="flex flex-col items-center mb-6">
           <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
           <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
@@ -181,7 +181,7 @@ const UserDashboard: React.FC = () => {
             ))}
           </div>
         )}
-      </div>
+      </div> 
     </div>
   );
 };

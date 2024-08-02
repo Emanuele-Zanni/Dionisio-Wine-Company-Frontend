@@ -1,8 +1,8 @@
 
 
-import { handleAuth } from '@auth0/nextjs-auth0';
+// import { handleAuth } from '@auth0/nextjs-auth0';
 
-export const GET = handleAuth();
+// export const GET = handleAuth();
 
 // ver cual es la que va 
 
@@ -14,6 +14,8 @@ export const GET = handleAuth({
     returnTo: "/",
     
   }),
+
+  
   signup: handleLogin({
     authorizationParams: {
       screen_hint: "signup",
@@ -23,6 +25,7 @@ export const GET = handleAuth({
   
 });
 
+// export const GET = handleAuth();
 
 
 // VERSION SIN POST DE BACK
