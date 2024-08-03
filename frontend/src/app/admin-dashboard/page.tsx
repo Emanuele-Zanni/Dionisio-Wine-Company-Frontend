@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Product, User, Category } from "../interfaces/interfaces";
 import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
+import { useRouter } from 'next/navigation';
 
 const AdminDashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -19,6 +20,7 @@ const AdminDashboard: React.FC = () => {
     store: '',
   });
   const [newCategory, setNewCategory] = useState<string>('');
+  const [categoryToDelete, setCategoryToDelete] = useState<string>('');
   const [errors, setErrors] = useState({
     name: '',
     description: '',
@@ -29,7 +31,18 @@ const AdminDashboard: React.FC = () => {
     store: '',
   });
 
+  const router = useRouter();
+
+  
   useEffect(() => {
+    // Verificar si el usuario es admin
+    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+    if (!isAdmin) {
+      router.push('/api/auth/login'); // Redirige a la página de inicio de sesión
+      return;
+    }
+
+    // Cargar datos de categorías y usuario
     const fetchCategories = async () => {
       try {
         const response = await axios.get('/api-vinos/categories');
@@ -38,10 +51,6 @@ const AdminDashboard: React.FC = () => {
         console.error('Error fetching categories:', error);
       }
     };
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get('/api-vinos/users');
@@ -51,8 +60,10 @@ const AdminDashboard: React.FC = () => {
         console.error('Error fetching user:', error);
       }
     };
+    
+    fetchCategories();
     fetchUser();
-  }, []);
+  }, [router]);
 
   const validate = (name: string, value: string | number): string => {
     switch (name) {
@@ -112,7 +123,6 @@ const AdminDashboard: React.FC = () => {
 
     try {
       const response = await axios.post('/api-vinos/products', newProduct);
-      //setProducts(prevProducts => [...prevProducts, response.data]);
       setNewProduct({
         name: '',
         description: '',
@@ -128,8 +138,7 @@ const AdminDashboard: React.FC = () => {
         showConfirmButton: false,
         timer: 1500
       });
-      setProducts(prevProducts => [...prevProducts, newProduct])
-      console.log(response.data)
+      setProducts(prevProducts => [...prevProducts, newProduct]);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Error creando el producto:', error.response?.data || error.message);
@@ -151,9 +160,25 @@ const AdminDashboard: React.FC = () => {
         showConfirmButton: false,
         timer: 1500
       });
-      console.log(response.data)
     } catch (error) {
       console.error('Error creando la categoría:', error);
+    }
+  };
+
+  const handleCategoryDelete = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.delete(`/api-vinos/categories/${categoryToDelete}`);
+      setCategories(prevCategories => prevCategories.filter(category => category.categoryId !== categoryToDelete));
+      setCategoryToDelete('');
+      Swal.fire({
+        icon: 'success',
+        title: 'Categoría eliminada correctamente',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    } catch (error) {
+      console.error('Error eliminando la categoría:', error);
     }
   };
 
@@ -222,25 +247,9 @@ const AdminDashboard: React.FC = () => {
                 onChange={handleChange}
                 placeholder="Stock"
                 className="w-full p-2 border border-gray-300 rounded"
-                min={1}
                 required
               />
               {errors.stock && <p className="text-red-500">{errors.stock}</p>}
-            </div>
-            <div className="mb-2">
-              <label htmlFor="imgUrl" className="block text-left">Imagen</label>
-              <input
-                type="file"
-                id="imgUrl"
-                accept=".jpg, .jpeg"
-                onChange={handleImageUpload}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-              {errors.imgUrl && <p className="text-red-500">{errors.imgUrl}</p>}
-              {newProduct.imgUrl && (
-                <img src={newProduct.imgUrl} alt="Preview" className="mt-2 w-full h-48 object-cover" />
-              )}
             </div>
             <div className="mb-2">
               <label htmlFor="category" className="block text-left">Categoría</label>
@@ -254,9 +263,7 @@ const AdminDashboard: React.FC = () => {
               >
                 <option value="">Seleccionar categoría</option>
                 {categories.map(category => (
-                  <option key={category.categoryId} value={category.categoryId}>
-                    {category.name}
-                  </option>
+                  <option key={category.categoryId} value={category.categoryId}>{category.name}</option>
                 ))}
               </select>
               {errors.category && <p className="text-red-500">{errors.category}</p>}
@@ -271,12 +278,33 @@ const AdminDashboard: React.FC = () => {
                 onChange={handleChange}
                 placeholder="Bodega"
                 className="w-full p-2 border border-gray-300 rounded"
-                maxLength={25}
                 required
               />
               {errors.store && <p className="text-red-500">{errors.store}</p>}
             </div>
-            <button type="submit" className="w-full py-2 px-4 bg-red-950 text-white rounded hover:bg-red-900 mt-8">
+            <div className="mb-2">
+              <label htmlFor="imgUrl" className="block text-left">Imagen</label>
+              <input
+                type="file"
+                id="imgUrl"
+                name="imgUrl"
+                accept=".jpg, .jpeg"
+                onChange={handleImageUpload}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              />
+              {errors.imgUrl && <p className="text-red-500">{errors.imgUrl}</p>}
+            </div>
+            {newProduct.imgUrl && (
+              <div className="mb-2">
+                <img src={newProduct.imgUrl} alt="Vista previa de la imagen" className="w-full h-auto" />
+              </div>
+            )}
+            <button
+              type="submit"
+              className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              disabled={Object.values(errors).some(error => error !== '')}
+            >
               Crear Producto
             </button>
           </form>
@@ -285,54 +313,60 @@ const AdminDashboard: React.FC = () => {
           <h2 className="text-xl text-center">Crear Categoría</h2>
           <form onSubmit={handleCategorySubmit} className="max-w-md mx-auto">
             <div className="mb-2">
-              <label htmlFor="category" className="block text-left">Nombre de la categoría</label>
+              <label htmlFor="newCategory" className="block text-left">Nombre de la categoría</label>
               <input
                 type="text"
-                id="category"
-                name="category"
+                id="newCategory"
+                name="newCategory"
                 value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
+                onChange={e => setNewCategory(e.target.value)}
                 placeholder="Nombre de la categoría"
                 className="w-full p-2 border border-gray-300 rounded"
                 required
               />
             </div>
-            <button type="submit" className="w-full py-2 px-4 bg-red-950 text-white rounded hover:bg-red-900 mt-8">
+            <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
               Crear Categoría
+            </button>
+          </form>
+        </section>
+        <section className="my-4 w-full lg:w-1/2">
+          <h2 className="text-xl text-center">Eliminar Categoría</h2>
+          <form onSubmit={handleCategoryDelete} className="max-w-md mx-auto">
+            <div className="mb-2">
+              <label htmlFor="categoryToDelete" className="block text-left">Categoría a eliminar</label>
+              <select
+                id="categoryToDelete"
+                name="categoryToDelete"
+                value={categoryToDelete}
+                onChange={e => setCategoryToDelete(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded"
+                required
+              >
+                <option value="">Seleccionar categoría</option>
+                {categories.map(category => (
+                  <option key={category.categoryId} value={category.categoryId}>{category.name}</option>
+                ))}
+              </select>
+            </div>
+            <button type="submit" className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600">
+              Eliminar Categoría
             </button>
           </form>
         </section>
       </div>
       <section className="my-4">
-        <h2 className="text-xl text-center">Búsqueda y Filtrado</h2>
-        <div className="max-w-md mx-auto">
-          <input
-            type="text"
-            placeholder="Buscar productos"
-            className="w-full p-2 border border-gray-300 rounded mb-2"
-          />
-          <select className="w-full p-2 border border-gray-300 rounded mb-2">
-            <option value="">Filtrar por categoría</option>
-            {categories.map(category => (
-              <option key={category.categoryId} value={category.categoryId}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </section>
-      <section className="my-4">
-        <h2 className="text-xl text-center">Productos</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map(product => (
-            <div key={product.id} className="border border-gray-300 p-4 rounded">
-              <img src={product.imgUrl} alt={product.name} className="w-full h-48 object-cover mb-4" />
-              <h3 className="text-lg font-bold">{product.name}</h3>
+        <h2 className="text-xl text-center">Productos Creados</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {products.map((product, index) => (
+            <div key={index} className="p-4 border border-gray-300 rounded">
+              <h3 className="font-bold">{product.name}</h3>
               <p>{product.description}</p>
-              <p>Precio: ${product.price}</p>
+              <p>Precio: ${product.price.toFixed(2)}</p>
               <p>Stock: {product.stock}</p>
               <p>Categoría: {categories.find(category => category.categoryId === product.category)?.name || 'N/A'}</p>
               <p>Bodega: {product.store}</p>
+              {product.imgUrl && <img src={product.imgUrl} alt={product.name} className="w-full h-auto mt-2" />}
             </div>
           ))}
         </div>
