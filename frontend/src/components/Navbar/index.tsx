@@ -83,7 +83,7 @@ function Navbar() {
                 <></>
               )}
             </li>
-            {!isAdmin && (
+            {user && !isAdmin && (
               <li>
                 <div className="flex items-center px-4">
                   <Link href="/cart">
