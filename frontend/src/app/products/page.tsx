@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
@@ -10,6 +10,14 @@ async function getProducts() {
     const products = await res.json();
     return products.data;
 }
+
+const debounce = (func: Function, delay: number) => {
+    let timer: NodeJS.Timeout;
+    return (...args: any[]) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => func(...args), delay);
+    };
+};
 
 const Products = () => {
     const [products, setProducts] = useState<IProduct[]>([]);
@@ -46,19 +54,7 @@ const Products = () => {
         fetchData();
     }, []);
 
-    useEffect(() => {
-
-        resetFilters();
-    }, []); 
-
-    const resetFilters = () => {
-        setFilters(initialFilters);
-        setSortOrder('asc'); 
-        setFilteredProducts(products);
-        setShowFilteredProducts(false); 
-    };
-
-    const applyFilters = () => {
+    const applyFilters = useCallback(() => {
         const filtered = products
             .filter(product => 
                 (filters.category.name ? product.category.name.toLowerCase().includes(filters.category.name.toLowerCase()) : true) &&
@@ -73,6 +69,19 @@ const Products = () => {
 
         setFilteredProducts(filtered);
         setShowFilteredProducts(true);
+    }, [filters, sortOrder, products]);
+
+    const debouncedApplyFilters = useCallback(debounce(applyFilters, 300), [applyFilters]);
+
+    useEffect(() => {
+        debouncedApplyFilters();
+    }, [filters, sortOrder, debouncedApplyFilters]);
+
+    const resetFilters = () => {
+        setFilters(initialFilters);
+        setSortOrder('asc');
+        setFilteredProducts(products);
+        setShowFilteredProducts(false);
     };
 
     return (
@@ -84,13 +93,12 @@ const Products = () => {
                 setSortOrder={setSortOrder}
                 applyFilters={applyFilters}
                 resetFilters={resetFilters}
-                products={products}
             />
             <div className="flex-1 p-4">
                 {showFilteredProducts && filteredProducts.length === 0 ? (
                     <p className="text-center text-red-600">Ningún producto encontrado</p>
                 ) : (
-                    <ProductsList products={filteredProducts} />
+                    <ProductsList products={showFilteredProducts ? filteredProducts : products} />
                 )}
             </div>
         </div>
