@@ -5,6 +5,7 @@ import { Product, User, Category } from "../interfaces/interfaces";
 import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const AdminDashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -297,7 +298,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             {newProduct.imgUrl && (
               <div className="mb-2">
-                <img src={newProduct.imgUrl} alt="Vista previa de la imagen" className="w-full h-auto" />
+                <Image src={newProduct.imgUrl} alt="Vista previa de la imagen" className="w-full h-auto" />
               </div>
             )}
             <button
