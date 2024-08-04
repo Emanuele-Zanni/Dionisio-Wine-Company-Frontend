@@ -56,11 +56,7 @@ function Detail({ params }: { params: { id: string } }) {
                
                 <div className="flex flex-row items-start space-x-8">
                     <div className="flex flex-col items-start w-1/2 ">
-                        {product?.offer && (
-                            <div className="mb-4">
-                                <p className="font-bold text-champagne animate-bounce">Oferta: {product?.offer}%</p>
-                            </div>
-                        )}
+                     
                         {product && (
                             <Image 
                                 src={product.imgUrl} 
