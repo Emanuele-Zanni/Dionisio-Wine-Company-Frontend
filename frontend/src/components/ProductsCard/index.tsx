@@ -3,26 +3,38 @@
 import { IProduct, IProductProps } from "@/interface";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useUser } from '@auth0/nextjs-auth0/client';
+import Swal from 'sweetalert2';
 
 function ProductsCard({ product }: IProductProps) {
   const { user } = useUser();
 
   const handleAddToCart = (e: any) => {
-    if (!user) {
-      alert("You must be logged in to buy");
-    } else {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      const productExist = cart.some((cartProduct: IProduct) => cartProduct.id === product.id);
+    e.preventDefault(); 
 
-      if (!productExist) {
-        cart.push(product);
-        localStorage.setItem("cart", JSON.stringify(cart));
-        alert("Producto añadido al carrito.");
-      } else {
-        alert("El producto ya está en el carrito.");
-      }
+    if (user) {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      
+      cart.push(product);
+      localStorage.setItem("cart", JSON.stringify(cart));
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Añadido al carrito',
+        text: 'El producto se ha añadido al carrito.',
+      });
+    } else {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Inicio de sesión requerido',
+        text: 'Necesitas iniciar sesión para añadir productos al carrito.',
+        confirmButtonText: 'Iniciar sesión',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/api/auth/login";
+        }
+      });
     }
   };
 
@@ -53,31 +65,27 @@ function ProductsCard({ product }: IProductProps) {
         </div>
 
         <div className="flex w-full justify-between mt-auto space-x-2">
-          {user ? (
+          {user ? ( 
             <button
               className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
-              id={product?.id ? product.id.toString() : ''}
               onClick={handleAddToCart}
             >
               Comprar
             </button>
-          ) : (
-            <Link href="/api/auth/login">
-              <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">
-                Comprar
-              </button>
-            </Link>
+          ) : ( 
+          <Link className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg" href="/cart">
+            Comprar
+          </Link>
           )}
           <Link href={`/detail/${product.id}`} passHref>
             <button className="flex-1 px-2 py-2 text-white underline">
               Detalles
             </button>
-          </Link>
+          </Link> 
         </div>
       </div>
     </div>
   );
 }
-
 
 export default ProductsCard;
