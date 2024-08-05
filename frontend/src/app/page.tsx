@@ -6,6 +6,7 @@ import ProductList from "@/components/ProductList";
 import { IProduct } from "@/interface";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import axios from 'axios';
+import cookie from 'js-cookie';
 
 async function getProducts(): Promise<IProduct[]> {
   const res = await fetch("/api-vinos/products");
@@ -22,7 +23,7 @@ const Home = () => {
     const postUser = async () => {
       try {
         const response = await axios.post('/api-vinos/auth/user', {
-          id: user?.sub,
+          authId: user?.sub,
           name: user?.name,
           email: user?.email,
         });
@@ -31,10 +32,13 @@ const Home = () => {
         localStorage.setItem('token', token);
 
         const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-        const isAdmin = tokenPayload.isAdmin;
-        
-        // Guardar isAdmin en localStorage
-        localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+        const role = tokenPayload.role;
+
+        console.log(response);
+        console.log(tokenPayload);
+        console.log(role);
+
+        localStorage.setItem('role', role);
       } catch (error) {
         console.error('Error posting user:', error);
       }
@@ -45,6 +49,22 @@ const Home = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    const checkSession = () => {
+      const appSession = cookie.get('appSession');
+      if (!appSession) {
+        // En lugar de limpiar todo el localStorage, puedes limpiar solo la sesión específica.
+        localStorage.removeItem('sessionData');
+      }
+    };
+  
+    window.addEventListener('focus', checkSession);
+  
+    return () => {
+      window.removeEventListener('focus', checkSession);
+    };
+  }, []);
+  
   useEffect(() => {
     let isMounted = true;
 
@@ -64,8 +84,8 @@ const Home = () => {
 
     return () => {
       isMounted = false;
-      setProducts([]); 
-      setLoading(true); 
+      setProducts([]);
+      setLoading(true);
     };
   }, []);
 

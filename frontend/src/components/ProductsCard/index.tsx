@@ -56,7 +56,7 @@ function ProductsCard({ product }: IProductProps) {
           {user ? (
             <button
               className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
-              id={product?.id.toString()}
+              id={product?.id ? product.id.toString() : ''}
               onClick={handleAddToCart}
             >
               Comprar
@@ -78,5 +78,6 @@ function ProductsCard({ product }: IProductProps) {
     </div>
   );
 }
+
 
 export default ProductsCard;

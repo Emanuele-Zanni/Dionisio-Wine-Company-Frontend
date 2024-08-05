@@ -12,8 +12,8 @@ const UserDashboard: React.FC = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
 
-  // Verificar si el token en localStorage indica que el usuario no es admin
-  const isAdmin = localStorage.getItem('isAdmin') === 'false';
+  // Obtener el rol del usuario desde localStorage
+  const role = localStorage.getItem('role');
 
   useEffect(() => {
     console.log(user?.data);
@@ -22,7 +22,7 @@ const UserDashboard: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`/api-vinos/orders/${user?.id}`);
+        const response = await fetch(`/api-vinos/orders/${user?.authId}`);
         const data = await response.json();
         setOrders(data.orders || []);
         setFilteredOrders(data.orders || []);
@@ -71,8 +71,8 @@ const UserDashboard: React.FC = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
-  // Mostrar el contenido del dashboard solo si isAdmin es false
-  if (!isAdmin) {
+  // Mostrar el contenido del dashboard solo si el rol es user o superadmin
+  if (role !== 'user' && role !== 'superadmin') {
     return (
       <div className="text-center text-gray-500">No tienes acceso a esta página</div>
     );
