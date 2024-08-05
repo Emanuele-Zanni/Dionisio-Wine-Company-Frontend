@@ -100,7 +100,7 @@ function Navbar() {
               <li>
                 <div className="flex items-center px-4">
                   <Link href="/cart">
-                    <Image src="/carrito.png" alt="cart" width={30} height={30} className="cursor-pointer" />
+                    <Image src="/carrito2.png" alt="cart" width={30} height={30} className="cursor-pointer" />
                   </Link>
                 </div>
               </li>
