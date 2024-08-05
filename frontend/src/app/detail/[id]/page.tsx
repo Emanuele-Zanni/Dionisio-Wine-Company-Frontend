@@ -96,4 +96,5 @@ function Detail({ params }: { params: { id: string } }) {
     );
 }
 
-export default Detail;
+export default Detail
+

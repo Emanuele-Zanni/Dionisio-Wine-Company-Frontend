@@ -1,5 +1,3 @@
-// src/components/ProductList.tsx
-
 import { IProduct, IProductListProps } from "@/interface";
 import ProductsCard from "../ProductsCard";
 

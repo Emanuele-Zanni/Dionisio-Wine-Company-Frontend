@@ -1,31 +1,47 @@
-"use client"
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from '@auth0/nextjs-auth0/client';
 
+enum UserRole {
+  User = 'user',
+  Admin = 'admin',
+  SuperAdmin = 'superadmin',
+  Banned = 'banned',
+}
+
 function Navbar() {
   const router = useRouter();
   const { user, error, isLoading } = useUser();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-      setIsAdmin(tokenPayload.isAdmin);
+    const storedRole = localStorage.getItem('role') as UserRole | null;
+    if (storedRole) {
+      setRole(storedRole);
     }
   }, []);
 
   const handleLogout = async () => {
     try {
-      // Redirigir al endpoint de logout de Auth0
-      window.location.href = '/api/auth/logout'; // Esto redirige al endpoint de logout de Auth0
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/api/auth/logout';
     } catch (error) {
       console.error('Error during logout:', error);
     }
   };
+
+  const profileLink = role === UserRole.Admin || role === UserRole.SuperAdmin
+    ? "/admin-dashboard"
+    : "/user-dashboard";
+
+  // No renderizar nada si el usuario está baneado
+  if (role === UserRole.Banned) {
+    return null;
+  }
 
   return (
     <nav className="bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a] border-gray-200">
@@ -70,27 +86,27 @@ function Navbar() {
                 Contacto
               </a>
             </li>
-            <li>
-              {user ? (
-                <Link href={isAdmin ? "/admin-dashboard" : "/user-dashboard"} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
-                  {user.picture ? (
-                    <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
-                  ) : (
-                    "Mi perfil"
-                  )}
-                </Link>
-              ) : (
-                <></>
-              )}
-            </li>
-            {user && !isAdmin && (
-              <li>
-                <div className="flex items-center px-4">
-                  <Link href="/cart">
-                    <Image src="/carrito2.png" alt="cart" width={30} height={30} className="cursor-pointer" />
-                  </Link>    
-                </div>
-              </li>
+            {user && role !== UserRole.Banned && (
+              <>
+                <li>
+                  <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+                    {user.picture ? (
+                      <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
+                    ) : (
+                      "Mi perfil"
+                    )}
+                  </Link>
+                </li>
+                {role === UserRole.User && (
+                  <li>
+                    <div className="flex items-center px-4">
+                      <Link href="/cart">
+                        <Image src="/carrito.png" alt="cart" width={30} height={30} className="cursor-pointer" />
+                      </Link>
+                    </div>
+                  </li>
+                )}
+              </>
             )}
             <li>
               {user ? (
@@ -113,5 +129,4 @@ function Navbar() {
   );
 }
 
-
-export default Navbar;
+export default Navbar; 
