@@ -18,17 +18,17 @@ function Navbar() {
   const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
-      setRole(tokenPayload.role as UserRole);
+    const storedRole = localStorage.getItem('role') as UserRole | null;
+    if (storedRole) {
+      setRole(storedRole);
     }
   }, []);
 
   const handleLogout = async () => {
     try {
-      // Redirigir al endpoint de logout de Auth0
-      window.location.href = '/api/auth/logout'; // Esto redirige al endpoint de logout de Auth0
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/api/auth/logout';
     } catch (error) {
       console.error('Error during logout:', error);
     }
@@ -39,7 +39,7 @@ function Navbar() {
     : "/user-dashboard";
 
   if (role === UserRole.Banned) {
-    return null; // No renderizar la navbar si el usuario está baneado
+    return null;
   }
 
   return (
@@ -101,7 +101,7 @@ function Navbar() {
                 <div className="flex items-center px-4">
                   <Link href="/cart">
                     <Image src="/carrito.png" alt="cart" width={30} height={30} className="cursor-pointer" />
-                  </Link>    
+                  </Link>
                 </div>
               </li>
             )}

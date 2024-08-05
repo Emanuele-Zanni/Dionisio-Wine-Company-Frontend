@@ -22,7 +22,7 @@ const UserDashboard: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`/api-vinos/orders/${user?.id}`);
+        const response = await fetch(`/api-vinos/orders/${user?.authId}`);
         const data = await response.json();
         setOrders(data.orders || []);
         setFilteredOrders(data.orders || []);
