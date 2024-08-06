@@ -37,6 +37,8 @@ const AdminDashboard: React.FC = () => {
 
   const router = useRouter();
 
+  const router = useRouter();
+
   useEffect(() => {
     // Obtener el rol del usuario desde localStorage
     const role = localStorage.getItem('role');
