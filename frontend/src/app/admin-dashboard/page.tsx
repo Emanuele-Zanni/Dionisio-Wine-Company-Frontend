@@ -37,8 +37,7 @@ const AdminDashboard: React.FC = () => {
 
   const router = useRouter();
 
-  const router = useRouter();
-
+  
   useEffect(() => {
     // Obtener el rol del usuario desde localStorage
     const role = localStorage.getItem('role');
@@ -76,7 +75,7 @@ const AdminDashboard: React.FC = () => {
       case 'description':
         return typeof value === 'string' && value.length > 250 ? 'Descripción no puede exceder 250 caracteres' : '';
       case 'category':
-        return typeof value === 'string' && value.length > 20 ? 'Categoría no puede exceder 20 caracteres' : '';
+        return typeof value === 'string' && value.length < 20 ? 'Categoría no puede exceder 20 caracteres' : '';
       case 'price':
       case 'stock':
         return typeof value === 'number' && value <= 0 ? 'Debe ser un número positivo' : '';
@@ -134,18 +133,19 @@ const AdminDashboard: React.FC = () => {
 
     const token = localStorage.getItem('token');
     try {
-      await axios.post('/api-vinos/products', {
+      const response = await axios.post('/api-vinos/products', {
         ...newProduct,
         imgUrl: imageUrl || newProduct.imgUrl,
       }, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Basic: ${token}`,
         },
       });
       Swal.fire('¡Producto creado!', 'El producto ha sido creado exitosamente', 'success');
       setNewProduct({ name: '', description: '', price: 0, stock: 0, imgUrl: '', category: '', store: '' });
       setImagePreview(null);
       fetchProducts(); // Recargar la lista de productos después de agregar uno nuevo
+      console.log(response)
     } catch (error) {
       console.error('Error al crear producto:', error);
       Swal.fire('Error', 'Hubo un problema al crear el producto', 'error');
@@ -160,14 +160,15 @@ const AdminDashboard: React.FC = () => {
 
     const token = localStorage.getItem('token');
     try {
-      await axios.post('/api-vinos/categories', { name: newCategory }, {
+      const response = await axios.post('/api-vinos/categories', { name: newCategory }, {
         headers: {
           Authorization: `Basic: ${token}`,
         },
       });
       Swal.fire('¡Categoría creada!', 'La categoría ha sido creada exitosamente', 'success');
       setNewCategory('');
-      fetchCategories(); // Recargar la lista de categorías después de agregar una nueva
+      fetchCategories();
+      console.log(response) // Recargar la lista de categorías después de agregar una nueva
     } catch (error) {
       console.error('Error al crear categoría:', error);
       Swal.fire('Error', 'Hubo un problema al crear la categoría', 'error');
@@ -179,14 +180,36 @@ const AdminDashboard: React.FC = () => {
       Swal.fire('Error', 'El nombre de la categoría no puede estar vacío', 'error');
       return;
     }
-
+  
     const token = localStorage.getItem('token');
+  
     try {
-      await axios.delete(`/api-vinos/categories/${categoryToDelete}`, {
+      // Obtener la lista de categorías
+      const response = await axios.get('/api-vinos/categories', {
         headers: {
           Authorization: `Basic: ${token}`,
         },
       });
+  
+      const categories = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
+      
+      // Encontrar el UUID de la categoría con el nombre proporcionado
+      const category = categories.find(cat => cat.name.toLowerCase() === categoryToDelete.toLowerCase());
+  
+      if (!category) {
+        Swal.fire('Error', 'Categoría no encontrada', 'error');
+        return;
+      }
+  
+      const categoryId = category.categoryId;
+  
+      // Realizar la solicitud de eliminación usando el UUID
+      await axios.delete(`/api-vinos/categories/${categoryId}`, {
+        headers: {
+          Authorization: `Basic: ${token}`,
+        },
+      });
+  
       Swal.fire('¡Categoría eliminada!', 'La categoría ha sido eliminada exitosamente', 'success');
       setCategoryToDelete('');
       fetchCategories(); // Recargar la lista de categorías después de eliminar una
@@ -195,6 +218,8 @@ const AdminDashboard: React.FC = () => {
       Swal.fire('Error', 'Hubo un problema al eliminar la categoría', 'error');
     }
   };
+  
+  
 
   const fetchProducts = async () => {
     try {
@@ -375,7 +400,7 @@ const AdminDashboard: React.FC = () => {
             <li key={product.id} className="border-b border-gray-200 pb-4">
               <h3 className="font-semibold">{product.name}</h3>
               <p>{product.description}</p>
-              <p>${product.price.toFixed(2)}</p>
+              <p>${typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price as string).toFixed(2)}</p>
               <p>Stock: {product.stock}</p>
               <p>Categoría: {categories.find((category) => category.categoryId === product.category)?.name}</p>
               <img src={product.imgUrl} alt={product.name} className="w-32 h-32 object-cover mt-2" />
