@@ -36,7 +36,7 @@
 
 export async function getProductById(id: string): Promise<IProduct> {
     try {
-        const res = await fetch(`${apiUrl}/products/${id}`, {
+        const res = await fetch(`/api-vinos/products/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,29 +44,21 @@ export async function getProductById(id: string): Promise<IProduct> {
         });
 
         if (!res.ok) {
+    
             throw new Error(`Network response was not ok: ${res.statusText}`);
         }
 
-        const product = await res.json();
-        if (!product) {
-            throw new Error('Unexpected response structure or empty response');
+        const product: IProduct = await res.json();
+
+       
+        if (!product || !product.productId || !product.name) {
+            throw new Error('Product data is invalid or incomplete');
         }
 
         return product;
     } catch (error: any) {
         console.error('Error fetching product:', error.message);
-        throw new Error(error.message);
+        throw new Error(error.message); 
     }
 }
-
-// src/components/helpers/product.peticion.ts REVISAR CUANDO ANDE
-
-
-// export const getProductById = async (id: string): Promise<IProduct> => {
-//     const response = await fetch(`/api-vinos/products/${id}`);
-//     if (!response.ok) {
-//         throw new Error('Failed to fetch product');
-//     }
-//     return response.json();
-// };
 
