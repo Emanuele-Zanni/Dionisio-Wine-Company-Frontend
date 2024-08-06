@@ -28,6 +28,7 @@ function Navbar() {
     try {
       localStorage.removeItem('token');
       localStorage.removeItem('role');
+      localStorage.removeItem('cart');
       window.location.href = '/api/auth/logout';
     } catch (error) {
       console.error('Error during logout:', error);
@@ -96,7 +97,7 @@ function Navbar() {
                 </Link>
               </li>
             )}
-            {user && role === UserRole.User && (
+            {(user && role === UserRole.User) || (user && role === UserRole.SuperAdmin) ? (
               <li>
                 <div className="flex items-center px-4">
                   <Link href="/cart">
@@ -104,18 +105,7 @@ function Navbar() {
                   </Link>
                 </div>
               </li>
-            )}
-                {user && role === UserRole.SuperAdmin && (
-              <li>
-                <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
-                  {user.picture ? (
-                    <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
-                  ) : (
-                    "Mi perfil"
-                  )}
-                </Link>
-              </li>
-            )}
+            ) : null}
             <li>
               {user ? (
                 <button
