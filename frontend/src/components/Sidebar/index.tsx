@@ -169,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({ filters, setFilters, sortOrder, setSo
             </div>
 
             <div className="flex space-x-2 w-full">
-                <button onClick={handleApplyFilters} className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">
+                <button onClick={handleApplyFilters} className="px-4 py-2 bg-[#800020]  text-white rounded-lg">
                     Aplicar Filtros
                 </button>
                 <button onClick={handleResetFilters} className="flex-1 px-4 py-2 text-bold text-[#800020]">

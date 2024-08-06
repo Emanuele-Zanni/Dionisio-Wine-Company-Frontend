@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -20,40 +19,34 @@ const Cart = () => {
     if (typeof window !== "undefined" && window.localStorage) {
       const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
       if (storedCart) {
-        // Recalcular el total del carrito
-        let totalCart = 0;
-        storedCart.forEach((item: IProduct) => {
-          totalCart += parseFloat(item.price) * (item.quantity || 1); // Ajustar el cálculo del total considerando la cantidad
-        });
-        setTotal(totalCart);
         setCart(storedCart);
+        
+        const totalCart = storedCart.reduce((acc: number, item: IProduct) => acc + item.price * (item.quantity || 1), 0);
+        setTotal(totalCart);
       }
     }
   }, []);
 
-  const handleRemoveFromCart = (productId: string | undefined) => {
-    if (!productId) return;
-
-    // Filtrar el carrito para eliminar solo el producto con el ID especificado
-    const updatedCart = cart.filter((product) => product.id !== productId);
-    setCart(updatedCart);
-
-    // Recalcular el total
-    const updatedTotal = updatedCart.reduce((acc, curr) => acc + parseFloat(curr.price) * (curr.quantity || 1), 0);
-    setTotal(updatedTotal);
-
-    // Actualizar el almacenamiento local
+  const updateLocalStorage = (updatedCart: IProduct[]) => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
+
+  const handleRemoveFromCart = (productId: string) => {
+    const updatedCart = cart.filter((product) => product.productId !== productId);
+    setCart(updatedCart);
+    const updatedTotal = updatedCart.reduce((acc, curr) => acc + curr.price * (curr.quantity || 1), 0);
+    setTotal(updatedTotal);
+    updateLocalStorage(updatedCart);
   };
 
   const handleClick = async () => {
     if (!user) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Inicia sesión para continuar con tu compra',
-        text: 'Serás redirigido a la página de inicio de sesión.',
-        confirmButtonText: 'Iniciar sesión',
-      });
+      // await Swal.fire({
+      //   icon: 'warning',
+      //   title: 'Inicia sesión para continuar con tu compra',
+      //   text: 'Serás redirigido a la página de inicio de sesión.',
+      //   confirmButtonText: 'Iniciar sesión',
+      // });
       router.push("/api/auth/login");
       return;
     }
@@ -71,7 +64,7 @@ const Cart = () => {
     }
 
     const orderItems = cart.map((product) => ({
-      productId: product.id,
+      productId: product.productId,
       quantity: product.quantity || 1,
     }));
 
@@ -79,7 +72,7 @@ const Cart = () => {
       await createrOrder(orderItems, userId);
       setCart([]);
       setTotal(0);
-      localStorage.setItem("cart", "[]");
+      updateLocalStorage([]);
       await Swal.fire({
         icon: 'success',
         title: 'Compra realizada con éxito',
@@ -98,25 +91,34 @@ const Cart = () => {
     }
   };
 
-  const handleQuantityChange = (id: string, delta: number) => {
+  const handleQuantityChange = async (productId: string, delta: number) => {
     setCart((prevCart) => {
       const updatedCart = prevCart.map((item) => {
-        if (item.id === id) {
+        if (item.productId === productId) {
           const newQuantity = (item.quantity || 1) + delta;
+
+          
+          if (newQuantity > item.stock) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Stock insuficiente',
+              text: 'No hay más unidades disponibles.',
+              confirmButtonText: 'Aceptar',
+            });
+            return item; 
+          }
+
           return {
             ...item,
-            quantity: Math.max(newQuantity, 1) // Asegura que la cantidad sea al menos 1
+            quantity: Math.max(newQuantity, 1) 
           };
         }
         return item;
       });
 
-      // Recalcular el total del carrito
-      const totalCart = updatedCart.reduce((acc, curr) => acc + parseFloat(curr.price) * (curr.quantity || 1), 0);
+      const totalCart = updatedCart.reduce((acc, curr) => acc + curr.price * (curr.quantity || 1), 0);
       setTotal(totalCart);
-
-      // Actualizar el almacenamiento local
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      updateLocalStorage(updatedCart);
       return updatedCart;
     });
   };
@@ -126,48 +128,52 @@ const Cart = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center py-6">
-        <p className="text-center text-gray-500">Debes iniciar sesión para realizar tu compra.</p>
-        <a href="/api/auth/login" className="text-red-950 underline">Inicia sesión aquí</a>
-      </div>
-    );
+      router.push("/api/auth/login")
+    )
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
-      <h1 className="text-2xl font-bold mb-6 text-center dark:text-white">Tu Carrito</h1>
+      <h1 className="text-2xl mt-7 font-semibold text-gray-700 ">Tu Carrito</h1>
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col gap-6">
           {cart.length > 0 ? (
             cart.map((product) => (
-              <div key={product.id} className="flex items-center bg-gray-50 p-4 rounded-lg shadow-sm space-x-4">
+              <div key={product.productId} className="flex items-center bg-gray-50 p-4 rounded-lg shadow-sm space-x-4">
                 <Image src={product.imgUrl} alt={product.name} width={150} height={150} className="rounded-lg" />
                 <div className="flex-1">
                   <p className="text-lg font-medium dark:text-white">{product.name}</p>
-                  <p className="text-sm text-gray-600">Price: ${product.price}</p>
+                  <p className="text-sm text-gray-600">Precio: ${product.price}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => handleQuantityChange(product.id, -1)}
+                    onClick={() => handleQuantityChange(product.productId, -1)}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
-                    disabled={(product.quantity || 1) <= 1} // Evitar que se reduzca a menos de 1
+                    disabled={(product.quantity || 1) <= 1} 
                   >
                     -
                   </button>
                   <span className="w-10 text-center text-sm">{product.quantity || 1}</span>
                   <button
-                    onClick={() => handleQuantityChange(product.id, 1)}
+                    onClick={() => handleQuantityChange(product.productId, 1)}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
                   >
                     +
                   </button>
                 </div>
                 <button
-                  onClick={() => handleRemoveFromCart(product.id)}
-                  className="bg-gray-500 hover:bg-gray-300 text-white p-2 rounded-md ml-4"
-                >
-                  Remove
-                </button>
+  onClick={() => handleRemoveFromCart(product.productId)}
+  className= "flex items-center"
+>
+  <Image
+    src="/eliminar.png" // Reemplaza con la ruta a tu imagen
+    alt="Eliminar"
+    width={24} // Ajusta el tamaño según tus necesidades
+    height={24} // Ajusta el tamaño según tus necesidades
+    className="mr-2" // Espacio entre la imagen y el texto, si es necesario
+  />
+
+</button>
               </div>
             ))
           ) : (
@@ -175,15 +181,15 @@ const Cart = () => {
           )}
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xl font-bold dark:text-white">Total: ${total.toFixed(2)}</p>
+          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
           <button
             onClick={handleClick}
             disabled={cart.length === 0}
-            className={`w-full md:w-auto bg-red-950 hover:bg-red-500 text-white p-3 rounded-md mt-4 md:mt-0 md:ml-12 ${
+            className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
               cart.length === 0 ? "cursor-not-allowed opacity-50" : ""
             }`}
           >
-            Checkout
+            Comprar
           </button>
         </div>
       </div>
@@ -192,4 +198,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

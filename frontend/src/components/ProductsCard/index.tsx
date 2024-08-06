@@ -10,20 +10,29 @@ function ProductsCard({ product }: IProductProps) {
   const { user } = useUser();
 
   const handleAddToCart = (e: any) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
     if (user) {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const cart: IProduct[] = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      
-      cart.push(product);
-      localStorage.setItem("cart", JSON.stringify(cart));
+      const productExists = cart.some((item: IProduct) => item.productId === product.productId);
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Añadido al carrito',
-        text: 'El producto se ha añadido al carrito.',
-      });
+      if (productExists) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Producto ya en el carrito',
+          text: 'Este producto ya está en el carrito.',
+        });
+      } else {
+        cart.push(product);
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Añadido al carrito',
+          text: 'El producto se ha añadido al carrito.',
+        });
+      }
     } else {
       Swal.fire({
         icon: 'warning',
@@ -37,6 +46,7 @@ function ProductsCard({ product }: IProductProps) {
       });
     }
   };
+
 
   return (
     <div className="border-2 border-[#800020] p-4 rounded-lg w-[250px] h-[400px] flex flex-col mx-auto bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a]">
@@ -67,17 +77,17 @@ function ProductsCard({ product }: IProductProps) {
         <div className="flex w-full justify-between mt-auto space-x-2">
           {user ? ( 
             <button
-              className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
+              className="px-4 py-2 bg-white text-[#800020] rounded-lg font-bold"
               onClick={handleAddToCart}
             >
               Comprar
             </button>
           ) : ( 
-          <Link className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg" href="/cart">
+          <Link className="px-4 py-2 bg-white text-[#800020] rounded-lg" href="/cart">
             Comprar
           </Link>
           )}
-          <Link href={`/detail/${product.id}`} passHref>
+          <Link href={`/detail/${product.productId}`} passHref>
             <button className="flex-1 px-2 py-2 text-white underline">
               Detalles
             </button>

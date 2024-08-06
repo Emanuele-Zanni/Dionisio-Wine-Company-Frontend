@@ -72,11 +72,11 @@ const UserDashboard: React.FC = () => {
   if (error) return <div>{error.message}</div>;
 
   // Mostrar el contenido del dashboard solo si el rol es user o superadmin
-  if (role !== 'user' && role !== 'superadmin') {
-    return (
-      <div className="text-center text-gray-500">No tienes acceso a esta página</div>
-    );
-  }
+  // if (role !== 'user' && role !== 'superadmin') {
+  //   return (
+  //     <div className="text-center text-gray-500">No tienes acceso a esta página</div>
+  //   );
+  // }
 
   return (
     <div className="flex flex-col items-center p-4 space-y-6">
