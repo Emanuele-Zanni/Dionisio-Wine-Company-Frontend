@@ -54,7 +54,7 @@ function Navbar() {
             height={30}
           />
           <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
-            Dionysio Wine
+            Dionisio Wine
           </span>
         </a>
 
@@ -81,7 +81,7 @@ function Navbar() {
               </Link>
             </li>
             <li>
-              <a href="#" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+              <a href="/contacto" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
                 Contacto
               </a>
             </li>
@@ -103,6 +103,17 @@ function Navbar() {
                     <Image src="/carrito2.png" alt="cart" width={30} height={30} className="cursor-pointer" />
                   </Link>
                 </div>
+              </li>
+            )}
+                {user && role === UserRole.SuperAdmin && (
+              <li>
+                <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+                  {user.picture ? (
+                    <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
+                  ) : (
+                    "Mi perfil"
+                  )}
+                </Link>
               </li>
             )}
             <li>

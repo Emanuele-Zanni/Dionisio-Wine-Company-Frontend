@@ -30,20 +30,14 @@ const Cart = () => {
     }
   }, []);
 
-  const handleRemoveFromCart = (productId: string | undefined) => {
-    if (!productId) return;
-
-    // Filtrar el carrito para eliminar solo el producto con el ID especificado
+  const handleRemoveFromCart = (productId: string) => {
     const updatedCart = cart.filter((product) => product.id !== productId);
     setCart(updatedCart);
-
-    // Recalcular el total
-    const updatedTotal = updatedCart.reduce((acc, curr) => acc + parseFloat(curr.price) * (curr.quantity || 1), 0);
+    const updatedTotal = updatedCart.reduce((acc, curr) => acc + curr.price, 0);
     setTotal(updatedTotal);
-
-    // Actualizar el almacenamiento local
     localStorage.setItem("cart", JSON.stringify(updatedCart));
-  };
+};
+
 
   const handleClick = async () => {
     if (!user) {

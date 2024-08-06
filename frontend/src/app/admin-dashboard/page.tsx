@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -5,9 +6,10 @@ import { Product, User, Category } from "../interfaces/interfaces";
 import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 import { useRouter } from 'next/navigation';
+import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
 const AdminDashboard: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const {user} = useUser();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [newProduct, setNewProduct] = useState<Product>({
@@ -30,6 +32,10 @@ const AdminDashboard: React.FC = () => {
     category: '',
     store: '',
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const router = useRouter();
 
   const router = useRouter();
 
@@ -50,19 +56,20 @@ const AdminDashboard: React.FC = () => {
         console.error('Error fetching categories:', error);
       }
     };
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get('/api-vinos/users');
-        const fetchedUser = response.data.data[0] || null;
-        setUser(fetchedUser);
-      } catch (error) {
-        console.error('Error fetching user:', error);
-      }
-    };
+    
     
     fetchCategories();
-    fetchUser();
+    
   }, [router]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('/api-vinos/categories');
+      setCategories(response.data.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const validate = (name: string, value: string | number): string => {
     switch (name) {
@@ -90,8 +97,17 @@ const AdminDashboard: React.FC = () => {
     setErrors({ ...errors, category: validate('category', e.target.value) });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const validationErrors = Object.entries(newProduct).reduce((acc, [name, value]) => {
       const error = validate(name, value);
       return error ? { ...acc, [name]: error } : acc;
@@ -100,10 +116,35 @@ const AdminDashboard: React.FC = () => {
     setErrors(validationErrors as typeof errors);
     if (Object.values(validationErrors).some((error) => error)) return;
 
+    let imageUrl = '';
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('upload_preset', process.env.CLOUDINARY_UPLOAD_PRESET!);
+
+      try {
+        const response = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`, formData);
+        imageUrl = response.data.secure_url;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        Swal.fire('Error', 'Hubo un problema al subir la imagen', 'error');
+        return;
+      }
+    }
+
+    const token = localStorage.getItem('token');
     try {
-      await axios.post('https://dionisio-wine-company-backend.onrender.com/products', newProduct);
+      await axios.post('/api-vinos/products', {
+        ...newProduct,
+        imgUrl: imageUrl || newProduct.imgUrl,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       Swal.fire('¡Producto creado!', 'El producto ha sido creado exitosamente', 'success');
       setNewProduct({ name: '', description: '', price: 0, stock: 0, imgUrl: '', category: '', store: '' });
+      setImagePreview(null);
       fetchProducts(); // Recargar la lista de productos después de agregar uno nuevo
     } catch (error) {
       console.error('Error al crear producto:', error);
@@ -117,8 +158,13 @@ const AdminDashboard: React.FC = () => {
       return;
     }
 
+    const token = localStorage.getItem('token');
     try {
-      await axios.post('https://dionisio-wine-company-backend.onrender.com/categories', { name: newCategory });
+      await axios.post('/api-vinos/categories', { name: newCategory }, {
+        headers: {
+          Authorization: `Basic: ${token}`,
+        },
+      });
       Swal.fire('¡Categoría creada!', 'La categoría ha sido creada exitosamente', 'success');
       setNewCategory('');
       fetchCategories(); // Recargar la lista de categorías después de agregar una nueva
@@ -134,8 +180,13 @@ const AdminDashboard: React.FC = () => {
       return;
     }
 
+    const token = localStorage.getItem('token');
     try {
-      await axios.delete(`https://dionisio-wine-company-backend.onrender.com/categories/${categoryToDelete}`);
+      await axios.delete(`/api-vinos/categories/${categoryToDelete}`, {
+        headers: {
+          Authorization: `Basic: ${token}`,
+        },
+      });
       Swal.fire('¡Categoría eliminada!', 'La categoría ha sido eliminada exitosamente', 'success');
       setCategoryToDelete('');
       fetchCategories(); // Recargar la lista de categorías después de eliminar una
@@ -147,7 +198,7 @@ const AdminDashboard: React.FC = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('https://dionisio-wine-company-backend.onrender.com/products');
+      const response = await axios.get('/api-vinos/products');
       setProducts(response.data.data);
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -220,18 +271,6 @@ const AdminDashboard: React.FC = () => {
             {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock}</p>}
           </div>
           <div>
-            <label htmlFor="imgUrl" className="block font-semibold">Imagen URL</label>
-            <input
-              type="text"
-              id="imgUrl"
-              name="imgUrl"
-              value={newProduct.imgUrl}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-            {errors.imgUrl && <p className="text-red-500 text-sm mt-1">{errors.imgUrl}</p>}
-          </div>
-          <div>
             <label htmlFor="category" className="block font-semibold">Categoría</label>
             <select
               id="category"
@@ -240,9 +279,11 @@ const AdminDashboard: React.FC = () => {
               onChange={handleCategoryChange}
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="">Selecciona una categoría</option>
+              <option value="">Seleccione una categoría</option>
               {categories.map((category) => (
-                <option key={category.id} value={category.id}>{category.name}</option>
+                <option key={category.categoryId} value={category.categoryId}>
+                  {category.name}
+                </option>
               ))}
             </select>
             {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
@@ -259,65 +300,88 @@ const AdminDashboard: React.FC = () => {
             />
             {errors.store && <p className="text-red-500 text-sm mt-1">{errors.store}</p>}
           </div>
-          <button type="submit" className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg mt-4">
+          <div>
+            <label htmlFor="imgUrl" className="block font-semibold">Imagen</label>
+            <input
+              type="file"
+              id="imgUrl"
+              name="imgUrl"
+              accept="image/jpeg, image/jpg"
+              onChange={handleImageChange}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            {errors.imgUrl && <p className="text-red-500 text-sm mt-1">{errors.imgUrl}</p>}
+            {imagePreview && <img src={imagePreview} alt="Vista previa de la imagen" className="mt-2 w-32 h-32 object-cover" />}
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
             Crear Producto
           </button>
         </form>
       </div>
 
-      <div className="mb-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Agregar Categoría</h2>
-          <input
-            type="text"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mb-4"
-            placeholder="Nombre de la nueva categoría"
-          />
+      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Crear Categoría</h2>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="newCategory" className="block font-semibold">Nombre de la Categoría</label>
+            <input
+              type="text"
+              id="newCategory"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
           <button
+            type="button"
             onClick={handleAddCategory}
-            className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           >
-            Agregar Categoría
+            Crear Categoría
           </button>
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Eliminar Categoría</h2>
-          <input
-            type="text"
-            value={categoryToDelete}
-            onChange={(e) => setCategoryToDelete(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded mb-4"
-            placeholder="Nombre de la categoría a eliminar"
-          />
+      <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Eliminar Categoría</h2>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="categoryToDelete" className="block font-semibold">Nombre de la Categoría</label>
+            <input
+              type="text"
+              id="categoryToDelete"
+              value={categoryToDelete}
+              onChange={(e) => setCategoryToDelete(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+          </div>
           <button
+            type="button"
             onClick={handleDeleteCategory}
-            className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
+            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
           >
             Eliminar Categoría
           </button>
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold mb-4">Lista de Productos</h2>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold">Productos</h2>
+        <ul className="space-y-4">
           {products.map((product) => (
-            <div key={product.id} className="p-4 mb-4 border border-gray-300 rounded">
-              <h3 className="text-xl font-semibold">{product.name}</h3>
+            <li key={product.id} className="border-b border-gray-200 pb-4">
+              <h3 className="font-semibold">{product.name}</h3>
               <p>{product.description}</p>
-              <p>Precio: {product.price}</p>
+              <p>${product.price.toFixed(2)}</p>
               <p>Stock: {product.stock}</p>
-              <p>Imagen URL: {product.imgUrl}</p>
-              <p>Categoría: {product.category}</p>
-              <p>Bodega: {product.store}</p>
-            </div>
+              <p>Categoría: {categories.find((category) => category.categoryId === product.category)?.name}</p>
+              <img src={product.imgUrl} alt={product.name} className="w-32 h-32 object-cover mt-2" />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );

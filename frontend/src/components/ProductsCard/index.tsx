@@ -88,25 +88,39 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Swal from 'sweetalert2';
+import {useRouter} from "next/navigation";
 
 function ProductsCard({ product }: IProductProps) {
+  const router = useRouter() 
   const { user } = useUser();
 
   const handleAddToCart = (e: any) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
     if (user) {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const cart: IProduct[] = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      
-      cart.push(product);
-      localStorage.setItem("cart", JSON.stringify(cart));
+      const productExist = cart.some((item: IProduct) => item.id === product.id);
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Añadido al carrito',
-        text: 'El producto se ha añadido al carrito.',
-      });
+      if (productExist) {
+        Swal.fire({
+          icon: 'info',
+          title: 'Producto ya en el carrito',
+          text: 'Este producto ya está en tu carrito.',
+        }).then(() => {
+          router.push("/cart");
+        });
+      } else {
+        cart.push(product);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        Swal.fire({
+          icon: 'success',
+          title: 'Producto añadido',
+          text: 'El producto se ha añadido al carrito.',
+        }).then(() => {
+          router.push("/cart");
+        });
+      }
     } else {
       Swal.fire({
         icon: 'warning',
@@ -120,7 +134,7 @@ function ProductsCard({ product }: IProductProps) {
       });
     }
   };
-
+  
   return (
     <div className="border-2 border-[#800020] p-4 rounded-lg w-[250px] h-[400px] flex flex-col mx-auto bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a]">
       <div className="p-4 flex items-center justify-center flex-grow overflow-hidden">
