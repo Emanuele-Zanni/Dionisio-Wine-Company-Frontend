@@ -93,12 +93,12 @@ function ProductsCard({ product }: IProductProps) {
   const { user } = useUser();
 
   const handleAddToCart = (e: any) => {
-    e.preventDefault(); // Previene el comportamiento por defecto del botón
+    e.preventDefault(); 
 
     if (user) {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      // Añadir el producto al carrito, permitiendo duplicados
+      
       cart.push(product);
       localStorage.setItem("cart", JSON.stringify(cart));
 

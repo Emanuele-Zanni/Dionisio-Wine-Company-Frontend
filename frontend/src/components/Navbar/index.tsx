@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -38,7 +38,6 @@ function Navbar() {
     ? "/admin-dashboard"
     : "/user-dashboard";
 
-  // No renderizar nada si el usuario está baneado
   if (role === UserRole.Banned) {
     return null;
   }
@@ -87,26 +86,24 @@ function Navbar() {
               </a>
             </li>
             {user && role !== UserRole.Banned && (
-              <>
-                <li>
-                  <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
-                    {user.picture ? (
-                      <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
-                    ) : (
-                      "Mi perfil"
-                    )}
+              <li>
+                <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+                  {user.picture ? (
+                    <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
+                  ) : (
+                    "Mi perfil"
+                  )}
+                </Link>
+              </li>
+            )}
+            {user && role === UserRole.User && (
+              <li>
+                <div className="flex items-center px-4">
+                  <Link href="/cart">
+                    <Image src="/carrito2.png" alt="cart" width={30} height={30} className="cursor-pointer" />
                   </Link>
-                </li>
-                {role === UserRole.User && (
-                  <li>
-                    <div className="flex items-center px-4">
-                      <Link href="/cart">
-                        <Image src="/carrito.png" alt="cart" width={30} height={30} className="cursor-pointer" />
-                      </Link>
-                    </div>
-                  </li>
-                )}
-              </>
+                </div>
+              </li>
             )}
             <li>
               {user ? (
@@ -129,4 +126,4 @@ function Navbar() {
   );
 }
 
-export default Navbar; 
+export default Navbar;

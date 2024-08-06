@@ -34,13 +34,12 @@
     }
 }
 
-
 export async function getProductById(id: string): Promise<IProduct> {
     try {
         const res = await fetch(`${apiUrl}/products/${id}`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json', // Asegúrate de enviar el tipo de contenido correcto
+                'Content-Type': 'application/json',
             },
         });
 
