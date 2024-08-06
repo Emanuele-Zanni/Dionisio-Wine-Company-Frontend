@@ -134,7 +134,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
-      <h1 className="text-2xl font-bold mb-6 text-center dark:text-white">Tu Carrito</h1>
+      <h1 className="text-2xl mt-7 font-semibold text-gray-700 ">Tu Carrito</h1>
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col gap-6">
           {cart.length > 0 ? (
@@ -162,11 +162,18 @@ const Cart = () => {
                   </button>
                 </div>
                 <button
-                  onClick={() => handleRemoveFromCart(product.productId)}
-                  className="bg-gray-500 hover:bg-gray-300 text-white p-2 rounded-md ml-4"
-                >
-                  Eliminar
-                </button>
+  onClick={() => handleRemoveFromCart(product.productId)}
+  className= "flex items-center"
+>
+  <Image
+    src="/eliminar.png" // Reemplaza con la ruta a tu imagen
+    alt="Eliminar"
+    width={24} // Ajusta el tamaño según tus necesidades
+    height={24} // Ajusta el tamaño según tus necesidades
+    className="mr-2" // Espacio entre la imagen y el texto, si es necesario
+  />
+
+</button>
               </div>
             ))
           ) : (
@@ -174,11 +181,11 @@ const Cart = () => {
           )}
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xl font-bold dark:text-white">Total: ${total.toFixed(2)}</p>
+          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
           <button
             onClick={handleClick}
             disabled={cart.length === 0}
-            className={`w-full md:w-auto bg-red-950 hover:bg-red-500 text-white p-3 rounded-md mt-4 md:mt-0 md:ml-12 ${
+            className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
               cart.length === 0 ? "cursor-not-allowed opacity-50" : ""
             }`}
           >

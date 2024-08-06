@@ -77,13 +77,13 @@ function ProductsCard({ product }: IProductProps) {
         <div className="flex w-full justify-between mt-auto space-x-2">
           {user ? ( 
             <button
-              className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg"
+              className="px-4 py-2 bg-white text-[#800020] rounded-lg font-bold"
               onClick={handleAddToCart}
             >
               Comprar
             </button>
           ) : ( 
-          <Link className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg" href="/cart">
+          <Link className="px-4 py-2 bg-white text-[#800020] rounded-lg" href="/cart">
             Comprar
           </Link>
           )}
