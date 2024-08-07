@@ -1,0 +1,22 @@
+.mapContainer {
+    height: 70vh; /* Ajusta según tus necesidades, 70% de la altura de la ventana del navegador */
+  width: 100%;  /* Ajusta el ancho al 100% del contenedor padre */
+  max-height: 600px; /* Altura máxima para evitar que el mapa sea demasiado grande */
+  max-width: 25%;  /* Asegura que el mapa no exceda el ancho de la ventana */
+   /* Margen superior para separar el mapa del contenido anterior */
+  position: relative; /* Asegura que el mapa esté posicionado correctamente dentro del contenedor */
+}
+  
+  .mapContainer:before {
+    content: "";
+    display: block;
+     
+  }
+  
+  .map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70%;
+  }
