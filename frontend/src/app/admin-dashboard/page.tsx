@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 import { useRouter } from 'next/navigation';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import Image from 'next/image';
 
 const AdminDashboard: React.FC = () => {
   const {user} = useUser();
@@ -235,7 +236,7 @@ const AdminDashboard: React.FC = () => {
       <div className="flex flex-col items-center mb-6">
         {user ? (
           <>
-            <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
+            <Image src={user.picture} alt={user.name} className="w-16 h-16 rounded-full"  width={30} height={30}/>
             <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
             <p className="text-lg text-gray-600">{user.email}</p>
           </>
@@ -403,7 +404,7 @@ const AdminDashboard: React.FC = () => {
               <p>${typeof product.price === 'number' ? product.price.toFixed(2) : parseFloat(product.price as string).toFixed(2)}</p>
               <p>Stock: {product.stock}</p>
               <p>Categoría: {categories.find((category) => category.categoryId === product.category)?.name}</p>
-              <img src={product.imgUrl} alt={product.name} className="w-32 h-32 object-cover mt-2" />
+              <Image src={product.imgUrl} alt={product.name} className="w-32 h-32 object-cover mt-2" width={30} height={30}/>
             </li>
           ))}
         </ul>

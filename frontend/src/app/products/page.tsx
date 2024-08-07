@@ -77,12 +77,12 @@ const Products = () => {
         debouncedApplyFilters();
     }, [filters, sortOrder, debouncedApplyFilters]);
 
-    const resetFilters = () => {
+    const resetFilters = useCallback(() => {
         setFilters(initialFilters);
         setSortOrder('asc');
         setFilteredProducts(products);
         setShowFilteredProducts(false);
-    };
+    }, [initialFilters, products]);
 
     return (
         <div className="flex">

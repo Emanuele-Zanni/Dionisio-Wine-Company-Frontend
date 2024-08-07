@@ -1,9 +1,10 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Filters, Order } from "../interfaces/interfaces"
 import axios from 'axios';
+import Image from 'next/image';
 
 const UserDashboard: React.FC = () => {
   const { user, error, isLoading } = useUser();
@@ -13,28 +14,24 @@ const UserDashboard: React.FC = () => {
   const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
 
   // Obtener el rol del usuario desde localStorage
-  const role = localStorage.getItem('role');
+  const role = typeof window !== 'undefined' ? localStorage.getItem('role') : null;
 
   useEffect(() => {
-    console.log(user?.data);
-  }, [])
+    if (user?.authId) {
+      const fetchOrders = async () => {
+        try {
+          const response = await fetch(`/api-vinos/orders/${user.authId}`);
+          const data = await response.json();
+          setOrders(data.orders || []);
+          setFilteredOrders(data.orders || []);
+        } catch (error) {
+          console.error('Error fetching orders:', error);
+        }
+      };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch(`/api-vinos/orders/${user?.authId}`);
-        const data = await response.json();
-        setOrders(data.orders || []);
-        setFilteredOrders(data.orders || []);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    };
-
-    if (user) {
       fetchOrders();
     }
-  }, [user]);
+  }, [user?.authId]);
 
   useEffect(() => {
     const applySorting = () => {
@@ -50,7 +47,7 @@ const UserDashboard: React.FC = () => {
     };
 
     applySorting();
-  }, [sortOrder]);
+  }, [sortOrder, filteredOrders]);
 
   const applyFilters = () => {
     const filtered = orders.filter((order) => {
@@ -82,7 +79,7 @@ const UserDashboard: React.FC = () => {
     <div className="flex flex-col items-center p-4 space-y-6">
       {user && (
         <div className="flex flex-col items-center mb-6">
-          <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
+          <Image src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" width={30} height={30}/>
           <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
           <p className="text-lg text-gray-600">{user.email}</p>
         </div>
