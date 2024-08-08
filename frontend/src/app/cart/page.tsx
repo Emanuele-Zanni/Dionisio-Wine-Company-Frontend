@@ -146,7 +146,7 @@ const Cart = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => handleQuantityChange(product.productId, -1)}
+                    onClick={() => handleQuantityChange(product.productId ?? '', -1)}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
                     disabled={(product.quantity || 1) <= 1} 
                   >
@@ -154,14 +154,14 @@ const Cart = () => {
                   </button>
                   <span className="w-10 text-center text-sm">{product.quantity || 1}</span>
                   <button
-                    onClick={() => handleQuantityChange(product.productId, 1)}
+                    onClick={() => handleQuantityChange(product.productId ?? '', 1)}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
                   >
                     +
                   </button>
                 </div>
                 <button
-                  onClick={() => handleRemoveFromCart(product.productId)}
+                  onClick={() => handleRemoveFromCart(product.productId ?? '')}
                   className= "flex items-center"
                 >
                   <Image
