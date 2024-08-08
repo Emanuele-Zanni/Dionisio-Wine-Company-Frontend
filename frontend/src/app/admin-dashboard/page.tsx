@@ -224,15 +224,23 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
-        {user ? (
-          <>
-            <Image src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" width={30} height={30} />
-            <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
-            <p className="text-lg text-gray-600">{user.email}</p>
-          </>
-        ) : (
-          <h1 className="text-3xl font-bold mt-2">Administrador</h1>
-        )}
+      {user && user.picture ? (
+  <>
+    <Image
+      src={user.picture}
+      alt={user.name ?? 'Usuario'}
+      className="w-16 h-16 rounded-full"
+      width={30}
+      height={30}
+    />
+    <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
+    <p className="text-lg text-gray-600">{user.email}</p>
+  </>
+) : (
+  <h1 className="text-3xl font-bold mt-2">Administrador</h1>
+)}
+        
+
       </div>
 
       <div className="mb-6">
