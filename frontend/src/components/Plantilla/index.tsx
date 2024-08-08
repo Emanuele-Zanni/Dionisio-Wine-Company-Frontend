@@ -65,11 +65,11 @@ const Plantilla = () => {
                             </div>
                             <div>
                                 <p className="font-semibold">Temp. Mín de Servicio:</p>
-                                <p>6 °C</p>
+                                <p>6 C</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Temp. Máx de Servicio:</p>
-                                <p>8 °C</p>
+                                <p>8 C</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Maridaje:</p>
