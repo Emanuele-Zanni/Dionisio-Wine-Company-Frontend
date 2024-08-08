@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useCallback } from 'react';
 import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';
@@ -56,15 +54,19 @@ const Products = () => {
 
     const applyFilters = useCallback(() => {
         const filtered = products
-            .filter(product => 
-                (filters.category.name ? product.category.name.toLowerCase().includes(filters.category.name.toLowerCase()) : true) &&
-                (filters.store ? product.store.toLowerCase().includes(filters.store.toLowerCase()) : true) &&
-                (filters.name ? product.name.toLowerCase().includes(filters.name.toLowerCase()) : true) &&
-                (product.price >= filters.priceMin) &&
-                (product.price <= filters.priceMax)
-            )
-            .sort((a, b) => 
-                sortOrder === 'asc' ? a.price - b.price : b.price - a.price
+            .filter(product => {
+                // Convert product.price to a number for comparison
+                const price = parseFloat(product.price);
+                return (
+                    (filters.category.name ? product.category.name.toLowerCase().includes(filters.category.name.toLowerCase()) : true) &&
+                    (filters.store ? product.store.toLowerCase().includes(filters.store.toLowerCase()) : true) &&
+                    (filters.name ? product.name.toLowerCase().includes(filters.name.toLowerCase()) : true) &&
+                    (price >= filters.priceMin) &&
+                    (price <= filters.priceMax)
+                );
+            })
+            .sort((a, b) =>
+                sortOrder === 'asc' ? parseFloat(a.price) - parseFloat(b.price) : parseFloat(b.price) - parseFloat(a.price)
             );
 
         setFilteredProducts(filtered);
