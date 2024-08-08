@@ -88,7 +88,7 @@ function Navbar() {
                 Contacto
               </a>
             </li>
-            {user && role && role !== UserRole.Banned && (
+            {user &&  (
               <li>
                 <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
                   {user.picture ? (
@@ -99,7 +99,7 @@ function Navbar() {
                 </Link>
               </li>
             )}
-            {(user && role === UserRole.User) || (user && role === UserRole.SuperAdmin) ? (
+            {(user && (role === UserRole.User || role === UserRole.SuperAdmin)) ? (
               <li>
                 <div className="flex items-center px-4">
                   <Link href="/cart">
