@@ -1,3 +1,4 @@
+"use client"
 import { IProduct, IProductListProps } from "@/interface";
 import ProductsCard from "../ProductsCard";
 

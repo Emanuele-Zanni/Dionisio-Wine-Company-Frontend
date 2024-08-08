@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect, useCallback } from 'react';
 import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';

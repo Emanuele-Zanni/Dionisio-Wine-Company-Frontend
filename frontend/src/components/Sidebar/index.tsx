@@ -1,3 +1,4 @@
+"use client"
 import './Sidebar.css';
 import { useState, useEffect } from 'react';
 
