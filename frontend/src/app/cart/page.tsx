@@ -134,25 +134,47 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     try {
+      // Obtener el carrito desde localStorage
+      const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+      if (!cartItems || cartItems.length === 0) {
+        console.error("El carrito está vacío.");
+        return;
+      }
+  
+      // Enviar datos al backend de Stripe para iniciar el checkout
       const response = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cartItems: [{ name: 'Product 1', imgUrl: 'http://example.com/image.jpg', price: 25.00, quantity: 2 }] }),
+        body: JSON.stringify({
+          cartItems: cartItems.map((item: IProduct) => ({
+            productId: item.productId,  // Asegúrate de que el campo productId esté presente
+            name: item.name,
+            imgUrl: item.imgUrl,
+            price: item.price,
+            quantity: item.quantity || 1,
+          })),
+        }),
       });
   
       const data = await response.json();
+  
       if (response.ok) {
-        localStorage.removeItem('cart'); // Limpiar el carrito
+        // Guardar cartItems en localStorage para su uso posterior (ej. en la página de éxito)
+        localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
+        
+        // Redirigir a la URL de éxito de Stripe
         window.location.href = data.url;
       } else {
-        console.error('Error creating checkout session:', data.error);
+        console.error('Error creando la sesión de checkout:', data.error);
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
+  
   
   
   return (
