@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -39,6 +40,7 @@ function Navbar() {
     ? "/admin-dashboard"
     : "/user-dashboard";
 
+  // Asegurarse de que `role` no sea null antes de hacer comparaciones
   if (role === UserRole.Banned) {
     return null;
   }
@@ -86,7 +88,7 @@ function Navbar() {
                 Contacto
               </a>
             </li>
-            {user && role !== UserRole.Banned && (
+            {user && role && role !== UserRole.Banned && (
               <li>
                 <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
                   {user.picture ? (
