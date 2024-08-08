@@ -68,18 +68,20 @@ const UserDashboard: React.FC = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
 
-  // Mostrar el contenido del dashboard solo si el rol es user o superadmin
-  // if (role !== 'user' && role !== 'superadmin') {
-  //   return (
-  //     <div className="text-center text-gray-500">No tienes acceso a esta página</div>
-  //   );
-  // }
-
   return (
     <div className="flex flex-col items-center p-4 space-y-6">
       {user && (
         <div className="flex flex-col items-center mb-6">
-          <Image src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" width={30} height={30}/>
+          {/* Asegurarse de que user.picture es una string válida antes de usarla en el componente Image */}
+          {user.picture && (
+            <Image 
+              src={user.picture} 
+              alt={user.name || "User avatar"} 
+              className="w-16 h-16 rounded-full" 
+              width={30} 
+              height={30}
+            />
+          )}
           <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
           <p className="text-lg text-gray-600">{user.email}</p>
         </div>
