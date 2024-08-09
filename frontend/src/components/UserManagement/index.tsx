@@ -1,6 +1,5 @@
-// app/admin-dashboard/UserManagement.tsx
-
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 const roles = ['user', 'admin', 'superadmin', 'banned'];
 
@@ -15,6 +14,7 @@ const UserManagement = () => {
   });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
+  const [roleToUpdate, setRoleToUpdate] = useState<{ id: string, newRole: string } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -50,28 +50,30 @@ const UserManagement = () => {
     setFilteredUsers(filtered);
   };
 
-  const handleRoleChange = (id: string, newRole: string) => {
+  const handleRoleChange = () => {
+    if (!roleToUpdate) return;
+
+    const { id, newRole } = roleToUpdate;
     const token = localStorage.getItem('token');
-    if (!token) return;
+    const userRole = localStorage.getItem('role'); // Obtiene el rol del usuario actual desde localStorage
   
-    // Encontrar el usuario actual basado en el id
-    const user = users.find(user => user.id === id);
-  
-    if (!user) return;
-  
-    // Crear el payload para el PATCH con todos los datos del usuario + el nuevo rol
-    const updatedUser = {
-      ...user,
-      role: newRole,
-    };
-  
-    fetch(`/api-vinos/users/${id}`, {
+    // Verificar si el usuario actual es un superadmin
+    if (userRole !== 'superadmin') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Solo un superadmin puede modificar los roles'
+      });
+      return;
+    }
+
+    fetch(`/api-vinos/users/${id}/role`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${token}`,
+        'Authorization': `Basic: ${token}`,
       },
-      body: JSON.stringify(updatedUser), // Enviar el usuario completo con el nuevo rol
+      body: JSON.stringify({ role: newRole }), // Solo enviamos el nuevo rol
     })
       .then(res => {
         if (!res.ok) {
@@ -80,14 +82,28 @@ const UserManagement = () => {
         return res.json();
       })
       .then(data => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Rol modificado correctamente'
+        });
+
         // Actualizar la lista de usuarios en el estado
         const updatedUsers = users.map(user =>
           user.id === id ? { ...user, role: newRole } : user
         );
         setUsers(updatedUsers);
         setFilteredUsers(updatedUsers);
+        setRoleToUpdate(null); // Limpiar el estado de rol para actualizar
       })
-      .catch(error => console.error('Error updating role:', error));
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al modificar el rol'
+        });
+        console.error('Error updating role:', error);
+      });
   };
 
   const fetchOrders = (userId: string) => {
@@ -175,7 +191,7 @@ const UserManagement = () => {
               <select
                 value={user.role}
                 className="p-2 border rounded w-full"
-                onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                onChange={(e) => setRoleToUpdate({ id: user.id, newRole: e.target.value })}
               >
                 {roles.map(role => (
                   <option key={role} value={role}>{role}</option>
@@ -183,7 +199,7 @@ const UserManagement = () => {
               </select>
               <button
                 className="bg-blue-500 text-white p-2 rounded w-full"
-                onClick={() => handleRoleChange(user.id, user.role)}
+                onClick={handleRoleChange}
               >
                 SAVE
               </button>
