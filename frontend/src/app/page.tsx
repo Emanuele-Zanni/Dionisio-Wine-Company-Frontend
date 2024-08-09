@@ -10,6 +10,7 @@ import cookie from 'js-cookie';
 
 async function getProducts(): Promise<IProduct[]> {
   const res = await fetch("/api-vinos/products");
+  console.log(res)
   const data = await res.json();
   return data.data;
 }
