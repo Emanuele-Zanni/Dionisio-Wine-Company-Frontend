@@ -21,7 +21,9 @@ const Cart = () => {
       if (storedCart) {
         setCart(storedCart);
         
-        const totalCart = storedCart.reduce((acc: number, item: IProduct) => acc + item.price * (item.quantity || 1), 0);
+        const totalCart = storedCart.reduce((acc: number, item: IProduct) => 
+          acc + (typeof item.price === 'number' ? item.price : 0) * (item.quantity || 1)
+        , 0);
         setTotal(totalCart);
       }
     }
@@ -34,19 +36,15 @@ const Cart = () => {
   const handleRemoveFromCart = (productId: string) => {
     const updatedCart = cart.filter((product) => product.productId !== productId);
     setCart(updatedCart);
-    const updatedTotal = updatedCart.reduce((acc, curr) => acc + curr.price * (curr.quantity || 1), 0);
+    const updatedTotal = updatedCart.reduce((acc, curr) => 
+      acc + (typeof curr.price === 'number' ? curr.price : 0) * (curr.quantity || 1)
+    , 0);
     setTotal(updatedTotal);
     updateLocalStorage(updatedCart);
   };
 
   const handleClick = async () => {
     if (!user) {
-      // await Swal.fire({
-      //   icon: 'warning',
-      //   title: 'Inicia sesión para continuar con tu compra',
-      //   text: 'Serás redirigido a la página de inicio de sesión.',
-      //   confirmButtonText: 'Iniciar sesión',
-      // });
       router.push("/api/auth/login");
       return;
     }
@@ -97,7 +95,6 @@ const Cart = () => {
         if (item.productId === productId) {
           const newQuantity = (item.quantity || 1) + delta;
 
-          
           if (newQuantity > item.stock) {
             Swal.fire({
               icon: 'warning',
@@ -116,7 +113,9 @@ const Cart = () => {
         return item;
       });
 
-      const totalCart = updatedCart.reduce((acc, curr) => acc + curr.price * (curr.quantity || 1), 0);
+      const totalCart = updatedCart.reduce((acc, curr) => 
+        acc + (typeof curr.price === 'number' ? curr.price : 0) * (curr.quantity || 1)
+      , 0);
       setTotal(totalCart);
       updateLocalStorage(updatedCart);
       return updatedCart;
@@ -207,18 +206,17 @@ const Cart = () => {
                   </button>
                 </div>
                 <button
-  onClick={() => handleRemoveFromCart(product.productId)}
-  className= "flex items-center"
->
-  <Image
-    src="/eliminar.png" // Reemplaza con la ruta a tu imagen
-    alt="Eliminar"
-    width={24} // Ajusta el tamaño según tus necesidades
-    height={24} // Ajusta el tamaño según tus necesidades
-    className="mr-2" // Espacio entre la imagen y el texto, si es necesario
-  />
-
-</button>
+                  onClick={() => handleRemoveFromCart(product.productId)}
+                  className= "flex items-center"
+                >
+                  <Image
+                    src="/eliminar.png"
+                    alt="Eliminar"
+                    width={24}
+                    height={24}
+                    className="mr-2"
+                  />
+                </button>
               </div>
             ))
           ) : (
