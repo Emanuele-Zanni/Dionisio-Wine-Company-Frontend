@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 import { useRouter } from 'next/navigation';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import UserManagement from '@/components/UserManagement';
 
 const AdminDashboard: React.FC = () => {
   const {user} = useUser();
@@ -407,6 +408,9 @@ const AdminDashboard: React.FC = () => {
             </li>
           ))}
         </ul>
+      </div>
+      <div>
+        <UserManagement/>
       </div>
     </div>
   );
