@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { Filters, Order } from "../interfaces/interfaces"
+import jwtDecode from 'jwt-decode';
+import { Filters, Order, OrderItem } from "../interfaces/interfaces";
 import axios from 'axios';
 
 const UserDashboard: React.FC = () => {
@@ -12,17 +13,26 @@ const UserDashboard: React.FC = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
 
-  // Obtener el rol del usuario desde localStorage
-  const role = localStorage.getItem('role');
+  // Obtener userId desde el JWT en localStorage
+  const getUserIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decodedToken: any = token(token);
+        return decodedToken.id; // Suponiendo que el id del usuario está en el campo 'id'
+      } catch (e) {
+        console.error('Error decoding token:', e);
+      }
+    }
+    return null;
+  };
 
-  useEffect(() => {
-    console.log(user?.data);
-  }, [])
+  const userId = getUserIdFromToken();
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`/api-vinos/orders/${user?.authId}`);
+        const response = await fetch(`/api-vinos/orders/${userId}`);
         const data = await response.json();
         setOrders(data.orders || []);
         setFilteredOrders(data.orders || []);
@@ -31,10 +41,10 @@ const UserDashboard: React.FC = () => {
       }
     };
 
-    if (user) {
+    if (userId) {
       fetchOrders();
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     const applySorting = () => {
@@ -55,8 +65,8 @@ const UserDashboard: React.FC = () => {
   const applyFilters = () => {
     const filtered = orders.filter((order) => {
       return (
-        (filters.category ? order.items.some(item => item.name.includes(filters.category)) : true) &&
-        (filters.store ? order.items.some(item => item.name.includes(filters.store)) : true) &&
+        (filters.category ? order.items.some(item => item.category.includes(filters.category)) : true) &&
+        (filters.store ? order.items.some(item => item.store.includes(filters.store)) : true) &&
         (filters.name ? order.items.some(item => item.name.includes(filters.name)) : true)
       );
     });
@@ -70,13 +80,6 @@ const UserDashboard: React.FC = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
-
-  // Mostrar el contenido del dashboard solo si el rol es user o superadmin
-  // if (role !== 'user' && role !== 'superadmin') {
-  //   return (
-  //     <div className="text-center text-gray-500">No tienes acceso a esta página</div>
-  //   );
-  // }
 
   return (
     <div className="flex flex-col items-center p-4 space-y-6">
@@ -143,25 +146,31 @@ const UserDashboard: React.FC = () => {
       </div>
 
       <div className="flex-1 w-full">
-        {filteredOrders && filteredOrders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <div className="text-center text-gray-500">Aún no hay órdenes</div>
         ) : (
           <div className="space-y-4">
-            {filteredOrders?.map((order) => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.id}
-                className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition cursor-pointer"
+                className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">Orden: {order.id}</span>
-                  <span className="font-semibold">Total: ${order.total.toFixed(2)}</span>
-                </div>
-                <div className="mt-4 hidden">
-                  {order.items.map((item, index) => (
-                    <div key={index} className="text-gray-700">
-                      {item.name} - {item.quantity} x ${item.price.toFixed(2)}
+                <div className="flex flex-col space-y-4">
+                  {order.items.map((item: OrderItem, index: number) => (
+                    <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
+                      <img src={item.imageUrl} alt={item.name} className="w-24 h-24 object-cover mr-4" />
+                      <div className="flex-1">
+                        <div className="font-semibold text-lg">{item.name}</div>
+                        <div>Cantidad: {item.quantity}</div>
+                      </div>
+                      <div className="font-semibold text-lg">${item.price.toFixed(2)}</div>
                     </div>
                   ))}
+                </div>
+                <div className="flex justify-between mt-4">
+                  <span className="font-semibold">Orden: {order.id}</span>
+                  <span className="font-semibold">Fecha: {new Date(order.date).toLocaleDateString()}</span>
+                  <span className="font-semibold">Total: ${order.total.toFixed(2)}</span>
                 </div>
               </div>
             ))}
