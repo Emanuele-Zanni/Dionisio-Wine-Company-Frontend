@@ -7,10 +7,13 @@ import Image from "next/image";
 import Plantilla from "@/components/Plantilla";
 import Link from "next/link";
 
+
+
 function Detail({ params }: { params: { productId: string } }) {
     const [product, setProduct] = useState<IProduct | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
 
     useEffect(() => {
         let isMounted = true; 
@@ -45,6 +48,7 @@ function Detail({ params }: { params: { productId: string } }) {
 
     if (loading) return <p>La página se está cargando...</p>;
     if (error) return <p>{error}</p>;
+        
 
     return (
         <div className="w-full h-auto flex flex-col items-center justify-center p-4 bg-white">
