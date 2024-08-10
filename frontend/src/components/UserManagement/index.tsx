@@ -125,6 +125,11 @@ const UserManagement = () => {
       .catch(error => console.error('Error fetching orders:', error));
   };
 
+  const formatPrice = (price: any) => {
+    const numericPrice = parseFloat(price);
+    return isNaN(numericPrice) ? '00.00' : numericPrice.toFixed(2);
+  };
+
   return (
     <div className="p-4">
       {/* Título centrado */}
@@ -216,24 +221,31 @@ const UserManagement = () => {
 
       {/* Pop-up de Órdenes */}
       {selectedUserId && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full max-w-lg relative p-4">
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-start justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-3xl relative overflow-auto" style={{ maxHeight: 'calc(100vh - 100px)' }}>
             <button
               className="absolute top-2 right-2 text-gray-500"
               onClick={() => setSelectedUserId(null)}
             >
               &times;
             </button>
-            <h2 className="text-xl font-semibold mb-4">Órdenes del Usuario {selectedUserId}</h2>
+            <h2 className="text-xl font-semibold mb-4 place-self-center">Órdenes del Usuario</h2>
             <div className="space-y-4">
               {orders.map(order => (
                 <div key={order.id} className="p-4 border rounded shadow-sm">
-                  <p className="font-semibold">Nombre: {order.productName}</p>
-                  <p>Cantidad: {order.quantity}</p>
-                  <p>Precio: {order.price}</p>
-                  <p>ID de la Orden: {order.id}</p>
-                  <p>Fecha: {new Date(order.date).toLocaleDateString()}</p>
-                  <p>Total: {order.total}</p>
+                  <div className="mb-4">
+                    <h3 className="font-semibold text-lg">Orden ID: {order.id}</h3>
+                    {order.details.map((product: any, index: number) => (
+                      <div key={index} className="p-2 border rounded mb-2">
+                        <p className="font-bold">Nombre del Vino</p>
+                        <p>Cantidad: {product.quantity}</p>
+                        <p>Precio por Unidad: ${formatPrice(product.price)}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-right font-bold">
+                    Total: ${formatPrice(order.details.reduce((total: number, product: any) => total + (product.price ? parseFloat(product.price) : 0) * product.quantity, 0))}
+                  </div>
                 </div>
               ))}
             </div>
