@@ -88,15 +88,16 @@ const Home = () => {
     let isMounted = true;
 
     async function fetchData() {
-      try {
-        const products = await getProducts();
-        if (isMounted) {
-          setProducts(products);
-          setLoading(false);
+        try {
+            const products = await getProductsDB();
+            console.log('Fetched Products:', products);
+            if (isMounted) {
+                setProducts(products);
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
         }
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
     }
 
     fetchData();

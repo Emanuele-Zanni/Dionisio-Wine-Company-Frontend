@@ -5,7 +5,6 @@
 
  const apiUrl = 'https://dionisio-wine-company-backend.onrender.com';
 
-
  export async function getProductsDB(): Promise<IProduct[]> {
     try {
         const res = await fetch(`${apiUrl}/products`, {
@@ -20,19 +19,26 @@
             throw new Error(`Network response was not ok: ${res.statusText}`);
         }
 
-        const data = await res.json();
+        // Lee el cuerpo de la respuesta como texto primero
+        const text = await res.text();
+        console.log('Response Text:', text);
 
-        // Asumiendo que `data` es un array de objetos
-        if (!Array.isArray(data)) {
-            throw new Error('Unexpected response structure or empty response');
+        // Intenta analizar el texto como JSON
+        try {
+            const data = JSON.parse(text);
+            console.log('Parsed API Response Data:', data);
+
+            // Verifica si `data` es un array
+            if (!Array.isArray(data)) {
+                throw new Error('Unexpected response structure or empty response');
+            }
+
+            return data;
+        } catch (jsonError) {
+            console.error('Error parsing JSON:', jsonError.message);
+            console.error('Response Text:', text);
+            throw new Error('Failed to parse JSON from response');
         }
-
-        console.log('API Response Data:', data); 
-
-        // Asumimos que `data` es el array de productos
-        const products: IProduct[] = data;
-        console.log('Products:', products); 
-        return products;
     } catch (error: any) {
         console.error('Error fetching products:', error.message);
         throw new Error(error.message);
