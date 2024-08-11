@@ -11,9 +11,8 @@
         const res = await fetch(`${apiUrl}/products`, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json', 
-                'Cache-Control': 'no-cache'
-
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
             },
         });
 
@@ -22,13 +21,17 @@
         }
 
         const data = await res.json();
-        if (!data || !data.results) {
+
+        // Verifica la estructura de la respuesta
+        console.log('API Response Data:', data);
+
+        // Asegúrate de que data tenga la estructura correcta
+        if (!data || !Array.isArray(data.products)) {
             throw new Error('Unexpected response structure or empty response');
         }
 
-        console.log('API Response:', data); 
-        const products: IProduct[] = data.results;
-        console.log('Products:', products); 
+        const products: IProduct[] = data.products; // Cambia 'results' por la clave correcta
+        console.log('Products:', products);
         return products;
     } catch (error: any) {
         console.error('Error fetching products:', error.message);
