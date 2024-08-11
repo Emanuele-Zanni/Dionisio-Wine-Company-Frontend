@@ -35,13 +35,24 @@
 
             return data;
         } catch (jsonError) {
-            console.error('Error parsing JSON:', jsonError.message);
+            // Verifica si el error tiene una propiedad `message`
+            if (jsonError instanceof Error) {
+                console.error('Error parsing JSON:', jsonError.message);
+            } else {
+                console.error('Error parsing JSON:', jsonError);
+            }
             console.error('Response Text:', text);
             throw new Error('Failed to parse JSON from response');
         }
     } catch (error: any) {
-        console.error('Error fetching products:', error.message);
-        throw new Error(error.message);
+        // Manejamos el tipo unknown adecuadamente
+        if (error instanceof Error) {
+            console.error('Error fetching products:', error.message);
+            throw new Error(error.message);
+        } else {
+            console.error('Unknown error fetching products:', error);
+            throw new Error('Unknown error occurred');
+        }
     }
 }
 
