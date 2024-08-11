@@ -11,7 +11,8 @@ import cookie from 'js-cookie';
 async function getProducts(): Promise<IProduct[]> {
   const res = await fetch("/api-vinos/products", {
     headers: {
-      'Accept': 'application/json'
+      'Accept': 'application/json',
+      'Cache-Control': 'no-cache'
     }
   });
   
