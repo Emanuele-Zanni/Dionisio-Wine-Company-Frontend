@@ -20,7 +20,6 @@ function Detail({ params }: { params: { productId: string } }) {
             setLoading(true);
             setError(null);
             try {
-                // Obtener el producto por ID usando getProductById
                 const fetchedProduct = await getProductById(params.productId);
                 if (isMounted) {
                     setProduct(fetchedProduct);
@@ -47,14 +46,14 @@ function Detail({ params }: { params: { productId: string } }) {
     if (loading) return <p>La página se está cargando...</p>;
     if (error) return <p>{error}</p>;
 
-    if (!product) return <p>No se encontró el producto.</p>; // Manejo adicional si el producto es null
+    if (!product) return <p>No se encontró el producto.</p>;
 
     return (
         <div className="w-full h-auto flex flex-col items-center justify-center p-4 bg-white">
             <div className="w-full max-w-5xl p-8 rounded-lg shadow-lg">
                 <div className="flex flex-row items-start space-x-8">
                     <div className="flex flex-col items-start w-1/2">
-                        {product && (
+                        {product.imgUrl && (
                             <Image 
                                 src={product.imgUrl} 
                                 alt={product.name} 

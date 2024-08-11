@@ -57,7 +57,7 @@
 }
 export async function getProductById(id: string): Promise<IProduct> {
     try {
-        const res = await fetch(`/api-vinos/products/${id}`, {
+        const res = await fetch(`https://dionisio-wine-company-backend.onrender.com/products/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -65,13 +65,11 @@ export async function getProductById(id: string): Promise<IProduct> {
         });
 
         if (!res.ok) {
-    
             throw new Error(`Network response was not ok: ${res.statusText}`);
         }
 
         const product: IProduct = await res.json();
 
-       
         if (!product || !product.productId || !product.name) {
             throw new Error('Product data is invalid or incomplete');
         }
@@ -82,4 +80,3 @@ export async function getProductById(id: string): Promise<IProduct> {
         throw new Error(error.message); 
     }
 }
-
