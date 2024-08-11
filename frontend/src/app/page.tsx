@@ -9,8 +9,14 @@ import axios from 'axios';
 import cookie from 'js-cookie';
 
 async function getProducts(): Promise<IProduct[]> {
-  const res = await fetch("/api-vinos/products");
-  console.log(res)
+  const res = await fetch("/api-vinos/products", {
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+  
+  console.log(res);
+  
   const data = await res.json();
   return data.data;
 }
