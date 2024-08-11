@@ -5,9 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Swal from 'sweetalert2';
+import { useRouter } from 'next/navigation';
 
 function ProductsCard({ product }: IProductProps) {
   const { user } = useUser();
+  const router = useRouter();
 
   const handleAddToCart = (e: any) => {
     e.preventDefault();
@@ -41,12 +43,11 @@ function ProductsCard({ product }: IProductProps) {
         confirmButtonText: 'Iniciar sesión',
       }).then((result) => {
         if (result.isConfirmed) {
-          window.location.href = "/api/auth/login";
+          router.push("/api/auth/login");
         }
       });
     }
   };
-
 
   return (
     <div className="border-2 border-[#800020] p-4 rounded-lg w-[250px] h-[400px] flex flex-col mx-auto bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a]">
@@ -56,7 +57,7 @@ function ProductsCard({ product }: IProductProps) {
             className="rounded-xl object-cover"
             src={product.imgUrl}
             alt={product.name}
-            layout="fill"
+            fill
           />
         </div>
       </div>
@@ -75,23 +76,23 @@ function ProductsCard({ product }: IProductProps) {
         </div>
 
         <div className="flex w-full justify-between mt-auto space-x-2">
-          {user ? ( 
+          {user ? (
             <button
               className="px-4 py-2 bg-white text-[#800020] rounded-lg font-bold"
               onClick={handleAddToCart}
             >
               Comprar
             </button>
-          ) : ( 
-          <Link className="px-4 py-2 bg-white text-[#800020] rounded-lg" href="/cart">
-            Comprar
-          </Link>
+          ) : (
+            <Link className="px-4 py-2 bg-white text-[#800020] rounded-lg" href="/cart">
+              Comprar
+            </Link>
           )}
           <Link href={`/detail/${product.productId}`} passHref>
             <button className="flex-1 px-2 py-2 text-white underline">
               Detalles
             </button>
-          </Link> 
+          </Link>
         </div>
       </div>
     </div>
