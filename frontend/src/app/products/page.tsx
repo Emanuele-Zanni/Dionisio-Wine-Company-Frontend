@@ -3,12 +3,19 @@ import { useState, useEffect, useCallback } from 'react';
 import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
+import { getProductsDB } from '@/components/helpers/product.peticion';
 
-async function getProducts() {
-    const res = await fetch('/api-vinos/products');
-    const products = await res.json();
-    return products.data;
-}
+async function getProducts(): Promise<IProduct[]> {
+    try {
+      const products = await getProductsDB();
+      console.log(products);
+      return products; // Asegúrate de devolver los productos aquí
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return []; // Devuelve un array vacío en caso de error para evitar problemas en la UI
+    }
+  }
+
 
 const debounce = (func: Function, delay: number) => {
     let timer: NodeJS.Timeout;
