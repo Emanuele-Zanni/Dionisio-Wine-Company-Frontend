@@ -28,12 +28,12 @@
             const data = JSON.parse(text);
             console.log('Parsed API Response Data:', data);
 
-            // Verifica si `data` es un array
-            if (!Array.isArray(data)) {
+            // Verifica si `data` tiene la propiedad `data` y es un array
+            if (!data.data || !Array.isArray(data.data)) {
                 throw new Error('Unexpected response structure or empty response');
             }
 
-            return data;
+            return data.data; // Devuelve el array de productos
         } catch (jsonError) {
             // Verifica si el error tiene una propiedad `message`
             if (jsonError instanceof Error) {
@@ -55,7 +55,6 @@
         }
     }
 }
-
 export async function getProductById(id: string): Promise<IProduct> {
     try {
         const res = await fetch(`/api-vinos/products/${id}`, {
