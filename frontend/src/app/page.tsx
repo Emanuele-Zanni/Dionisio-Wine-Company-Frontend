@@ -10,12 +10,14 @@ import cookie from 'js-cookie';
 import { getProductsDB } from '@/components/helpers/product.peticion';
 
 // async function getProducts(): Promise<IProduct[]> {
-  async function getProducts() {
+  async function getProducts(): Promise<IProduct[]> {
     try {
       const products = await getProductsDB();
       console.log(products);
+      return products; // Asegúrate de devolver los productos aquí
     } catch (error) {
       console.error('Error fetching products:', error);
+      return []; // Devuelve un array vacío en caso de error para evitar problemas en la UI
     }
   }
 //   const res = await fetch("/api-vinos/products", {
