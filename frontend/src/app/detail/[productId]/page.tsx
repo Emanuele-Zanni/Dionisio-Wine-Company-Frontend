@@ -7,7 +7,6 @@ import Image from "next/image";
 import Plantilla from "@/components/Plantilla";
 import Link from "next/link";
 
-
 function Detail({ params }: { params: { productId: string } }) {
     const [product, setProduct] = useState<IProduct | null>(null);
     const [loading, setLoading] = useState(true);
