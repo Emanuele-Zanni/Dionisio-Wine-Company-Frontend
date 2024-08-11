@@ -22,16 +22,16 @@
 
         const data = await res.json();
 
-        // Verifica la estructura de la respuesta
-        console.log('API Response Data:', data);
-
-        // Asegúrate de que data tenga la estructura correcta
-        if (!data || !Array.isArray(data.products)) {
+        // Asumiendo que `data` es un array de objetos
+        if (!Array.isArray(data)) {
             throw new Error('Unexpected response structure or empty response');
         }
 
-        const products: IProduct[] = data.products; // Cambia 'results' por la clave correcta
-        console.log('Products:', products);
+        console.log('API Response Data:', data); 
+
+        // Asumimos que `data` es el array de productos
+        const products: IProduct[] = data;
+        console.log('Products:', products); 
         return products;
     } catch (error: any) {
         console.error('Error fetching products:', error.message);
