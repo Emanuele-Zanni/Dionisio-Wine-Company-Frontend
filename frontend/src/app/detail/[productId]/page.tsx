@@ -19,7 +19,9 @@ function Detail({ params }: { params: { productId: string } }) {
             setLoading(true);
             setError(null);
             try {
+                console.log('Fetching product with ID:', params.productId);
                 const fetchedProduct = await getProductById(params.productId);
+                console.log('Fetched product:', fetchedProduct);
                 if (isMounted) {
                     setProduct(fetchedProduct);
                 }

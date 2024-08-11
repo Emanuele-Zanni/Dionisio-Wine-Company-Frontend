@@ -64,6 +64,7 @@ export async function getProductById(productId: string): Promise<IProduct> {
                 'Cache-Control': 'no-cache', // Opcional para evitar caché
             },
         });
+       
 
         if (!res.ok) {
             throw new Error(`Network response was not ok: ${res.statusText}`);
