@@ -9,7 +9,6 @@ import axios from 'axios';
 import cookie from 'js-cookie';
 import { getProductsDB } from '@/components/helpers/product.peticion';
 
-// async function getProducts(): Promise<IProduct[]> {
   async function getProducts(): Promise<IProduct[]> {
     try {
       const products = await getProductsDB();
@@ -20,18 +19,6 @@ import { getProductsDB } from '@/components/helpers/product.peticion';
       return []; // Devuelve un array vacío en caso de error para evitar problemas en la UI
     }
   }
-//   const res = await fetch("/api-vinos/products", {
-//     headers: {
-//       'Accept': 'application/json',
-//       'Cache-Control': 'no-cache'
-//     }
-//   });
-  
-//   console.log(res);
-  
-//   const data = await res.json();
-//   return data.data;
-// }
 
 const Home = () => {
   const [products, setProducts] = useState<IProduct[]>([]);

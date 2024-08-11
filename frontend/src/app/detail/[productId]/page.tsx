@@ -8,28 +8,26 @@ import Plantilla from "@/components/Plantilla";
 import Link from "next/link";
 
 
-
 function Detail({ params }: { params: { productId: string } }) {
     const [product, setProduct] = useState<IProduct | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
 
     useEffect(() => {
-        let isMounted = true; 
+        let isMounted = true;
 
         const fetchData = async () => {
             setLoading(true);
             setError(null);
             try {
-                // Asegúrate de que params.id se corresponda con productId en la API
-                const fetchedProduct = await getProductById(params.productId); 
+                // Obtener el producto por ID usando getProductById
+                const fetchedProduct = await getProductById(params.productId);
                 if (isMounted) {
-                    setProduct(fetchedProduct); 
+                    setProduct(fetchedProduct);
                 }
             } catch (error: any) {
                 if (isMounted) {
-                    setError("Error fetching product: " + error.message);
+                    setError("Error fetching product: " + (error.message || "Unknown error"));
                     console.error("Error fetching product:", error);
                 }
             } finally {
@@ -42,13 +40,14 @@ function Detail({ params }: { params: { productId: string } }) {
         fetchData();
 
         return () => {
-            isMounted = false; 
+            isMounted = false;
         };
     }, [params.productId]);
 
     if (loading) return <p>La página se está cargando...</p>;
     if (error) return <p>{error}</p>;
-        
+
+    if (!product) return <p>No se encontró el producto.</p>; // Manejo adicional si el producto es null
 
     return (
         <div className="w-full h-auto flex flex-col items-center justify-center p-4 bg-white">
@@ -68,19 +67,19 @@ function Detail({ params }: { params: { productId: string } }) {
                         <ul className="list-none list-inside mt-20">
                             <li className="text-black mb-4 text-left flex items-center">
                                 <Image src="/uva.png" alt="icon" width={30} height={30} className="w-4 h-4 mr-2"/>
-                                {product?.category.name}
+                                {product.category.name}
                             </li>
                             <li className="text-black mb-4 text-left flex items-center">
                                 <Image src="/bodega.png" alt="icon" width={30} height={30} className="w-4 h-4 mr-2"/>
-                                {product?.store}
+                                {product.store}
                             </li>
                         </ul>
                     </div>
                     <div className="flex flex-col items-start w-1/2">
-                        <h2 className="text-2xl font-bold mb-4 text-center text-red-900">{product?.name}</h2>
-                        <p className="text-gray-700 mb-4 text-left mt-8">{product?.description}</p>
-                        <p className="text-gray-700 font-bold underline underline-offset-8 mb-4 mt-8">$ {product?.price}</p>
-                        <p className="text-red-900 mb-4 text-center mt-4">{product?.stock} disponibles</p>
+                        <h2 className="text-2xl font-bold mb-4 text-center text-red-900">{product.name}</h2>
+                        <p className="text-gray-700 mb-4 text-left mt-8">{product.description}</p>
+                        <p className="text-gray-700 font-bold underline underline-offset-8 mb-4 mt-8">$ {product.price}</p>
+                        <p className="text-red-900 mb-4 text-center mt-4">{product.stock} disponibles</p>
                         <Link href="/cart">
                             <button className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg">
                                 Agregar al Carrito
