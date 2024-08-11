@@ -57,11 +57,11 @@
 }
 export async function getProductById(id: string): Promise<IProduct> {
     try {
-        const res = await fetch(`${apiUrl}/products/${id}`, {
+        const res = await fetch(`/api-vinos/products/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache', // Asegura que se obtengan datos frescos
+                'Cache-Control': 'no-cache', 
             },
         });
 
