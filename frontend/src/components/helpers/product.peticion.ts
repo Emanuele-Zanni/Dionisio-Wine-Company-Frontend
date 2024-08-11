@@ -21,12 +21,12 @@
 
         // Lee el cuerpo de la respuesta como texto primero
         const text = await res.text();
-        console.log('Response Text:', text);
+        
 
         // Intenta analizar el texto como JSON
         try {
             const data = JSON.parse(text);
-            console.log('Parsed API Response Data:', data);
+            
 
             // Verifica si `data` tiene la propiedad `data` y es un array
             if (!data.data || !Array.isArray(data.data)) {
@@ -45,7 +45,7 @@
             throw new Error('Failed to parse JSON from response');
         }
     } catch (error: any) {
-        // Manejamos el tipo unknown adecuadamente
+        
         if (error instanceof Error) {
             console.error('Error fetching products:', error.message);
             throw new Error(error.message);
