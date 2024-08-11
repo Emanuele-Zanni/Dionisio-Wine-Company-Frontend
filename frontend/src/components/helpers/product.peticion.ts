@@ -55,13 +55,13 @@
         }
     }
 }
-export async function getProductById(id: string): Promise<IProduct> {
+export async function getProductById(productId: string): Promise<IProduct> {
     try {
-        const res = await fetch(`/api-vinos/products/${id}`, {
+        const res = await fetch(`https://dionisio-wine-company-backend.onrender.com/products/${productId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache', 
+                'Cache-Control': 'no-cache', // Opcional para evitar caché
             },
         });
 
