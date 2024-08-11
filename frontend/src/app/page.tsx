@@ -7,20 +7,29 @@ import { IProduct } from "@/interface";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import axios from 'axios';
 import cookie from 'js-cookie';
+import { getProductsDB } from '@/components/helpers/product.peticion';
 
-async function getProducts(): Promise<IProduct[]> {
-  const res = await fetch("/api-vinos/products", {
-    headers: {
-      'Accept': 'application/json',
-      'Cache-Control': 'no-cache'
+// async function getProducts(): Promise<IProduct[]> {
+  async function getProducts() {
+    try {
+      const products = await getProductsDB();
+      console.log(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
     }
-  });
+  }
+//   const res = await fetch("/api-vinos/products", {
+//     headers: {
+//       'Accept': 'application/json',
+//       'Cache-Control': 'no-cache'
+//     }
+//   });
   
-  console.log(res);
+//   console.log(res);
   
-  const data = await res.json();
-  return data.data;
-}
+//   const data = await res.json();
+//   return data.data;
+// }
 
 const Home = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
