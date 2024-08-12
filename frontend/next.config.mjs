@@ -23,7 +23,7 @@ const nextConfig = {
         destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
       },
       {
-        source: '/products/:id',
+        source: '/api-vinos/products/:id',
         destination: '/api/products/:id', 
       },
     ];

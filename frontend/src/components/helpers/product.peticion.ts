@@ -55,16 +55,15 @@
         }
     }
 }
-export async function getProductById(id: string){
+export async function getProductById(id: string) {
     try {
         const res = await fetch(`${apiUrl}/products/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache', // Opcional para evitar caché
+                'Cache-Control': 'no-cache',
             },
         });
-       
 
         if (!res.ok) {
             throw new Error(`Network response was not ok: ${res.statusText}`);
@@ -79,6 +78,6 @@ export async function getProductById(id: string){
         return product;
     } catch (error: any) {
         console.error('Error fetching product:', error.message);
-        throw new Error(error.message); 
+        throw new Error(error.message);
     }
 }
