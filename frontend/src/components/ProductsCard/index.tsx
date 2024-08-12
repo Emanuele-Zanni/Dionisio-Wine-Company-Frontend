@@ -2,7 +2,6 @@
 
 import { IProduct, IProductProps } from "@/interface";
 import Image from "next/image";
-import Link from "next/link";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
@@ -49,6 +48,10 @@ function ProductsCard({ product }: IProductProps) {
     }
   };
 
+  const handleDetailsClick = () => {
+    router.push(`/detail/${product.productId}`);
+  };
+
   return (
     <div className="border-2 border-[#800020] p-4 rounded-lg w-[250px] h-[400px] flex flex-col mx-auto bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a]">
       <div className="p-4 flex items-center justify-center flex-grow overflow-hidden">
@@ -84,15 +87,16 @@ function ProductsCard({ product }: IProductProps) {
               Comprar
             </button>
           ) : (
-            <Link className="px-4 py-2 bg-white text-[#800020] rounded-lg" href="/cart">
+            <button className="px-4 py-2 bg-white text-[#800020] rounded-lg" onClick={() => router.push("/cart")}>
               Comprar
-            </Link>
-          )}
-          <Link href={`/detail/${product.productId}`} passHref>
-            <button className="flex-1 px-2 py-2 text-white underline">
-              Detalles
             </button>
-          </Link>
+          )}
+          <button 
+            className="flex-1 px-2 py-2 text-white underline"
+            onClick={handleDetailsClick}
+          >
+            Detalles
+          </button> 
         </div>
       </div>
     </div>
