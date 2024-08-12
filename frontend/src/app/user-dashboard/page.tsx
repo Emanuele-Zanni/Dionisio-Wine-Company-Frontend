@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { Filters, Order } from "../interfaces/interfaces";
+import { Filters, Order, IOrder} from "../interfaces/interfaces";
 import Image from 'next/image';
 
 const UserDashboard: React.FC = () => {
@@ -61,21 +61,21 @@ const UserDashboard: React.FC = () => {
   const applyFilters = (ordersToFilter: Order[]) => {
     const filtered = ordersToFilter.filter((order) => {
       return (
-        (filters.category ? order.details.some(item => item.category.includes(filters.category)) : true) &&
-        (filters.store ? order.details.some(item => item.store.includes(filters.store)) : true) &&
-        (filters.name ? order.details.some(item => item.name.includes(filters.name)) : true)
+        (filters.category ? order.items.some(item => item.name.includes(filters.category)) : true) &&
+        (filters.store ? order.items.some(item => item.name.includes(filters.store)) : true) &&
+        (filters.name ? order.items.some(item => item.name.includes(filters.name)) : true)
       );
     });
-
+  
     const sortedOrders = filtered.sort((a, b) => {
       if (sortOrder === 'asc') {
-        return a.price - b.price;
+        return a.total - b.total;
       } else {
-        return b.price - a.price;
+        return b.total - a.total;
       }
     });
-
-    console.log('Filtered and Sorted Orders:', sortedOrders); // Verifica cómo se están filtrando y ordenando las órdenes
+  
+    console.log('Filtered and Sorted Orders:', sortedOrders); 
     setFilteredOrders(sortedOrders);
   };
 
@@ -176,28 +176,29 @@ const UserDashboard: React.FC = () => {
                 className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition"
               >
                 <div className="flex flex-col space-y-4">
-                  {/* Verificar si order.details está definido y es un array */}
-                  {order.details && Array.isArray(order.details) ? (
-                    order.details.map((detail, index) => (
-                      <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
-                        <div className="flex-1">
-                          <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
-                          <div>Cantidad: {detail.quantity}</div>
-                          <div>Precio: ${detail.price ? Number(detail.price).toFixed(2) : "0.00"}</div>
-                          <div>Total: ${detail.total ? Number(detail.total).toFixed(2) : "0.00"}</div>
-                        </div>
-                      </div>
+               
+                {order.items && Array.isArray(order.items) ? (
+                   order.items.map((item, index) => (
+                  <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
+                   <div className="flex-1">
+                    <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
+                   <div>Nombre: {item.name}</div>
+                      <div>Cantidad: {item.quantity}</div>
+                      <div>Precio: ${item.price ? Number(item.price).toFixed(2) : "0.00"}</div>
+                      <div>Total: ${(item.price * item.quantity).toFixed(2)}</div>
+                   </div>
+                  </div>
                     ))
-                  ) : (
+                ) : (
                     <div className="text-center text-red-500">No se encontraron detalles para esta orden.</div>
-                  )}
+                )}
                 </div>
                 <div className="flex justify-between mt-4">
-                  <span className="font-semibold">Orden: {order.id}</span>
-                  <span className="font-semibold">Fecha: {new Date(order.createdAt).toLocaleDateString()}</span>
-                  <span className="font-semibold">Total: ${order.price ? Number(order.price).toFixed(2) : "0.00"}</span>
-                  <span className="font-semibold">Estado: {order.status}</span>
-                </div>
+              <span className="font-semibold">Orden: {order.id}</span>
+              <span className="font-semibold">Fecha: {new Date(order.createdAt).toLocaleDateString()}</span>
+            <span className="font-semibold">Total: ${order.total ? Number(order.total).toFixed(2) : "0.00"}</span>
+            {/* <span className="font-semibold">Estado: {order.status}</span>  */}
+              </div>
               </div>
             ))}
           </div>
