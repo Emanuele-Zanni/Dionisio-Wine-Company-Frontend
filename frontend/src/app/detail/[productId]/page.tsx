@@ -44,7 +44,7 @@ function Detail({ params }: { params: { productId: string } }) {
         return () => {
             isMounted = false;
         };
-    }, [params.productId]);
+    }, [params, params.productId]);
 
     if (loading) return <p>La página se está cargando...</p>;
     if (error) return <p>{error}</p>;

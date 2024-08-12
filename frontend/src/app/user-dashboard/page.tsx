@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import { Filters, Order } from "../interfaces/interfaces";
+import Image from 'next/image';
 
 const UserDashboard: React.FC = () => {
   const { user, error, isLoading } = useUser();

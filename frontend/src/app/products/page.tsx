@@ -5,7 +5,7 @@ import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
 import { getProductsDB } from '@/components/helpers/product.peticion';
 
-async function getProducts(): Promise<IProduct[]> {
+async function getProducts() {
     try {
       const products = await getProductsDB();
       console.log(products);

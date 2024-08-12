@@ -237,7 +237,7 @@ const Cart = () => {
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
           <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
-          <button
+          {/* <button
             onClick={handleClick}
             disabled={cart.length === 0}
             className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
@@ -245,7 +245,7 @@ const Cart = () => {
             }`}
           >
             Comprar
-          </button>
+          </button> */}
         </div>
         <button
         onClick={handleCheckout}
