@@ -7,7 +7,7 @@ import Image from "next/image";
 import Plantilla from "@/components/Plantilla";
 import Link from "next/link";
 
-function Detail({ params }: { params: { productId: string } }) {
+function Detail({ params }: { params: { id: string } }) {
     const [product, setProduct] = useState<IProduct | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -21,8 +21,8 @@ function Detail({ params }: { params: { productId: string } }) {
             setLoading(true);
             setError(null);
             try {
-                console.log('Fetching product with ID:', params.productId);
-                const fetchedProduct = await getProductById(params.productId);
+                console.log('Fetching product with ID:', params.id);
+                const fetchedProduct = await getProductById(params.id);
                 console.log('Fetched product:', fetchedProduct);
                 if (isMounted) {
                     setProduct(fetchedProduct);
@@ -44,7 +44,7 @@ function Detail({ params }: { params: { productId: string } }) {
         return () => {
             isMounted = false;
         };
-    }, [params.productId]);
+    }, [params.id]);
 
     if (loading) return <p>La página se está cargando...</p>;
     if (error) return <p>{error}</p>;
