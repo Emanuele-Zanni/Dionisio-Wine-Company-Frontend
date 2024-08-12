@@ -1,6 +1,7 @@
 "use client";
 
-import { IProduct, IProductProps } from "@/interface";
+import {IProductProps } from "@/interface";
+import { IProduct } from "../helpers/interfaces";
 import Image from "next/image";
 import { useUser } from '@auth0/nextjs-auth0/client';
 import Swal from 'sweetalert2';
