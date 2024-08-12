@@ -34,16 +34,16 @@ const UserDashboard: React.FC = () => {
     if (userId) {
       const fetchOrders = async () => {
         try {
-          const token = localStorage.getItem('token'); // Obtener el token desde localStorage
+          const token = localStorage.getItem('token')
           const response = await fetch(`/api-vinos/orders/${userId}`, {
             headers: {
               'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
             },
           });
           const data = await response.json();
-  
+          
           console.log('Full Response:', data); // Log completo de la respuesta
-  
+          
           if (data && Array.isArray(data)) {
             console.log('Fetched Orders:', data);
             setOrders(data);
@@ -60,16 +60,21 @@ const UserDashboard: React.FC = () => {
       fetchOrders();
     }
   }, [userId]);
-  
 
   // Función para aplicar filtros y sorting
   const applyFilters = (ordersToFilter: Order[]) => {
     const filtered = ordersToFilter.filter((order) => {
-      return (
-        (filters.category ? order.details.some(item => item.category.includes(filters.category)) : true) &&
-        (filters.store ? order.details.some(item => item.store.includes(filters.store)) : true) &&
-        (filters.name ? order.details.some(item => item.name.includes(filters.name)) : true)
-      );
+      // Filtrar los detalles dentro de la orden
+      const filteredDetails = order.details.filter((item) => {
+        return (
+          (filters.category ? item.category.includes(filters.category) : true) &&
+          (filters.store ? item.store.includes(filters.store) : true) &&
+          (filters.name ? item.name.includes(filters.name) : true)
+        );
+      });
+
+      // Solo incluir la orden si tiene al menos un detalle que pase el filtro
+      return filteredDetails.length > 0;
     });
 
     const sortedOrders = filtered.sort((a, b) => {
@@ -175,8 +180,12 @@ const UserDashboard: React.FC = () => {
                   {order.details && Array.isArray(order.details) ? (
                     order.details.map((detail, index) => (
                       <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
+                        <img src={detail.imgUrl} alt={detail.name} className="w-16 h-16 mr-4"/>
                         <div className="flex-1">
                           <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
+                          <div>Nombre: {detail.name}</div>
+                          <div>Categoría: {detail.category}</div>
+                          <div>Bodega: {detail.store}</div>
                           <div>Cantidad: {detail.quantity}</div>
                           <div>Precio: ${detail.price ? Number(detail.price).toFixed(2) : "0.00"}</div>
                           <div>Total: ${detail.total ? Number(detail.total).toFixed(2) : "0.00"}</div>
@@ -203,3 +212,39 @@ const UserDashboard: React.FC = () => {
 };
 
 export default withPageAuthRequired(UserDashboard);
+
+
+
+
+/*
+useEffect(() => {
+  if (userId) {
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const response = await fetch(`/api-vinos/orders/${userId}`, {
+          headers: {
+            'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
+          },
+        });
+        const data = await response.json();
+        
+        console.log('Full Response:', data); // Log completo de la respuesta
+        
+        if (data && Array.isArray(data)) {
+          console.log('Fetched Orders:', data);
+          setOrders(data);
+        } else {
+          console.warn('No orders found or invalid response format:', data);
+          setOrders([]);
+          setFilteredOrders([]);
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    };
+
+    fetchOrders();
+  }
+}, [userId]);
+*/
