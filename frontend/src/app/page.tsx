@@ -3,25 +3,26 @@
 import { useEffect, useState } from 'react';
 import Carrusel from "@/components/Carrusel";
 import ProductList from "@/components/ProductList";
-import { IProduct } from "@/interface";
+import { IProduct } from '@/components/helpers/interfaces';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import axios from 'axios';
 import cookie from 'js-cookie';
-import { getProductsDB } from '@/components/helpers/product.peticion';
+import { getProductsDB} from '@/components/helpers/product.peticion';
 
-  async function getProducts(){
-    try {
-      const products = await getProductsDB();
-      console.log(products);
-      return products; // Asegúrate de devolver los productos aquí
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      return []; // Devuelve un array vacío en caso de error para evitar problemas en la UI
-    }
+async function getProducts() {
+  try {
+    const products: IProduct[] = await getProductsDB(); 
+    console.log(products);
+    return products;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
   }
+}
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
+  // Asegúrate de usar el tipo correcto aquí
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, error, isLoading } = useUser();
 
@@ -59,13 +60,12 @@ const Home = () => {
     const checkSession = () => {
       const appSession = cookie.get('appSession');
       if (!appSession) {
-        // En lugar de limpiar todo el localStorage, puedes limpiar solo la sesión específica.
         localStorage.removeItem('sessionData');
       }
     };
-  
+
     window.addEventListener('focus', checkSession);
-  
+
     return () => {
       window.removeEventListener('focus', checkSession);
     };
@@ -75,23 +75,23 @@ const Home = () => {
     let isMounted = true;
 
     async function fetchData() {
-        try {
-            const products = await getProductsDB();
-            console.log('Fetched Products:', products);
-            if (isMounted) {
-                setProducts(products);
-                setLoading(false);
-            }
-        } catch (error) {
-            console.error('Error fetching products:', error);
+      try {
+        const products = await getProducts(); // Asegúrate de llamar a la función correcta
+        console.log('Fetched Products:', products);
+        if (isMounted) {
+          setProducts(products); // Aquí debería funcionar sin error
+          setLoading(false);
         }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
     }
 
     fetchData();
 
     return () => {
       isMounted = false;
-      setProducts([]);
+      setProducts([]); 
       setLoading(true);
     };
   }, []);
@@ -113,9 +113,7 @@ const Home = () => {
           <ProductList products={products} />
         </div>
       </div>
-      <div className="text-center pt-28">
-        
-      </div>
+      <div className="text-center pt-28"></div>
     </div>
   );
 }

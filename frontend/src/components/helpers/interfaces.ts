@@ -1,16 +1,18 @@
 export interface IProduct {
-    productId?: string;
+  productId?: string;
+  name: string;
+  description: string;
+  price: string; 
+  stock: number;
+  imgUrl: string;
+  quantity?: number;
+  category: {
+    categoryId: string;
     name: string;
-    description: string;
-    price: number; 
-    stock: number;
-    imgUrl: string;
-    category: {
-      categoryId: string;
-      name: string;
-    };
-    store: string;
-  }
+  };
+  store: string;
+}
+
 
   export interface AppSession {
     data: {

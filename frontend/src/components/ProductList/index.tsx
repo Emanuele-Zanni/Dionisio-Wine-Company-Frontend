@@ -1,5 +1,6 @@
 "use client"
-import { IProduct, IProductListProps } from "@/interface";
+import {IProductListProps } from "@/interface";
+import { IProduct } from "../helpers/interfaces";
 import ProductsCard from "../ProductsCard";
 
 function ProductList({ products }: IProductListProps) {
