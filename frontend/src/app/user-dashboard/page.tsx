@@ -34,11 +34,16 @@ const UserDashboard: React.FC = () => {
     if (userId) {
       const fetchOrders = async () => {
         try {
-          const response = await fetch(`/api-vinos/orders/${userId}`);
+          const token = localStorage.getItem('token'); // Obtener el token desde localStorage
+          const response = await fetch(`/api-vinos/orders/${userId}`, {
+            headers: {
+              'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
+            },
+          });
           const data = await response.json();
-          
+  
           console.log('Full Response:', data); // Log completo de la respuesta
-          
+  
           if (data && Array.isArray(data)) {
             console.log('Fetched Orders:', data);
             setOrders(data);
@@ -55,6 +60,7 @@ const UserDashboard: React.FC = () => {
       fetchOrders();
     }
   }, [userId]);
+  
 
   // Función para aplicar filtros y sorting
   const applyFilters = (ordersToFilter: Order[]) => {
