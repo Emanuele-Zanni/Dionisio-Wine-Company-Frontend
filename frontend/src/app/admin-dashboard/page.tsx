@@ -225,7 +225,11 @@ const AdminDashboard: React.FC = () => {
       <div className="flex flex-col items-center mb-6">
         {user ? (
           <>
-            <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
+            <img 
+              src={user.picture ?? ''} 
+              alt={user.name ?? 'User Avatar'} 
+              className="w-16 h-16 rounded-full" 
+            />
             <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
             <p className="text-lg text-gray-600">{user.email}</p>
           </>
