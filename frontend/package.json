@@ -20,6 +20,7 @@
     "flowbite": "^2.4.1",
     "flowbite-react": "^0.10.1",
     "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
     "leaflet": "^1.9.4",
     "next": "^14.2.5",
     "next-cloudinary": "^6.6.2",
