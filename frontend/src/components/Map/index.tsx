@@ -3,10 +3,9 @@
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import styles from './Map.module.css';
 
-// Configuración del mapa
 const mapContainerStyle = {
-  height: "400px",
-  width: "100%", // Corregí el ancho para que sea más adecuado para la visualización
+  height: "100%", // La altura ahora se manejará en el archivo CSS
+  width: "100%", // La anchura ahora se manejará en el archivo CSS
 };
 
 const center = {
