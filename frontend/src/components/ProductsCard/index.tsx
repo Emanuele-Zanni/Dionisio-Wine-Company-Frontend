@@ -49,7 +49,15 @@ function ProductsCard({ product }: IProductProps) {
   };
 
   const handleDetailsClick = () => {
-    router.push(`/detail/${product.productId}`);
+    if (product.productId) {
+      router.push(`/detail/${product.productId}`);
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Producto no disponible',
+        text: 'No se pudo encontrar el ID del producto.',
+      });
+    }
   };
 
   return (
