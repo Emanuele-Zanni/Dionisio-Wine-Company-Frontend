@@ -22,6 +22,10 @@ const nextConfig = {
 
         destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
       },
+      {
+        source: '/products/:id',
+        destination: '/api/products/:id', 
+      },
     ];
   },
 };
