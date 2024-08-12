@@ -15,6 +15,8 @@ function Detail({ params }: { params: { productId: string } }) {
     useEffect(() => {
         let isMounted = true;
 
+        console.log('params:', params);
+
         const fetchData = async () => {
             setLoading(true);
             setError(null);
