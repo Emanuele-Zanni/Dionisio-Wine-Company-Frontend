@@ -47,7 +47,7 @@ export default function CheckoutPage() {
         
         const createOrder = async () => {
           try {
-            const orderData = {
+            const cartItems = {
               cartItems: cartItem.map(item => ({
                 productId: item.productId,
                 price: parseFloat(item.price), // Asegúrate de convertir el precio a número
@@ -58,7 +58,7 @@ export default function CheckoutPage() {
             };
 
             // Log de los datos enviados
-            console.log('Datos enviados en el POST:', orderData);
+            console.log('Datos enviados en el POST:', cartItems);
 
             const response = await fetch(`/api-vinos/orders/create/${userId}`, {
               method: 'POST',
@@ -66,18 +66,8 @@ export default function CheckoutPage() {
                 'Content-Type': 'application/json',
                 'Authorization': `Basic: ${token}`,
               },
-              /*
-              body: JSON.stringify({
-                cartItems: cartItems.map(item => ({
-                  productId: item.productId,
-                  price: item.price,
-                  quantity: item.quantity || 1,
-                })),
-                userId,
-                price: totalPrice,
-              }),
-              */
-              body: JSON.stringify(orderData),
+
+              body: JSON.stringify(cartItems),
             });
             
             console.log('Respuesta del servidor:', await response.json());
