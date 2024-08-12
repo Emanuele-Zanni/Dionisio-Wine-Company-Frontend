@@ -2,9 +2,9 @@
 import { error } from 'console';
 import React, { useEffect, useState } from 'react';
 
-interface cartItem {
+interface CartItem {
   productId: string;
-  price: number;
+  price: number; // Asegúrate de que price es de tipo número
   quantity: number;
 }
 
@@ -27,9 +27,9 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (orderStatus === 'success') {
-      const cartItem: cartItem[] = JSON.parse(localStorage.getItem("checkoutItems") || "[]");
+      const cartItems: CartItem[] = JSON.parse(localStorage.getItem("checkoutItems") || "[]");
 
-      if (cartItem.length > 0) {
+      if (cartItems.length > 0) {
         const token = localStorage.getItem("token");
 
         if (!token) {
@@ -40,17 +40,16 @@ export default function CheckoutPage() {
         const userId = getUserIdFromToken(token);
 
         // Calcular el precio total
-        const totalPrice = cartItem.reduce((total, item) => 
-          total + parseFloat(item.price) * (item.quantity || 1), 
+        const totalPrice = cartItems.reduce((total, item) => 
+          total + item.price * (item.quantity || 1), 
         0);
-        
         
         const createOrder = async () => {
           try {
-            const cartItems = {
-              cartItems: cartItem.map(item => ({
+            const orderData = {
+              cartItems: cartItems.map(item => ({
                 productId: item.productId,
-                price: parseFloat(item.price), // Asegúrate de convertir el precio a número
+                price: item.price, // El precio ya es un número, no se necesita parseFloat
                 quantity: item.quantity || 1,
               })),
               userId,
@@ -58,7 +57,7 @@ export default function CheckoutPage() {
             };
 
             // Log de los datos enviados
-            console.log('Datos enviados en el POST:', cartItems);
+            console.log('Datos enviados en el POST:', orderData);
 
             const response = await fetch(`/api-vinos/orders/create/${userId}`, {
               method: 'POST',
@@ -67,14 +66,10 @@ export default function CheckoutPage() {
                 'Authorization': `Basic: ${token}`,
               },
 
-              body: JSON.stringify(cartItems),
+              body: JSON.stringify(orderData),
             });
-            
+
             console.log('Respuesta del servidor:', await response.json());
-            
-            console.log(totalPrice)
-            console.log(response)
-            console.log(cartItem)
 
             if (!response.ok) {
               throw new Error('Error al crear la orden');
@@ -103,7 +98,6 @@ export default function CheckoutPage() {
       return null;
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
       <h1 className="text-2xl font-semibold text-gray-700">¡Gracias por tu compra!</h1>
