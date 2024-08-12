@@ -55,9 +55,22 @@ export  interface Filters {
   store: string;
   name: string;
 }
-
-export  interface Order {
+export interface Order {
   id: string;
   total: number;
-  items: Array<{ name: string; quantity: number; price: number }>;
+  createdAt: string; // Usa string para representar la fecha en formato ISO
+  items: Array<{ name: string; quantity: number; price: number; imageUrl: string }>;
 }
+
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  category: string; // Asumiendo que el item tiene una categoría
+  store: string; // Asumiendo que el item tiene una tienda o bodega
+  imageUrl: string; // URL de la imagen del item
+}
+
+

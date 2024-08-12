@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -7,7 +6,7 @@ import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 import { useRouter } from 'next/navigation';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import Image from 'next/image';
+import UserManagement from '@/components/UserManagement';
 
 const AdminDashboard: React.FC = () => {
   const { user } = useUser();
@@ -224,23 +223,15 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
-      {user && user.picture ? (
-  <>
-    <Image
-      src={user.picture}
-      alt={user.name ?? 'Usuario'}
-      className="w-16 h-16 rounded-full"
-      width={30}
-      height={30}
-    />
-    <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
-    <p className="text-lg text-gray-600">{user.email}</p>
-  </>
-) : (
-  <h1 className="text-3xl font-bold mt-2">Administrador</h1>
-)}
-        
-
+        {user ? (
+          <>
+            <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
+            <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
+            <p className="text-lg text-gray-600">{user.email}</p>
+          </>
+        ) : (
+          <h1 className="text-3xl font-bold mt-2">Administrador</h1>
+        )}
       </div>
 
       <div className="mb-6">
@@ -296,14 +287,17 @@ const AdminDashboard: React.FC = () => {
               <p>{product.description}</p>
               <p>${product.price}</p>
               <p>Stock: {product.stock}</p>
-              <p>Categoría: {product.category}</p>
-              <img src={product.imgUrl} alt={product.name} className="w-32 h-32 object-cover" />
+              <p>Categoría: {categories.find((category) => category.categoryId === product.category)?.name}</p>
+              <img src={product.imgUrl} alt={product.name} className="w-32 h-32 object-cover mt-2" />
             </li>
           ))}
         </ul>
+      </div>
+      <div>
+        <UserManagement/>
       </div>
     </div>
   );
 };
 
-export default withPageAuthRequired(AdminDashboard);
+export default AdminDashboard;

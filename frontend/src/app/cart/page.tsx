@@ -131,6 +131,51 @@ const Cart = () => {
     )
   }
 
+  const handleCheckout = async () => {
+    try {
+      // Obtener el carrito desde localStorage
+      const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+      if (!cartItems || cartItems.length === 0) {
+        console.error("El carrito está vacío.");
+        return;
+      }
+  
+      // Enviar datos al backend de Stripe para iniciar el checkout
+      const response = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cartItems: cartItems.map((item: IProduct) => ({
+            productId: item.productId,  // Asegúrate de que el campo productId esté presente
+            name: item.name,
+            imgUrl: item.imgUrl,
+            price: item.price,
+            quantity: item.quantity || 1,
+          })),
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Guardar cartItems en localStorage para su uso posterior (ej. en la página de éxito)
+        localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
+        
+        // Redirigir a la URL de éxito de Stripe
+        window.location.href = data.url;
+      } else {
+        console.error('Error creando la sesión de checkout:', data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+  
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
       <h1 className="text-2xl mt-7 font-semibold text-gray-700 ">Tu Carrito</h1>
@@ -202,6 +247,15 @@ const Cart = () => {
             Comprar
           </button>
         </div>
+        <button
+        onClick={handleCheckout}
+        disabled={cart.length === 0}
+        className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+          cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
+        }`}
+      >
+        Checkout
+      </button>
       </div>
     </div>
   );

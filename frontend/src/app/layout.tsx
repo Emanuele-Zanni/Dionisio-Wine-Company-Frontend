@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 import Footer from "@/components/Footer";
 
+
+
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 
 

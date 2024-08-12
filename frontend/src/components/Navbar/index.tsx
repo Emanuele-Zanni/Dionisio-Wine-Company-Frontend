@@ -30,6 +30,7 @@ function Navbar() {
       localStorage.removeItem('token');
       localStorage.removeItem('role');
       localStorage.removeItem('cart');
+      localStorage.removeItem('checkoutItems');
       window.location.href = '/api/auth/logout';
     } catch (error) {
       console.error('Error during logout:', error);

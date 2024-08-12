@@ -9,7 +9,7 @@ import axios from 'axios';
 import cookie from 'js-cookie';
 import { getProductsDB } from '@/components/helpers/product.peticion';
 
-  async function getProducts(): Promise<IProduct[]> {
+  async function getProducts(){
     try {
       const products = await getProductsDB();
       console.log(products);
@@ -21,7 +21,7 @@ import { getProductsDB } from '@/components/helpers/product.peticion';
   }
 
 const Home = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, error, isLoading } = useUser();
 
