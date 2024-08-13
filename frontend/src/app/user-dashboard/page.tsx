@@ -35,29 +35,29 @@ const UserDashboard: React.FC = () => {
     if (userId) {
       const fetchOrders = async () => {
         try {
-          const token = localStorage.getItem('token')
+          const token = localStorage.getItem('token');
           const response = await fetch(`/api-vinos/orders/${userId}`, {
             headers: {
               'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
             },
           });
           const data = await response.json();
-          
+
           console.log('Full Response:', data); // Log completo de la respuesta
-          
-          if (data && Array.isArray(data)) {
+
+          if (Array.isArray(data)) {
             console.log('Fetched Orders:', data);
             setOrders(data);
           } else {
             console.warn('No orders found or invalid response format:', data);
             setOrders([]);
-            setFilteredOrders([]);
           }
         } catch (error) {
           console.error('Error fetching orders:', error);
+          setOrders([]);
         }
       };
-  
+
       fetchOrders();
     }
   }, [userId]);
@@ -66,16 +66,16 @@ const UserDashboard: React.FC = () => {
   const applyFilters = (ordersToFilter: Order[]) => {
     const filtered = ordersToFilter.filter((order) => {
       // Filtrar los detalles dentro de la orden
-      const filteredItems = order.items.filter((item) => {
+      const filteredItems = order.items?.filter((item) => {
         return (
           (filters.name ? item.name.includes(filters.name) : true)
         );
-      });
+      }) || []; // Asegurarse de que filteredItems sea un array
 
       // Solo incluir la orden si tiene al menos un detalle que pase el filtro
       return filteredItems.length > 0;
     });
-  
+
     const sortedOrders = filtered.sort((a, b) => {
       if (sortOrder === 'asc') {
         return a.total - b.total;
@@ -83,8 +83,8 @@ const UserDashboard: React.FC = () => {
         return b.total - a.total;
       }
     });
-  
-    console.log('Filtered and Sorted Orders:', sortedOrders); 
+
+    console.log('Filtered and Sorted Orders:', sortedOrders);
     setFilteredOrders(sortedOrders);
   };
 
