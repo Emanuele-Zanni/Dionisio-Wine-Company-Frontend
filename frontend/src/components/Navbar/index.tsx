@@ -1,15 +1,15 @@
-"use client"
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 enum UserRole {
-  User = 'user',
-  Admin = 'admin',
-  SuperAdmin = 'superadmin',
-  Banned = 'banned',
+  User = "user",
+  Admin = "admin",
+  SuperAdmin = "superadmin",
+  Banned = "banned",
 }
 
 function Navbar() {
@@ -18,31 +18,41 @@ function Navbar() {
   const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem('role') as UserRole | null;
-    if (storedRole) {
-      setRole(storedRole);
+    const storedRole = localStorage.getItem("role") as UserRole | null;
+    console.log("Stored Role:", storedRole);
+    if (
+      storedRole &&
+      Object.values(UserRole).includes(storedRole as UserRole)
+    ) {
+      setRole(storedRole as UserRole);
     }
   }, []);
 
   const handleLogout = async () => {
     try {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      localStorage.removeItem('cart');
-      localStorage.removeItem('checkoutItems');
-      window.location.href = '/api/auth/logout';
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("cart");
+      localStorage.removeItem("checkoutItems");
+      window.location.href = "/api/auth/logout";
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error("Error durante el cierre de sesión:", error);
     }
   };
 
-  const profileLink = role === UserRole.Admin || role === UserRole.SuperAdmin
-    ? "/admin-dashboard"
-    : "/user-dashboard";
+  const profileLink =
+    role === UserRole.Admin || role === UserRole.SuperAdmin
+      ? "/admin-dashboard"
+      : "/user-dashboard";
 
   if (role === UserRole.Banned) {
     return null;
   }
+
+  const isRoleValid =
+    role === UserRole.User ||
+    role === UserRole.Admin ||
+    role === UserRole.SuperAdmin;
 
   return (
     <nav className="bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a] border-gray-200">
@@ -63,46 +73,80 @@ function Navbar() {
         <div className="hidden w-full md:block md:w-auto" id="navbar-default">
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-transparent md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 items-center">
             <li>
-              <Link href="/" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+              <Link
+                href="/"
+                className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+              >
                 Inicio
               </Link>
             </li>
             <li>
-              <Link href="/products" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+              <Link
+                href="/products"
+                className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+              >
                 Productos
               </Link>
             </li>
             <li>
-              <a href="#" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+              <a
+                href="#"
+                className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+              >
                 Servicios
               </a>
             </li>
             <li>
-              <Link href="/about-us" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+              <Link
+                href="/about-us"
+                className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+              >
                 Sobre Nosotros
               </Link>
             </li>
             <li>
-              <a href="/contacto" className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+              <a
+                href="/contacto"
+                className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+              >
                 Contacto
               </a>
             </li>
             {user && role !== UserRole.Banned && (
               <li>
-                <Link href={profileLink} className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0">
+                <Link
+                  href={profileLink}
+                  className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+                >
                   {user.picture ? (
-                    <Image src={user.picture} alt="profile" width={30} height={30} className="rounded-full" />
+                    <Image
+                      src={user.picture}
+                      alt="perfil"
+                      width={30}
+                      height={30}
+                      className="rounded-full"
+                    />
                   ) : (
                     "Mi perfil"
                   )}
                 </Link>
               </li>
             )}
+
+            {user && isRoleValid ? (
+
             {(user && role === UserRole.User) || (user && role === UserRole.SuperAdmin) || (user && role === UserRole.Admin) ? (
+
               <li>
                 <div className="flex items-center px-4">
                   <Link href="/cart">
-                    <Image src="/carrito2.png" alt="cart" width={30} height={30} className="cursor-pointer" />
+                    <Image
+                      src="/carrito2.png"
+                      alt="carrito"
+                      width={30}
+                      height={30}
+                      className="cursor-pointer"
+                    />
                   </Link>
                 </div>
               </li>
@@ -116,7 +160,10 @@ function Navbar() {
                   Logout
                 </button>
               ) : (
-                <Link className="text-white p-2 rounded hover:bg-[#800020]" href="/api/auth/login">
+                <Link
+                  className="text-white p-2 rounded hover:bg-[#800020]"
+                  href="/api/auth/login"
+                >
                   Login
                 </Link>
               )}
