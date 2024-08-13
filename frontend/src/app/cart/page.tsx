@@ -211,11 +211,11 @@ const Cart = () => {
   className= "flex items-center"
 >
   <Image
-    src="/eliminar.png" // Reemplaza con la ruta a tu imagen
+    src="/img/eliminar.png"
     alt="Eliminar"
-    width={24} // Ajusta el tamaño según tus necesidades
-    height={24} // Ajusta el tamaño según tus necesidades
-    className="mr-2" // Espacio entre la imagen y el texto, si es necesario
+    width={24}
+    height={24} 
+    className="mr-2"
   />
 
 </button>
