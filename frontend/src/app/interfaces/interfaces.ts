@@ -59,7 +59,8 @@ export interface Order {
   id: string;
   total: number;
   createdAt: string; // Usa string para representar la fecha en formato ISO
-  items: Array<{ name: string; quantity: number; price: number; imageUrl: string }>;
+  // items: Array<{ name: string; quantity: number; price: number; imageUrl: string }>;
+  items: OrderItem[];
 }
 
 
