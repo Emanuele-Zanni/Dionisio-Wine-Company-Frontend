@@ -43,35 +43,42 @@ export interface UserSession {
   }
 }
 
-export interface IOrder {
- id: number,
- status: string,
- date: Date,
- products: Product[]
+export interface Order {
+  id: string;
+  price: number; // Precio total de la orden
+  status: OrderStatus; // Estado de la orden
+  createdAt: string; // Fecha de creación en formato ISO
+  details: OrderDetail[]; // Detalles de la orden
 }
 
-export  interface Filters {
+export interface OrderDetail {
+  orderDetailId: string; // ID único del detalle de la orden
+  product: Product; // Información del producto
+  quantity: number; // Cantidad del producto
+  price: number; // Precio del producto
+  total: number; // Precio total para este producto
+}
+
+export enum OrderStatus {
+  PENDING = 'Pending',
+  SHIPPED = 'Shipped',
+  DELIVERED = 'Delivered',
+  CANCELLED = 'Cancelled',
+}
+
+export interface Filters {
   category: string;
   store: string;
   name: string;
 }
-export interface Order {
-  id: string;
-  total: number;
-  createdAt: string; // Usa string para representar la fecha en formato ISO
-  // items: Array<{ name: string; quantity: number; price: number; imageUrl: string }>;
-  items: OrderItem[];
-}
-
-
 export interface OrderItem {
   id: string;
   name: string;
   quantity: number;
   price: number;
-  category: string; // Asumiendo que el item tiene una categoría
-  store: string; // Asumiendo que el item tiene una tienda o bodega
-  imageUrl: string; // URL de la imagen del item
+  category: string; // Categoría del item
+  store: string; // Tienda o bodega del item
+  imgUrl: string; // Cambiado de `imageUrl` a `imgUrl` para que coincida con el código
 }
 
 
