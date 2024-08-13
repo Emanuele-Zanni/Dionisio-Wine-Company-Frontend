@@ -20,18 +20,12 @@ const Cart = () => {
       const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
       if (storedCart) {
         setCart(storedCart);
-        calculateTotal(storedCart);
+        
+        const totalCart = storedCart.reduce((acc: number, item: IProduct) => acc + item.price * (item.quantity || 1), 0);
+        setTotal(totalCart);
       }
     }
   }, []);
-
-  const calculateTotal = (cartItems: IProduct[]) => {
-    const totalCart = cartItems.reduce(
-      (acc, item) => acc + (typeof item.price === 'number' ? item.price : 0) * (item.quantity || 1),
-      0
-    );
-    setTotal(totalCart);
-  };
 
   const updateLocalStorage = (updatedCart: IProduct[]) => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
@@ -40,42 +34,19 @@ const Cart = () => {
   const handleRemoveFromCart = (productId: string) => {
     const updatedCart = cart.filter((product) => product.productId !== productId);
     setCart(updatedCart);
-    calculateTotal(updatedCart);
+    const updatedTotal = updatedCart.reduce((acc, curr) => acc + curr.price * (curr.quantity || 1), 0);
+    setTotal(updatedTotal);
     updateLocalStorage(updatedCart);
-  };
-
-  const handleQuantityChange = async (productId: string, delta: number) => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.map((item) => {
-        if (item.productId === productId) {
-          const newQuantity = (item.quantity || 1) + delta;
-
-          if (newQuantity > item.stock) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Stock insuficiente',
-              text: 'No hay más unidades disponibles.',
-              confirmButtonText: 'Aceptar',
-            });
-            return item; 
-          }
-
-          return {
-            ...item,
-            quantity: Math.max(newQuantity, 1)
-          };
-        }
-        return item;
-      });
-
-      calculateTotal(updatedCart);
-      updateLocalStorage(updatedCart);
-      return updatedCart;
-    });
   };
 
   const handleClick = async () => {
     if (!user) {
+      // await Swal.fire({
+      //   icon: 'warning',
+      //   title: 'Inicia sesión para continuar con tu compra',
+      //   text: 'Serás redirigido a la página de inicio de sesión.',
+      //   confirmButtonText: 'Iniciar sesión',
+      // });
       router.push("/api/auth/login");
       return;
     }
@@ -120,15 +91,58 @@ const Cart = () => {
     }
   };
 
+  const handleQuantityChange = async (productId: string, delta: number) => {
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) => {
+        if (item.productId === productId) {
+          const newQuantity = (item.quantity || 1) + delta;
+
+          
+          if (newQuantity > item.stock) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Stock insuficiente',
+              text: 'No hay más unidades disponibles.',
+              confirmButtonText: 'Aceptar',
+            });
+            return item; 
+          }
+
+          return {
+            ...item,
+            quantity: Math.max(newQuantity, 1) 
+          };
+        }
+        return item;
+      });
+
+      const totalCart = updatedCart.reduce((acc, curr) => acc + curr.price * (curr.quantity || 1), 0);
+      setTotal(totalCart);
+      updateLocalStorage(updatedCart);
+      return updatedCart;
+    });
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
+  if (!user) {
+    return (
+      router.push("/api/auth/login")
+    )
+  }
+
   const handleCheckout = async () => {
     try {
+      // Obtener el carrito desde localStorage
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
-
+  
       if (!cartItems || cartItems.length === 0) {
         console.error("El carrito está vacío.");
         return;
       }
-
+  
+      // Enviar datos al backend de Stripe para iniciar el checkout
       const response = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: {
@@ -136,7 +150,7 @@ const Cart = () => {
         },
         body: JSON.stringify({
           cartItems: cartItems.map((item: IProduct) => ({
-            productId: item.productId,
+            productId: item.productId,  // Asegúrate de que el campo productId esté presente
             name: item.name,
             imgUrl: item.imgUrl,
             price: item.price,
@@ -144,11 +158,14 @@ const Cart = () => {
           })),
         }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
+        // Guardar cartItems en localStorage para su uso posterior (ej. en la página de éxito)
         localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
+        
+        // Redirigir a la URL de éxito de Stripe
         window.location.href = data.url;
       } else {
         console.error('Error creando la sesión de checkout:', data.error);
@@ -157,17 +174,12 @@ const Cart = () => {
       console.error('Error:', error);
     }
   };
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
-
-  if (!user) {
-    return router.push("/api/auth/login");
-  }
-
+  
+  
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
-      <h1 className="text-2xl mt-7 font-semibold text-gray-700">Tu Carrito</h1>
+      <h1 className="text-2xl mt-7 font-semibold text-gray-700 ">Tu Carrito</h1>
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col gap-6">
           {cart.length > 0 ? (
@@ -180,44 +192,33 @@ const Cart = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => {
-                      if (product.productId) {
-                        handleQuantityChange(product.productId, -1);
-                      }
-                    }}
+                    onClick={() => handleQuantityChange(product.productId, -1)}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
-                    disabled={(product.quantity || 1) <= 1}
+                    disabled={(product.quantity || 1) <= 1} 
                   >
                     -
                   </button>
                   <span className="w-10 text-center text-sm">{product.quantity || 1}</span>
                   <button
-                    onClick={() => {
-                      if (product.productId) {
-                        handleQuantityChange(product.productId, 1);
-                      }
-                    }}
+                    onClick={() => handleQuantityChange(product.productId, 1)}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
                   >
                     +
                   </button>
                 </div>
                 <button
-                  onClick={() => {
-                    if (product.productId) {
-                      handleRemoveFromCart(product.productId);
-                    }
-                  }}
-                  className="flex items-center"
-                >
-                  <Image
-                    src="/eliminar.png"
-                    alt="Eliminar"
-                    width={24}
-                    height={24}
-                    className="mr-2"
-                  />
-                </button>
+  onClick={() => handleRemoveFromCart(product.productId)}
+  className= "flex items-center"
+>
+  <Image
+    src="/eliminar.png" // Reemplaza con la ruta a tu imagen
+    alt="Eliminar"
+    width={24} // Ajusta el tamaño según tus necesidades
+    height={24} // Ajusta el tamaño según tus necesidades
+    className="mr-2" // Espacio entre la imagen y el texto, si es necesario
+  />
+
+</button>
               </div>
             ))
           ) : (
@@ -225,18 +226,28 @@ const Cart = () => {
           )}
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xl mt-7 font-semibold text-gray-700">Total: ${total.toFixed(2)}</p>
-        </div>
+          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
+          {/* <button
+            onClick={handleClick}
+            disabled={cart.length === 0}
+            className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+              cart.length === 0 ? "cursor-not-allowed opacity-50" : ""
+            }`}
+          >
+            Comprar
+          </button> 
+        </div> */}
         <button
-          onClick={handleCheckout}
-          disabled={cart.length === 0}
-          className={`w-full md:w-auto bg-red-800 hover:bg-red-500 text-white p-3 rounded-md mt-7 ${
-            cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
-          }`}
-        >
-          Checkout
-        </button>
+        onClick={handleCheckout}
+        disabled={cart.length === 0}
+        className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+          cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
+        }`}
+      >
+        Checkout
+      </button>
       </div>
+    </div>
     </div>
   );
 };
