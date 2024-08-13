@@ -68,8 +68,6 @@ const UserDashboard: React.FC = () => {
       // Filtrar los detalles dentro de la orden
       const filteredItems = order.items.filter((item) => {
         return (
-          (filters.category ? item.name.includes(filters.category) : true) &&
-          (filters.store ? item.imageUrl.includes(filters.store) : true) &&
           (filters.name ? item.name.includes(filters.name) : true)
         );
       });
@@ -136,28 +134,6 @@ const UserDashboard: React.FC = () => {
           </select>
         </div>
         <div className="flex flex-col items-center">
-          <label htmlFor="category" className="font-semibold">Categoría:</label>
-          <input
-            type="text"
-            id="category"
-            name="category"
-            value={filters.category}
-            onChange={handleFilterChange}
-            className="p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="flex flex-col items-center">
-          <label htmlFor="store" className="font-semibold">Bodega:</label>
-          <input
-            type="text"
-            id="store"
-            name="store"
-            value={filters.store}
-            onChange={handleFilterChange}
-            className="p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="flex flex-col items-center">
           <label htmlFor="name" className="font-semibold">Nombre:</label>
           <input
             type="text"
@@ -195,11 +171,10 @@ const UserDashboard: React.FC = () => {
                         <div className="flex-1">
                           <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
                           <div>Nombre: {item.name}</div>
-                          <div>Categoría: {item.category}</div>
-                          <div>Bodega: {item.store}</div>
+                          {/* Eliminé las propiedades 'category' y 'store' que no existen en la interfaz */}
                           <div>Cantidad: {item.quantity}</div>
                           <div>Precio: ${item.price ? Number(item.price).toFixed(2) : "0.00"}</div>
-                          <div>Total: ${item.total ? Number(item.total).toFixed(2) : "0.00"}</div>
+                          <div>Total: ${item.quantity * item.price ? Number(item.quantity * item.price).toFixed(2) : "0.00"}</div>
                         </div>
                       </div>
                     ))
@@ -222,7 +197,6 @@ const UserDashboard: React.FC = () => {
 };
 
 export default withPageAuthRequired(UserDashboard);
-
 
 
 
