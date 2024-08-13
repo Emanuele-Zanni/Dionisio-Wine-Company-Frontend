@@ -20,14 +20,18 @@ const Cart = () => {
       const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
       if (storedCart) {
         setCart(storedCart);
-        
-        const totalCart = storedCart.reduce((acc: number, item: IProduct) => 
-          acc + (typeof item.price === 'number' ? item.price : 0) * (item.quantity || 1)
-        , 0);
-        setTotal(totalCart);
+        calculateTotal(storedCart);
       }
     }
   }, []);
+
+  const calculateTotal = (cartItems: IProduct[]) => {
+    const totalCart = cartItems.reduce(
+      (acc, item) => acc + (typeof item.price === 'number' ? item.price : 0) * (item.quantity || 1),
+      0
+    );
+    setTotal(totalCart);
+  };
 
   const updateLocalStorage = (updatedCart: IProduct[]) => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
@@ -36,11 +40,38 @@ const Cart = () => {
   const handleRemoveFromCart = (productId: string) => {
     const updatedCart = cart.filter((product) => product.productId !== productId);
     setCart(updatedCart);
-    const updatedTotal = updatedCart.reduce((acc, curr) => 
-      acc + (typeof curr.price === 'number' ? curr.price : 0) * (curr.quantity || 1)
-    , 0);
-    setTotal(updatedTotal);
+    calculateTotal(updatedCart);
     updateLocalStorage(updatedCart);
+  };
+
+  const handleQuantityChange = async (productId: string, delta: number) => {
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) => {
+        if (item.productId === productId) {
+          const newQuantity = (item.quantity || 1) + delta;
+
+          if (newQuantity > item.stock) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Stock insuficiente',
+              text: 'No hay más unidades disponibles.',
+              confirmButtonText: 'Aceptar',
+            });
+            return item; 
+          }
+
+          return {
+            ...item,
+            quantity: Math.max(newQuantity, 1)
+          };
+        }
+        return item;
+      });
+
+      calculateTotal(updatedCart);
+      updateLocalStorage(updatedCart);
+      return updatedCart;
+    });
   };
 
   const handleClick = async () => {
@@ -89,57 +120,15 @@ const Cart = () => {
     }
   };
 
-  const handleQuantityChange = async (productId: string, delta: number) => {
-    setCart((prevCart) => {
-      const updatedCart = prevCart.map((item) => {
-        if (item.productId === productId) {
-          const newQuantity = (item.quantity || 1) + delta;
-
-          if (newQuantity > item.stock) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Stock insuficiente',
-              text: 'No hay más unidades disponibles.',
-              confirmButtonText: 'Aceptar',
-            });
-            return item; 
-          }
-
-          return {
-            ...item,
-            quantity: Math.max(newQuantity, 1) 
-          };
-        }
-        return item;
-      });
-
-      const totalCart = updatedCart.reduce((acc, curr) => 
-        acc + (typeof curr.price === 'number' ? curr.price : 0) * (curr.quantity || 1)
-      , 0);
-      setTotal(totalCart);
-      updateLocalStorage(updatedCart);
-      return updatedCart;
-    });
-  };
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
-
-  if (!user) {
-    return (
-      router.push("/api/auth/login")
-    )
-  }
-
   const handleCheckout = async () => {
     try {
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
-  
+
       if (!cartItems || cartItems.length === 0) {
         console.error("El carrito está vacío.");
         return;
       }
-  
+
       const response = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: {
@@ -155,9 +144,9 @@ const Cart = () => {
           })),
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
         window.location.href = data.url;
@@ -168,10 +157,17 @@ const Cart = () => {
       console.error('Error:', error);
     }
   };
-  
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+
+  if (!user) {
+    return router.push("/api/auth/login");
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
-      <h1 className="text-2xl mt-7 font-semibold text-gray-700 ">Tu Carrito</h1>
+      <h1 className="text-2xl mt-7 font-semibold text-gray-700">Tu Carrito</h1>
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col gap-6">
           {cart.length > 0 ? (
@@ -212,7 +208,7 @@ const Cart = () => {
                       handleRemoveFromCart(product.productId);
                     }
                   }}
-                  className= "flex items-center"
+                  className="flex items-center"
                 >
                   <Image
                     src="/eliminar.png"
@@ -229,12 +225,12 @@ const Cart = () => {
           )}
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
+          <p className="text-xl mt-7 font-semibold text-gray-700">Total: ${total.toFixed(2)}</p>
         </div>
         <button
           onClick={handleCheckout}
           disabled={cart.length === 0}
-          className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+          className={`w-full md:w-auto bg-red-800 hover:bg-red-500 text-white p-3 rounded-md mt-7 ${
             cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
           }`}
         >
