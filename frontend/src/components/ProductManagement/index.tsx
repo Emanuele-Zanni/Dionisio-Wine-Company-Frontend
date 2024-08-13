@@ -1,5 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Swal from 'sweetalert2';
+import axios from 'axios';
+
+interface Category {
+  categoryId: string;
+  name: string;
+}
 
 interface Product {
   productId: string;
@@ -10,10 +16,7 @@ interface Product {
   imgUrl: string;
   store: string;
   isActive: boolean;
-  category: {
-    categoryId: string;
-    name: string;
-  };
+  category: Category;
 }
 
 const ProductManagement = () => {
@@ -26,12 +29,16 @@ const ProductManagement = () => {
     productId: ''
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
+    // Fetch products
     fetch('/api-vinos/products')
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data.data)) { // Asegúrate de acceder al array correcto
+        if (Array.isArray(data.data)) {
           setProducts(data.data);
           setFilteredProducts(data.data);
         } else {
@@ -45,7 +52,34 @@ const ProductManagement = () => {
         setProducts([]);
         setFilteredProducts([]);
       });
+
+    // Fetch categories
+    fetch('/api-vinos/categories') // Replace with the actual endpoint for categories
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.data)) {
+          setCategories(data.data);
+        } else {
+          console.error('Data fetched is not an array:', data);
+          setCategories([]);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching categories:', error);
+        setCategories([]);
+      });
   }, []);
+
+  useEffect(() => {
+    if (imageFile) {
+      const objectUrl = URL.createObjectURL(imageFile);
+      setImagePreview(objectUrl);
+
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setImagePreview(null);
+    }
+  }, [imageFile]);
 
   const applyFilters = () => {
     const { name, category, store, productId } = filters;
@@ -67,24 +101,57 @@ const ProductManagement = () => {
       store: '',
       productId: ''
     });
-    setFilteredProducts(products); // Restablecer los productos filtrados a todos los productos
+    setFilteredProducts(products);
   };
 
   const handleAdjustClick = (product: Product) => {
     setSelectedProduct(product);
   };
 
-  const handlePatchProduct = () => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+
+  const handlePatchProduct = async () => {
     if (!selectedProduct) return;
 
+    let imageUrl = selectedProduct.imgUrl; // Retain existing image URL if no new image is provided
+
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append('file', imageFile);
+      formData.append('upload_preset', process.env.CLOUDINARY_UPLOAD_PRESET!);
+
+      try {
+        const response = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`, formData);
+        imageUrl = response.data.secure_url;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        Swal.fire('Error', 'Hubo un problema al subir la imagen', 'error');
+        return;
+      }
+    }
+
     const token = localStorage.getItem('token');
-    fetch(`/api-vinos/products/${selectedProduct.productId}`, {
+
+    fetch(`/api-vinos/products/${selectedProduct.productId}/update`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Basic: ${token}`,
+        Authorization: `Bearer ${token}`, // Corregido para JWT
       },
-      body: JSON.stringify(selectedProduct),
+      body: JSON.stringify({
+        name: selectedProduct.name,
+        description: selectedProduct.description,
+        price: selectedProduct.price,
+        stock: selectedProduct.stock,
+        imgUrl: imageUrl,
+        store: selectedProduct.store,
+        isActive: selectedProduct.stock > 0,
+        category: selectedProduct.category,
+      }),
     })
       .then((res) => {
         if (!res.ok) {
@@ -99,7 +166,8 @@ const ProductManagement = () => {
           text: 'Producto modificado correctamente',
         });
         setSelectedProduct(null); // Cerrar el popup
-        // Opcional: actualizar la lista de productos en el estado
+        setImageFile(null); // Limpiar la imagen seleccionada
+        setImagePreview(null); // Limpiar la vista previa
       })
       .catch((error) => {
         Swal.fire({
@@ -197,7 +265,7 @@ const ProductManagement = () => {
               &times;
             </button>
             <h2 className="text-xl font-semibold mb-4">Adjust Product</h2>
-            <form>
+            <form onSubmit={(e) => e.preventDefault()}>
               <div className="mb-4">
                 <label className="block text-sm font-medium">Nombre</label>
                 <input
@@ -221,7 +289,7 @@ const ProductManagement = () => {
                   type="number"
                   className="mt-1 block w-full p-2 border rounded"
                   value={selectedProduct.price}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, price: Number(e.target.value) })}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, price: +e.target.value })}
                 />
               </div>
               <div className="mb-4">
@@ -230,39 +298,50 @@ const ProductManagement = () => {
                   type="number"
                   className="mt-1 block w-full p-2 border rounded"
                   value={selectedProduct.stock}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: Number(e.target.value) })}
+                  onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: +e.target.value })}
                 />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium">Categoría</label>
-                <input
-                  type="text"
+                <select
                   className="mt-1 block w-full p-2 border rounded"
-                  value={selectedProduct.category.name}
-                  onChange={(e) => setSelectedProduct({
-                    ...selectedProduct,
-                    category: {
-                      ...selectedProduct.category,
-                      name: e.target.value
+                  value={selectedProduct.category.categoryId}
+                  onChange={(e) => {
+                    const selectedCategory = categories.find(category => category.categoryId === e.target.value);
+                    if (selectedCategory) {
+                      setSelectedProduct({ ...selectedProduct, category: selectedCategory });
                     }
-                  })}
-                />
+                  }}
+                >
+                  {categories.map((category) => (
+                    <option key={category.categoryId} value={category.categoryId}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">Bodega</label>
+                <label className="block text-sm font-medium">Imagen</label>
                 <input
-                  type="text"
-                  className="mt-1 block w-full p-2 border rounded"
-                  value={selectedProduct.store}
-                  onChange={(e) => setSelectedProduct({ ...selectedProduct, store: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="block w-full p-2 border rounded"
                 />
+                {imagePreview && (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="mt-2 w-32 h-32 object-cover rounded"
+                  />
+                )}
               </div>
               <button
                 type="button"
-                className="bg-green-500 text-white p-2 rounded"
+                className="bg-blue-500 text-white p-2 rounded"
                 onClick={handlePatchProduct}
               >
-                Guardar Cambios
+                Save Changes
               </button>
             </form>
           </div>
