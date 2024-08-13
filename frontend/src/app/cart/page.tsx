@@ -228,6 +228,9 @@ const Cart = () => {
           )}
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
+          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
+          {/* <button
+            onClick={handleClick}
           <p className="text-xl mt-7 font-semibold text-gray-700">Total: ${total.toFixed(2)}</p>
           <button
             onClick={handleCheckout}
@@ -236,6 +239,20 @@ const Cart = () => {
               cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
             }`}
           >
+            Comprar
+          </button> 
+        </div> */}
+        <button
+        onClick={handleCheckout}
+        disabled={cart.length === 0}
+        className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+          cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
+        }`}
+      >
+        Checkout
+      </button>
+      </div>
+    </div>
             Checkout
           </button>
         </div>

@@ -18,47 +18,52 @@ async function getProducts() {
 
 
 const debounce = (func: Function, delay: number) => {
-    let timer: NodeJS.Timeout;
-    return (...args: any[]) => {
-        clearTimeout(timer);
-        timer = setTimeout(() => func(...args), delay);
-    };
+  let timer: NodeJS.Timeout | null = null;
+  return (...args: any[]) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => func(...args), delay);
+  };
 };
 
 const Products = () => {
-    const [products, setProducts] = useState<IProduct[]>([]);
-    const [filters, setFilters] = useState({
-        category: { name: '' },
-        store: '',
-        name: '',
-        priceMin: 0,
-        priceMax: 100000
-    });
-    const [sortOrder, setSortOrder] = useState('asc');
-    const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
-    const [showFilteredProducts, setShowFilteredProducts] = useState(false);
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [filters, setFilters] = useState({
+    category: { name: "" },
+    store: "",
+    name: "",
+    priceMin: 0,
+    priceMax: 100000,
+  });
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
+  const [showFilteredProducts, setShowFilteredProducts] = useState(false);
 
-    const initialFilters = {
-        category: { name: '' },
-        store: '',
-        name: '',
-        priceMin: 0,
-        priceMax: 100000
+  const initialFilters = useMemo(
+    () => ({
+      category: { name: "" },
+      store: "",
+      name: "",
+      priceMin: 0,
+      priceMax: 100000,
+    }),
+    []
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const products = await getProducts();
+        setProducts(products);
+        setFilteredProducts(products);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const products = await getProducts();
-                setProducts(products);
-                setFilteredProducts(products);
-            } catch (error) {
-                console.error('Error fetching products:', error);
-            }
-        };
-
-        fetchData();
-    }, []);
+    fetchData();
+  }, []);
 
     const applyFilters = useCallback(() => {
         const filtered = products
@@ -77,42 +82,44 @@ const Products = () => {
                 sortOrder === 'asc' ? parseFloat(a.price) - parseFloat(b.price) : parseFloat(b.price) - parseFloat(a.price)
             );
 
-        setFilteredProducts(filtered);
-        setShowFilteredProducts(true);
-    }, [filters, sortOrder, products]);
+    setFilteredProducts(filtered);
+    setShowFilteredProducts(true);
+  }, [filters, sortOrder, products]);
 
-    const debouncedApplyFilters = useCallback(debounce(applyFilters, 300), [applyFilters]);
+  useEffect(() => {
+    const debouncedApplyFilters = debounce(applyFilters, 300);
 
-    useEffect(() => {
-        debouncedApplyFilters();
-    }, [filters, sortOrder, debouncedApplyFilters]);
+    debouncedApplyFilters();
+  }, [applyFilters, filters, sortOrder]);
 
-    const resetFilters = useCallback(() => {
-        setFilters(initialFilters);
-        setSortOrder('asc');
-        setFilteredProducts(products);
-        setShowFilteredProducts(false);
-    }, [initialFilters, products]);
+  const resetFilters = useCallback(() => {
+    setFilters(initialFilters);
+    setSortOrder("asc");
+    setFilteredProducts(products);
+    setShowFilteredProducts(false);
+  }, [initialFilters, products]);
 
-    return (
-        <div className="flex">
-            <Sidebar
-                filters={filters}
-                setFilters={setFilters}
-                sortOrder={sortOrder}
-                setSortOrder={setSortOrder}
-                applyFilters={applyFilters}
-                resetFilters={resetFilters}
-            />
-            <div className="flex-1 p-4">
-                {showFilteredProducts && filteredProducts.length === 0 ? (
-                    <p className="text-center text-red-600">Ningún producto encontrado</p>
-                ) : (
-                    <ProductsList products={showFilteredProducts ? filteredProducts : products} />
-                )}
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex">
+      <Sidebar
+        filters={filters}
+        setFilters={setFilters}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        applyFilters={applyFilters}
+        resetFilters={resetFilters}
+      />
+      <div className="flex-1 p-4">
+        {showFilteredProducts && filteredProducts.length === 0 ? (
+          <p className="text-center text-red-600">Ningún producto encontrado</p>
+        ) : (
+          <ProductsList
+            products={showFilteredProducts ? filteredProducts : products}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Products;
