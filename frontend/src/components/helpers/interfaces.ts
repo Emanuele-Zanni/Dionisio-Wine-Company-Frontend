@@ -22,10 +22,18 @@ export interface IProduct {
   }
   
   export interface IOrder {
-   id: number,
-   status: string,
-   date: Date,
-   products: IProduct[]
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    // Otros campos relevantes de la entidad Order...
+    details: OrderDetail[]; // Relación uno a muchos con OrderDetail
   }
-  
+  export interface OrderDetail {
+    orderDetailId: string;
+    order: IOrder;
+    product: IProduct;
+    quantity: number;
+    price: number;
+    total: number;
+  }
 

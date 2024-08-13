@@ -256,10 +256,15 @@ const UserDashboard: React.FC = () => {
               'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
             },
           });
-          const data: Order[] = await response.json();
+          const data = await response.json();
           
           console.log('Fetched Orders:', data);
-          setOrders(Array.isArray(data) ? data : []);
+          if (data && Array.isArray(data)) {
+            setOrders(data);
+          } else {
+            console.warn('No orders found or invalid response format:', data);
+            setOrders([]);
+          }
         } catch (error) {
           console.error('Error fetching orders:', error);
           setOrders([]);
@@ -273,30 +278,25 @@ const UserDashboard: React.FC = () => {
   // Función para aplicar filtros y sorting
   const applyFilters = (ordersToFilter: Order[]) => {
     const filtered = ordersToFilter.filter((order) => {
-      // Verifica que order.items existe y es un array antes de aplicar filter
-      if (Array.isArray(order.items)) {
-        const filteredItems = order.items.filter((item: OrderItem) => {
-          return (
-            (filters.category ? item.category.includes(filters.category) : true) &&
-            (filters.store ? item.store.includes(filters.store) : true) &&
-            (filters.name ? item.name.includes(filters.name) : true)
-          );
-        });
+      const filteredItems = order.items.filter((item) => {
+        return (
+          (filters.category ? item.category.includes(filters.category) : true) &&
+          (filters.store ? item.store.includes(filters.store) : true) &&
+          (filters.name ? item.name.includes(filters.name) : true)
+        );
+      });
 
-        // Si se encuentran items que coinciden con los filtros, incluir la orden
-        return filteredItems.length > 0;
-      }
-      // Si order.items no es un array, excluye esta orden
-      return false;
+      return filteredItems.length > 0;
     });
 
     const sortedOrders = filtered.sort((a, b) => {
-      const totalA = a.total;
-      const totalB = b.total;
-      return sortOrder === 'asc' ? totalA - totalB : totalB - totalA;
+      if (sortOrder === 'asc') {
+        return a.total - b.total;
+      } else {
+        return b.total - a.total;
+      }
     });
 
-    console.log('Filtered and Sorted Orders:', sortedOrders);
     setFilteredOrders(sortedOrders);
   };
 
@@ -307,7 +307,9 @@ const UserDashboard: React.FC = () => {
 
   // Aplicar filtros cuando los filtros cambien
   useEffect(() => {
-    applyFilters(orders);
+    if (orders.length > 0) {
+      applyFilters(orders);
+    }
   }, [filters, sortOrder, orders]);
 
   if (isLoading) return <div>Loading...</div>;
@@ -377,17 +379,17 @@ const UserDashboard: React.FC = () => {
       </div>
 
       <div className="flex-1 w-full">
-        {Array.isArray(filteredOrders) && filteredOrders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <div className="text-center text-gray-500">Aún no hay órdenes</div>
         ) : (
           <div className="space-y-4">
-            {Array.isArray(filteredOrders) && filteredOrders.map((order) => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.id}
                 className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition"
               >
                 <div className="flex flex-col space-y-4">
-                  {Array.isArray(order.items) && order.items.length > 0 ? (
+                  {order.items.length > 0 ? (
                     order.items.map((item, index) => (
                       <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
                         <img src={item.imageUrl} alt={item.name} className="w-16 h-16 mr-4"/>
