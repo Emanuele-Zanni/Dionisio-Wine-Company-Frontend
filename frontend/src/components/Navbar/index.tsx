@@ -20,10 +20,7 @@ function Navbar() {
   useEffect(() => {
     const storedRole = localStorage.getItem("role") as UserRole | null;
     console.log("Stored Role:", storedRole);
-    if (
-      storedRole &&
-      Object.values(UserRole).includes(storedRole as UserRole)
-    ) {
+    if (storedRole && Object.values(UserRole).includes(storedRole as UserRole)) {
       setRole(storedRole as UserRole);
     }
   }, []);
@@ -40,7 +37,7 @@ function Navbar() {
     }
   };
 
-  const profileLink =
+  const profileLink = 
     role === UserRole.Admin || role === UserRole.SuperAdmin
       ? "/admin-dashboard"
       : "/user-dashboard";
@@ -132,25 +129,25 @@ function Navbar() {
                 </Link>
               </li>
             )}
-
-            {user && isRoleValid ? (
-
-            {(user && role === UserRole.User) || (user && role === UserRole.SuperAdmin) || (user && role === UserRole.Admin) ? (
-
+            {user && isRoleValid && (
               <li>
                 <div className="flex items-center px-4">
-                  <Link href="/cart">
-                    <Image
-                      src="/carrito2.png"
-                      alt="carrito"
-                      width={30}
-                      height={30}
-                      className="cursor-pointer"
-                    />
-                  </Link>
+                  {(role === UserRole.User ||
+                    role === UserRole.SuperAdmin ||
+                    role === UserRole.Admin) && (
+                    <Link href="/cart">
+                      <Image
+                        src="/carrito2.png"
+                        alt="carrito"
+                        width={30}
+                        height={30}
+                        className="cursor-pointer"
+                      />
+                    </Link>
+                  )}
                 </div>
               </li>
-            ) : null}
+            )}
             <li>
               {user ? (
                 <button
