@@ -15,7 +15,7 @@ const UserManagement = () => {
   });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
-  const [roleToUpdate, setRoleToUpdate] = useState<{ id: string, newRole: string } | null>(null);
+  const [roleToUpdate, setRoleToUpdate] = useState<{ id: string; newRole: string } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -206,7 +206,7 @@ const UserManagement = () => {
                 Ver Órdenes
               </button>
               <select
-                value={roleToUpdate?.id === user.id ? roleToUpdate.newRole : user.role}
+                value={roleToUpdate?.id === user.id ? roleToUpdate?.newRole : user.role}
                 className="p-2 border rounded"
                 onChange={(e) => {
                   const newRole = e.target.value;
