@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import ProductsList from '@/components/ProductList';
 import Sidebar from '@/components/Sidebar';
 import { IProduct } from '@/interface';
