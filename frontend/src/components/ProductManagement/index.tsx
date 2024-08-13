@@ -15,7 +15,7 @@ interface Product {
   stock: number;
   imgUrl: string;
   store: string;
-  isActive: boolean;
+  //isActive: boolean;
   category: Category;
 }
 
@@ -116,14 +116,14 @@ const ProductManagement = () => {
 
   const handlePatchProduct = async () => {
     if (!selectedProduct) return;
-
+  
     let imageUrl = selectedProduct.imgUrl; // Retain existing image URL if no new image is provided
-
+  
     if (imageFile) {
       const formData = new FormData();
       formData.append('file', imageFile);
       formData.append('upload_preset', process.env.CLOUDINARY_UPLOAD_PRESET!);
-
+  
       try {
         const response = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`, formData);
         imageUrl = response.data.secure_url;
@@ -133,52 +133,74 @@ const ProductManagement = () => {
         return;
       }
     }
-
+  
     const token = localStorage.getItem('token');
-
-    fetch(`/api-vinos/products/${selectedProduct.productId}/update`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`, // Corregido para JWT
-      },
-      body: JSON.stringify({
-        name: selectedProduct.name,
-        description: selectedProduct.description,
-        price: selectedProduct.price,
-        stock: selectedProduct.stock,
-        imgUrl: imageUrl,
-        store: selectedProduct.store,
-        isActive: selectedProduct.stock > 0,
-        category: selectedProduct.category,
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Failed to update product');
-        }
-        return res.json();
-      })
-      .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Éxito',
-          text: 'Producto modificado correctamente',
-        });
-        setSelectedProduct(null); // Cerrar el popup
-        setImageFile(null); // Limpiar la imagen seleccionada
-        setImagePreview(null); // Limpiar la vista previa
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Error al modificar el producto',
-        });
-        console.error('Error updating product:', error);
+  
+    try {
+      const response = await fetch(`/api-vinos/products/${selectedProduct.productId}/update`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Corregido para JWT
+        },
+        body: JSON.stringify({
+          name: selectedProduct.name,
+          description: selectedProduct.description,
+          price: selectedProduct.price,
+          stock: selectedProduct.stock,
+          imgUrl: imageUrl,
+          store: selectedProduct.store,
+          isActive: selectedProduct.stock > 0,
+          category: selectedProduct.category,
+        }),
       });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+  
+      // Read the response JSON only once
+      const result = await response.json();
+      console.log(result);
+  
+      // Update the local state with the new product data
+      setProducts((prevProducts) => 
+        prevProducts.map((product) =>
+          product.productId === selectedProduct.productId
+            ? { ...product, ...result } // Update the product with the new data
+            : product
+        )
+      );
+  
+      // Update filteredProducts if necessary
+      setFilteredProducts((prevFilteredProducts) => 
+        prevFilteredProducts.map((product) =>
+          product.productId === selectedProduct.productId
+            ? { ...product, ...result }
+            : product
+        )
+      );
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Éxito',
+        text: 'Producto modificado correctamente',
+      });
+      setSelectedProduct(null); // Cerrar el popup
+      setImageFile(null); // Limpiar la imagen seleccionada
+      setImagePreview(null); // Limpiar la vista previa
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al modificar el producto',
+      });
+  
+      console.error('Error updating product:', error);
+    }
   };
-
+  
+  
   return (
     <div className="p-4">
       <h2 className="text-3xl font-bold text-center mb-8">Product Management</h2>
