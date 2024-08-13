@@ -253,11 +253,7 @@ const Cart = () => {
       </button>
       </div>
     </div>
-            Checkout
-          </button>
-        </div>
-      </div>
-    </div>
+   </div>
   );
 };
 
