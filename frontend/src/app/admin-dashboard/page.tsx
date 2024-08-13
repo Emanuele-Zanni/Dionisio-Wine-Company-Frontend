@@ -175,10 +175,10 @@ const AdminDashboard: React.FC = () => {
         },
       });
   
-      const categories = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
+      const categories: Category[] = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
       
       // Encontrar el UUID de la categoría con el nombre proporcionado
-      const category = categories.find(cat => cat.name.toLowerCase() === categoryToDelete.toLowerCase());
+      const category = categories.find((cat: Category) => cat.name.toLowerCase() === categoryToDelete.toLowerCase());
   
       if (!category) {
         Swal.fire('Error', 'Categoría no encontrada', 'error');
@@ -202,7 +202,6 @@ const AdminDashboard: React.FC = () => {
       Swal.fire('Error', 'Hubo un problema al eliminar la categoría', 'error');
     }
   };
-  
   
   const fetchProducts = async () => {
     try {
