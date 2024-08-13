@@ -133,7 +133,6 @@ const Cart = () => {
 
   const handleCheckout = async () => {
     try {
-      // Obtener el carrito desde localStorage
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
   
       if (!cartItems || cartItems.length === 0) {
@@ -141,7 +140,6 @@ const Cart = () => {
         return;
       }
   
-      // Enviar datos al backend de Stripe para iniciar el checkout
       const response = await fetch('/api/checkout_sessions', {
         method: 'POST',
         headers: {
@@ -149,7 +147,7 @@ const Cart = () => {
         },
         body: JSON.stringify({
           cartItems: cartItems.map((item: IProduct) => ({
-            productId: item.productId,  // Asegúrate de que el campo productId esté presente
+            productId: item.productId,
             name: item.name,
             imgUrl: item.imgUrl,
             price: item.price,
@@ -161,10 +159,7 @@ const Cart = () => {
       const data = await response.json();
   
       if (response.ok) {
-        // Guardar cartItems en localStorage para su uso posterior (ej. en la página de éxito)
         localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
-        
-        // Redirigir a la URL de éxito de Stripe
         window.location.href = data.url;
       } else {
         console.error('Error creando la sesión de checkout:', data.error);
@@ -173,8 +168,6 @@ const Cart = () => {
       console.error('Error:', error);
     }
   };
-  
-  
   
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
@@ -237,25 +230,16 @@ const Cart = () => {
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
           <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
-          {/* <button
-            onClick={handleClick}
-            disabled={cart.length === 0}
-            className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
-              cart.length === 0 ? "cursor-not-allowed opacity-50" : ""
-            }`}
-          >
-            Comprar
-          </button> */}
         </div>
         <button
-        onClick={handleCheckout}
-        disabled={cart.length === 0}
-        className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
-          cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
-        }`}
-      >
-        Checkout
-      </button>
+          onClick={handleCheckout}
+          disabled={cart.length === 0}
+          className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+            cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
+          }`}
+        >
+          Checkout
+        </button>
       </div>
     </div>
   );
