@@ -20,12 +20,11 @@ const Cart = () => {
       const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
       if (storedCart) {
         setCart(storedCart);
-        
-        const totalCart = storedCart.reduce((acc: number, item: IProduct) => {
-          const price = typeof item.price === 'number' ? item.price : 0;
-          const quantity = typeof item.quantity === 'number' ? item.quantity : 1;
-          return acc + price * quantity;
-        }, 0);
+
+        // Asegúrate de que `price` es un número
+        const totalCart = storedCart.reduce((acc: number, item: IProduct) =>
+          acc + (parseFloat(item.price) || 0) * (item.quantity || 1)
+        , 0);
         setTotal(totalCart);
       }
     }
@@ -36,13 +35,11 @@ const Cart = () => {
   };
 
   const handleRemoveFromCart = (productId: string) => {
-    const updatedCart = cart.filter((product) => product.productId !== productId);
+    const updatedCart = cart.filter((product) => product.productId === productId);
     setCart(updatedCart);
-    const updatedTotal = updatedCart.reduce((acc: number, curr: IProduct) => {
-      const price = typeof curr.price === 'number' ? curr.price : 0;
-      const quantity = typeof curr.quantity === 'number' ? curr.quantity : 1;
-      return acc + price * quantity;
-    }, 0);
+    const updatedTotal = updatedCart.reduce((acc, curr) => 
+      acc + (parseFloat(curr.price) || 0) * (curr.quantity || 1)
+    , 0);
     setTotal(updatedTotal);
     updateLocalStorage(updatedCart);
   };
@@ -66,7 +63,7 @@ const Cart = () => {
     }
 
     const orderItems = cart.map((product) => ({
-      productId: product.productId,
+      productId: product.productId || '',  // Asegúrate de que el `productId` no sea undefined
       quantity: product.quantity || 1,
     }));
 
@@ -111,17 +108,15 @@ const Cart = () => {
 
           return {
             ...item,
-            quantity: Math.max(newQuantity, 1),
+            quantity: Math.max(newQuantity, 1)
           };
         }
         return item;
       });
 
-      const totalCart = updatedCart.reduce((acc: number, curr: IProduct) => {
-        const price = typeof curr.price === 'number' ? curr.price : 0;
-        const quantity = typeof curr.quantity === 'number' ? curr.quantity : 1;
-        return acc + price * quantity;
-      }, 0);
+      const totalCart = updatedCart.reduce((acc, curr) =>
+        acc + (parseFloat(curr.price) || 0) * (curr.quantity || 1)
+      , 0);
       setTotal(totalCart);
       updateLocalStorage(updatedCart);
       return updatedCart;
@@ -151,10 +146,10 @@ const Cart = () => {
         },
         body: JSON.stringify({
           cartItems: cartItems.map((item: IProduct) => ({
-            productId: item.productId,
+            productId: item.productId || '',  // Asegúrate de que el `productId` no sea undefined
             name: item.name,
             imgUrl: item.imgUrl,
-            price: item.price,
+            price: parseFloat(item.price),
             quantity: item.quantity || 1,
           })),
         }),
@@ -175,7 +170,7 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
-      <h1 className="text-2xl mt-7 font-semibold text-gray-700 ">Tu Carrito</h1>
+      <h1 className="text-2xl mt-7 font-semibold text-gray-700">Tu Carrito</h1>
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md">
         <div className="flex flex-col gap-6">
           {cart.length > 0 ? (
@@ -184,33 +179,45 @@ const Cart = () => {
                 <Image src={product.imgUrl} alt={product.name} width={150} height={150} className="rounded-lg" />
                 <div className="flex-1">
                   <p className="text-lg font-medium dark:text-white">{product.name}</p>
-                  <p className="text-sm text-gray-600">Precio: ${product.price}</p>
+                  <p className="text-sm text-gray-600">Precio: ${parseFloat(product.price).toFixed(2)}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => handleQuantityChange(product.productId, -1)}
+                    onClick={() => {
+                      if (product.productId) {
+                        handleQuantityChange(product.productId, -1);
+                      }
+                    }}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
-                    disabled={(product.quantity || 1) <= 1} 
+                    disabled={(product.quantity || 1) <= 1}
                   >
                     -
                   </button>
                   <span className="w-10 text-center text-sm">{product.quantity || 1}</span>
                   <button
-                    onClick={() => handleQuantityChange(product.productId, 1)}
+                    onClick={() => {
+                      if (product.productId) {
+                        handleQuantityChange(product.productId, 1);
+                      }
+                    }}
                     className="bg-gray-300 hover:bg-gray-400 text-black p-1 rounded-md text-sm"
                   >
                     +
                   </button>
                 </div>
                 <button
-                  onClick={() => handleRemoveFromCart(product.productId)}
+                  onClick={() => {
+                    if (product.productId) {
+                      handleRemoveFromCart(product.productId);
+                    }
+                  }}
                   className="flex items-center"
                 >
                   <Image
                     src="/img/eliminar.png"
                     alt="Eliminar"
                     width={24}
-                    height={24} 
+                    height={24}
                     className="mr-2"
                   />
                 </button>
@@ -221,11 +228,11 @@ const Cart = () => {
           )}
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
+          <p className="text-xl mt-7 font-semibold text-gray-700">Total: ${total.toFixed(2)}</p>
           <button
             onClick={handleCheckout}
             disabled={cart.length === 0}
-            className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
+            className={`w-full md:w-auto bg-red-800 hover:bg-red-500 text-white p-3 rounded-md mt-7 ${
               cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
             }`}
           >
