@@ -98,7 +98,7 @@ function Navbar() {
                 </Link>
               </li>
             )}
-            {(user && role === UserRole.User) || (user && role === UserRole.SuperAdmin) ? (
+            {(user && role === UserRole.User) || (user && role === UserRole.SuperAdmin) || (user && role === UserRole.Admin) ? (
               <li>
                 <div className="flex items-center px-4">
                   <Link href="/cart">
