@@ -214,10 +214,10 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
-        {user ? (
+      {user ? (
           <>
-            <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
-            <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
+            <img src={user.picture || '/default-avatar.png'} alt={user.name || 'Usuario'} className="w-16 h-16 rounded-full" />
+            <h1 className="text-3xl font-bold mt-2">{user.name || 'Usuario'}</h1>
             <p className="text-lg text-gray-600">{user.email}</p>
           </>
         ) : (
