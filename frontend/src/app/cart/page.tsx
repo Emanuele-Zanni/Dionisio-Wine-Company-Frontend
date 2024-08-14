@@ -134,40 +134,40 @@ const Cart = () => {
         },
         body: JSON.stringify({ code: discountCode }),
       });
-  
+
       // Obtener el porcentaje de descuento
       const discountPercentage = await response.json();
-  
+
       if (response.ok) {
         const discountAmount = parseFloat(discountPercentage);
-  
+
         if (isNaN(discountAmount) || discountAmount <= 0) {
           throw new Error("El porcentaje de descuento no es válido");
         }
-  
+
         // Obtener el carrito desde el local storage
         const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
-  
+
         // Aplicar el descuento a cada producto en el carrito
-        const updatedCart = cartItems.map((item) => {
+        const updatedCart = cartItems.map((item: IProduct) => {
           const discountedPrice = parseFloat(item.price) * (1 - discountAmount / 100);
           return {
             ...item,
             price: discountedPrice.toFixed(2),  // Actualiza el precio con el descuento aplicado
           };
         });
-  
+
         // Actualizar el total con los precios con descuento
-        const totalWithDiscount = updatedCart.reduce((acc, item) =>
+        const totalWithDiscount = updatedCart.reduce((acc:any, item: any) =>
           acc + parseFloat(item.price) * (item.quantity || 1), 0
         ).toFixed(2);
-  
+
         // Guardar el carrito actualizado en el local storage y actualizar el estado
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         setCart(updatedCart);
         setTotal(parseFloat(totalWithDiscount));
         setDiscount(discountAmount);
-  
+
         Swal.fire({
           icon: 'success',
           title: 'Código aplicado',
@@ -192,8 +192,6 @@ const Cart = () => {
       });
     }
   };
-  
-
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -315,32 +313,17 @@ const Cart = () => {
           </button>
         </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
-          <p className="text-xl mt-7 font-semibold text-gray-700 ">Total: ${total.toFixed(2)}</p>
-          {/* <button
-            onClick={handleClick}
           <p className="text-xl mt-7 font-semibold text-gray-700">Total: ${total.toFixed(2)}</p>
           <button
             onClick={handleCheckout}
             disabled={cart.length === 0}
-            className={`w-full md:w-auto bg-red-800 hover:bg-red-500 text-white p-3 rounded-md mt-7 ${
-              cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
-            }`}
+            className={`w-full md:w-auto bg-red-800 hover:bg-red-500 text-white p-3 rounded-md mt-7 ${cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''}`}
           >
-            Comprar
-          </button> 
-        </div> */}
-        <button
-        onClick={handleCheckout}
-        disabled={cart.length === 0}
-        className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
-          cart.length === 0 ? 'cursor-not-allowed opacity-50' : ''
-        }`}
-      >
-        Checkout
-      </button>
+            Checkout
+          </button>
+        </div>
       </div>
     </div>
-   </div>
   );
 };
 
