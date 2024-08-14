@@ -30,36 +30,36 @@ const About = () => {
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="https://link2.com" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.linkedin.com/in/pedro-gandola/" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="/path/to/photo2.jpg" 
+                            src="" 
                             alt="Foto 2" 
                             width={80} 
                             height={80} 
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="https://link3.com" target="_blank" rel="noopener noreferrer">
+                    <a href="" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="/path/to/photo3.jpg" 
+                            src="" 
                             alt="Foto 3" 
                             width={80} 
                             height={80} 
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="https://link4.com" target="_blank" rel="noopener noreferrer">
+                    <a href="" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="/path/to/photo4.jpg" 
+                            src="" 
                             alt="Foto 4" 
                             width={80} 
                             height={80} 
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="https://link5.com" target="_blank" rel="noopener noreferrer">
+                    <a href="" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="/path/to/photo5.jpg" 
+                            src="" 
                             alt="Foto 5" 
                             width={80} 
                             height={80} 
