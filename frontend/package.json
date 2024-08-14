@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_OPTIONS='--max_old_space_size=450' next dev",
-    "build": "cross-env NODE_OPTIONS='--max_old_space_size=450' next build",
-    "start": "cross-env NODE_OPTIONS='--max_old_space_size=450' next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
