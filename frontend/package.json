@@ -3,15 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-<<<<<<< HEAD
     "dev": "next dev",
-    "build": "NODE_OPTIONS='--max_old_space_size=4096' next build",
-    "start": "NODE_OPTIONS='--max_old_space_size=1024' next start",
-=======
-    "dev": "cross-env NODE_OPTIONS='--max_old_space_size=450' next dev",
-  "build": "cross-env NODE_OPTIONS='--max_old_space_size=450' next build",
-  "start": "cross-env NODE_OPTIONS='--max_old_space_size=450' next start",
->>>>>>> cf1e79cf22d195622771fdaa5fade5dcbadf2da0
+    "build": "next build",
+    "start": " start",
     "lint": "next lint"
   },
   "dependencies": {
