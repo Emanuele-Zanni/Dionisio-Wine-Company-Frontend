@@ -150,6 +150,7 @@ const UserManagement = () => {
   return (
     <div className="p-4">
       {/* Filtros */}
+      <h2 className="text-3xl font-bold text-center mb-8">User Management</h2>
       <div className="mb-4">
         <input
           type="text"

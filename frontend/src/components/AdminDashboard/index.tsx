@@ -1,13 +1,12 @@
- "use client";
+"use client";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Product, User, Category } from "../interfaces/interfaces";
+import { Product, User, Category } from "../../app/interfaces/interfaces"
 import Swal from 'sweetalert2';
 import 'sweetalert2/src/sweetalert2.scss';
 import { useRouter } from 'next/navigation';
-import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import UserManagement from '@/components/UserManagement';
-import  ProductManagement  from '@/components/ProductManagement';
+import { useUser,  } from '@auth0/nextjs-auth0/client';
+
 
 const AdminDashboard: React.FC = () => {
   const {user} = useUser();
@@ -35,8 +34,6 @@ const AdminDashboard: React.FC = () => {
   });
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [showUserManagement, setShowUserManagement] = useState<boolean>(false);
-  const [showProductManagement, setShowProductManagement] = useState<boolean>(false);
   const router = useRouter();
   
   useEffect(() => {
@@ -392,35 +389,7 @@ const AdminDashboard: React.FC = () => {
           ))}
         </ul>
       </div>
-      <div className="button-container flex space-x-4 mb-4">
-        <button
-          onClick={() => setShowUserManagement(!showUserManagement)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-        >
-          {showUserManagement ? 'Ocultar Gestión de Usuarios' : 'Mostrar Gestión de Usuarios'}
-        </button>
-        <button
-          onClick={() => setShowProductManagement(!showProductManagement)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-        >
-          {showProductManagement ? 'Ocultar Gestión de Productos' : 'Mostrar Gestión de Productos'}
-        </button>
-      </div>
-
-      {/* Conditional rendering of ProductManagement and UserManagement */}
-      {showProductManagement && (
-        <section className="form-section">
-          <ProductManagement />
-        </section>
-      )}
-      {showUserManagement && (
-        <section className="user-management">
-          <UserManagement />
-        </section>
-      )}
     </div>
   );
 };
-export default AdminDashboard; 
-
-
+export default AdminDashboard;
