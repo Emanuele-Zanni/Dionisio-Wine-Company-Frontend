@@ -11,7 +11,7 @@ const UserDashboard: React.FC = () => {
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [sortOrder, setSortOrder] = useState('asc');
   const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string>();
 
   // Efecto para obtener el ID del usuario del token
   useEffect(() => {
