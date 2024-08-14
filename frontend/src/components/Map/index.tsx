@@ -5,8 +5,8 @@ import styles from './Map.module.css';
 
 // Configuración del mapa
 const mapContainerStyle = {
-  height: "400px",
-  width: "100%", // Corregí el ancho para que sea más adecuado para la visualización
+height: "100%",
+width: "100%", 
 };
 
 const center = {

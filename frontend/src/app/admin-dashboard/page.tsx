@@ -175,10 +175,10 @@ const AdminDashboard: React.FC = () => {
         },
       });
   
-      const categories = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
+      const categories: Category[] = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
       
       // Encontrar el UUID de la categoría con el nombre proporcionado
-      const category = categories.find(cat => cat.name.toLowerCase() === categoryToDelete.toLowerCase());
+      const category = categories.find((cat: Category) => cat.name.toLowerCase() === categoryToDelete.toLowerCase());
   
       if (!category) {
         Swal.fire('Error', 'Categoría no encontrada', 'error');
@@ -203,7 +203,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
   
-  
   const fetchProducts = async () => {
     try {
       const response = await axios.get('/api-vinos/products');
@@ -215,10 +214,10 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
-        {user ? (
+      {user ? (
           <>
-            <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-full" />
-            <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
+            <img src={user.picture || '/default-avatar.png'} alt={user.name || 'Usuario'} className="w-16 h-16 rounded-full" />
+            <h1 className="text-3xl font-bold mt-2">{user.name || 'Usuario'}</h1>
             <p className="text-lg text-gray-600">{user.email}</p>
           </>
         ) : (

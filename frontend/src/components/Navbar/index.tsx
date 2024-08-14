@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import { KeyIcon } from "@heroicons/react/24/solid";
 
 enum UserRole {
   User = "user",
@@ -18,12 +19,19 @@ function Navbar() {
   const [role, setRole] = useState<UserRole | null>(null);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("role") as UserRole | null;
-    console.log("Stored Role:", storedRole);
-    if (storedRole && Object.values(UserRole).includes(storedRole as UserRole)) {
-      setRole(storedRole as UserRole);
+    if (user) {
+      const storedRole = localStorage.getItem("role") as UserRole | null;
+      console.log("Stored Role:", storedRole);
+      if (
+        storedRole &&
+        Object.values(UserRole).includes(storedRole as UserRole)
+      ) {
+        setRole(storedRole as UserRole);
+      } else {
+        setRole(null);
+      }
     }
-  }, []);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -37,12 +45,8 @@ function Navbar() {
     }
   };
 
-  const profileLink = 
-    role === UserRole.Admin || role === UserRole.SuperAdmin
-      ? "/admin-dashboard"
-      : "/user-dashboard";
+  const profileLink = "/user-dashboard";
 
-  // Asegurarse de que `role` no sea null antes de hacer comparaciones
   if (role === UserRole.Banned) {
     return null;
   }
@@ -51,6 +55,10 @@ function Navbar() {
     role === UserRole.User ||
     role === UserRole.Admin ||
     role === UserRole.SuperAdmin;
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <nav className="bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a] border-gray-200">
@@ -110,25 +118,40 @@ function Navbar() {
                 Contacto
               </a>
             </li>
-            {user &&  (
-              <li>
-                <Link
-                  href={profileLink}
-                  className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
-                >
-                  {user.picture ? (
-                    <Image
-                      src={user.picture}
-                      alt="perfil"
-                      width={30}
-                      height={30}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    "Mi perfil"
-                  )}
-                </Link>
-              </li>
+            {user && (
+              <>
+                {role === UserRole.Admin || role === UserRole.SuperAdmin ? (
+                  <li>
+                    <Link
+                      href="/admin-dashboard"
+                      className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0 flex items-center space-x-2 rtl:space-x-reverse"
+                    >
+                      <KeyIcon className="h-6 w-6 text-white" />
+                      <span className="hidden md:inline">
+                        Panel de Administrador
+                      </span>
+                    </Link>
+                  </li>
+                ) : null}
+                <li>
+                  <Link
+                    href={profileLink}
+                    className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
+                  >
+                    {user.picture ? (
+                      <Image
+                        src={user.picture}
+                        alt="perfil"
+                        width={30}
+                        height={30}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      "Mi perfil"
+                    )}
+                  </Link>
+                </li>
+              </>
             )}
             {user && isRoleValid && (
               <li>

@@ -21,8 +21,11 @@ const nextConfig = {
         destination:
           "https://dionisio-wine-company-backend.onrender.com/:path*",
       },
-    
     ];
+  },
+  devServer: {
+    host: "0.0.0.0",
+    port: 5173,
   },
 };
 
