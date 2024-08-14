@@ -60,6 +60,7 @@ const AdminDashboard: React.FC = () => {
     
   }, [router]);
 
+  //funcional
   
   const fetchCategories = async () => {
       try {
