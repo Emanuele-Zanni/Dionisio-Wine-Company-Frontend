@@ -370,6 +370,11 @@ const AdminDashboard: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <div className="mb-6">
+    <DiscountCodeGenerator />
+        </div>
+        
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold">Productos</h2>
         <ul className="space-y-4">
