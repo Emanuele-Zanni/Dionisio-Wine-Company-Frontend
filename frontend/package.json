@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "set HOST=0.0.0.0 && set PORT=5173 && next dev",
+    "dev": "set HOST=127.0.0.1 && set PORT=5173 && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
