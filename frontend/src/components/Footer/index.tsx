@@ -25,37 +25,38 @@ function Footer() {
                             />
                         </a> */}
                     </div>
-                    <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+                    <div className="grid grid-cols-2 gap-16 sm:gap-6 sm:grid-cols-3">
+                        <div>
+                            {/* <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Subscripciones</h2>
+                            <ul className="text-white dark:text-gray-400 font-medium">
+                                <li className="mb-4">
+                                    <a href="" className="hover:underline">...</a>
+                                </li>
+                                <li>
+                                    <a href="" className="hover:underline">...</a>
+                                </li>
+                            </ul> */}
+                        </div>
+                        <div>
+                            <h2 className="mb-6 text-sm font-semibold text-white uppercase ">GitHub</h2>
+                            
+                            <ul className="text-white dark:text-gray-400 font-medium">
+                                <li className="mb-4">
+                                    <a href="https://github.com/laura-ml/Dionisio-Wine-Company-Frontend" target= "_blanck" className="hover:underline">Frontend</a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/Euka-e/Dionisio-Wine-Company-Backend" target= "_blanck" className="hover:underline">Backend</a>
+                                </li>
+                            </ul>
+                        </div>
                         <div>
                             <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Subscripciones</h2>
                             <ul className="text-white dark:text-gray-400 font-medium">
                                 <li className="mb-4">
-                                    <a href="" className="hover:underline">...</a>
+                                    <a href="#" className="hover:underline">Mensual</a>
                                 </li>
                                 <li>
-                                    <a href="" className="hover:underline">...</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Síguenos</h2>
-                            <ul className="text-white dark:text-gray-400 font-medium">
-                                <li className="mb-4">
-                                    <a href="" className="hover:underline">Github</a>
-                                </li>
-                                <li>
-                                    <a href="" className="hover:underline">Discord</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h2 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Legal</h2>
-                            <ul className="text-white dark:text-gray-400 font-medium">
-                                <li className="mb-4">
-                                    <a href="#" className="hover:underline">Privacy Policy</a>
-                                </li>
-                                <li>
-                                    <a href="#" className="hover:underline">Terms &amp; Conditions</a>
+                                    <a href="#" className="hover:underline">Anual</a>
                                 </li>
                             </ul>
                         </div>

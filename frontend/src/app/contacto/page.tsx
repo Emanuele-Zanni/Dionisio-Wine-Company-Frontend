@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import Image from 'next/image';
+import Map from '@/components/Map';
 
 const Contacto = () => {
     return (
-        <div className="min-h-screen bg-gray-100 flex flex-col items-center py-8">
-            <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-">
+        <div className="min-h-screen  flex flex-col items-center py-8">
+            <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-8">
                 <h1 className="text-3xl font-bold mb-8 text-center text-red-900">Contacto</h1>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -59,17 +59,12 @@ const Contacto = () => {
                     </button>
                 </form>
 
-                {/* <h2 className="text-2xl font-semibold mt-8 mb-4 text-red-900">Ubicación en el Mapa</h2>
-                 <div className="w-full h-64">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3282.992209273733!2d-58.37540138477043!3d-34.61972478045695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bccac2e46c9f1f%3A0x12dd56b51b30a8b8!2sSan%20Telmo%2C%20CABA!5e0!3m2!1sen!2sar!4v1620304971090!5m2!1sen!2sar"
-                        width="100%"
-                        height="100%"
-                        allowFullScreen={true}
-                        loading="lazy"
-                        className="rounded-lg"
-                    ></iframe>
-                </div> */}
+                <div className="w-full mt-6">
+                <p className="text-xl text-end font-bold text-red-950">
+                   Te esperamos en nuestro local!
+                  </p>
+        <Map />
+      </div>
             </div>
         </div>
     );
