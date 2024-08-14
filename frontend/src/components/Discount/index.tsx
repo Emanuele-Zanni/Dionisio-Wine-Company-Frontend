@@ -3,17 +3,24 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const DiscountCodeGenerator = () => {
-  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountAmount, setDiscountAmount] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [error, setError] = useState('');
 
   const handleGenerateCode = async () => {
     try {
+      // Convertir discountAmount a número entero, manejar NaN
       const percentage = parseInt(discountAmount, 10);
-      
+
+      if (isNaN(percentage) || percentage <= 0) {
+        setError('Por favor ingresa un monto de descuento válido.');
+        Swal.fire('Error', 'El monto de descuento debe ser un número válido y mayor que 0.', 'error');
+        return;
+      }
+
       // Asegúrate de tener el token de autenticación
       const token = localStorage.getItem('token'); // O el método que estés usando para obtener el token
-      
+
       const response = await axios.post('/api-vinos/offers/generate', 
         { percentage },
         {
@@ -23,7 +30,7 @@ const DiscountCodeGenerator = () => {
           },
         }
       );
-  
+
       if (response.data && response.data.code) {
         setGeneratedCode(response.data.code);
         setError('');
@@ -37,7 +44,6 @@ const DiscountCodeGenerator = () => {
       Swal.fire('Error', 'Hubo un problema al generar el código de descuento', 'error');
     }
   };
-  
 
   return (
     <div className="mb-6 bg-white p-6 rounded-lg shadow-md">

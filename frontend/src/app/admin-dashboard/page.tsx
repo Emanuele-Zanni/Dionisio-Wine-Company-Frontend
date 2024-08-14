@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import UserManagement from '@/components/UserManagement';
 import  ProductManagement  from '@/components/ProductManagement';
+import DiscountCodeGenerator from '@/components/Discount';
 
 const AdminDashboard: React.FC = () => {
   const {user} = useUser();
