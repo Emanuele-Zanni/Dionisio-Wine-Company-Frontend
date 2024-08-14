@@ -3,11 +3,10 @@
  */
 const nextConfig = {
   images: {
-    domains: ['dummyimage.com'], // Permite imágenes desde dummyimage.com
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**', // Permite cualquier subdominio de cualquier dominio
+        protocol: "https",
+        hostname: "**", // Permite cualquier subdominio de cualquier dominio
       },
     ],
   },
@@ -18,12 +17,16 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api-vinos/:path*',
-
-        destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
+        source: "/api-vinos/:path*",
+        destination:
+          "https://dionisio-wine-company-backend.onrender.com/:path*",
       },
     ];
   },
+  devServer: {
+    host: "0.0.0.0",
+    port: 5173,
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
