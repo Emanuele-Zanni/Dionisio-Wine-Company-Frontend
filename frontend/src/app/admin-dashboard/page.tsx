@@ -48,9 +48,10 @@ const AdminDashboard: React.FC = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get('/api-vinos/categories');
-        setCategories(response.data.data);
+        setCategories(response.data || []);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setCategories([]); // En caso de error, asegúrate de que categories sea un array vacío
       }
     };
     
@@ -58,14 +59,18 @@ const AdminDashboard: React.FC = () => {
     fetchCategories();
     
   }, [router]);
+
+  
   const fetchCategories = async () => {
-    try {
-      const response = await axios.get('/api-vinos/categories');
-      setCategories(response.data.data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
+      try {
+        const response = await axios.get('/api-vinos/categories');
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]); // En caso de error, asegúrate de que categories sea un array vacío
+      }
+    };
+    
   const validate = (name: string, value: string | number): string => {
     switch (name) {
       case 'description':
