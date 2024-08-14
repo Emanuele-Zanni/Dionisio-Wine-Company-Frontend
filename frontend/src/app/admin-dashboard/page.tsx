@@ -59,8 +59,7 @@ const AdminDashboard: React.FC = () => {
     fetchCategories();
     
   }, [router]);
-
-  //funcional
+  
   
   const fetchCategories = async () => {
       try {
@@ -181,7 +180,7 @@ const AdminDashboard: React.FC = () => {
         },
       });
   
-      const categories: Category[] = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
+      const categories: Category[] = response.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
       
       // Encontrar el UUID de la categoría con el nombre proporcionado
       const category = categories.find((cat: Category) => cat.name.toLowerCase() === categoryToDelete.toLowerCase());
