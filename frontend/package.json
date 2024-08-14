@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "NODE_OPTIONS='--max_old_space_size=2048' next build",
+    "dev": "set HOST=0.0.0.0 && set PORT=5173 && next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
