@@ -32,7 +32,7 @@ const About = () => {
                     </a>
                     <a href="https://www.linkedin.com/in/pedro-gandola/" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="" 
+                            src="https://media.licdn.com/dms/image/v2/D4D35AQHabwkRFhoRXw/profile-framedphoto-shrink_800_800/profile-framedphoto-shrink_800_800/0/1689255935737?e=1724266800&v=beta&t=PPQYH5-XXbdfDOiyXYt8-ImzjB7nK7SahmR66nHOp4U" 
                             alt="Foto 2" 
                             width={80} 
                             height={80} 
