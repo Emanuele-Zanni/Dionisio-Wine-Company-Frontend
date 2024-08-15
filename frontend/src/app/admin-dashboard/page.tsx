@@ -23,7 +23,6 @@ const AdminDashboard: React.FC = () => {
     imgUrl: "",
     category: "",
     store: "",
-    quantity: 0,
     total: 0,
   });
   const [newCategory, setNewCategory] = useState<string>("");
@@ -187,7 +186,6 @@ const AdminDashboard: React.FC = () => {
         imgUrl: "",
         category: "",
         store: "",
-        quantity: 0,
         total: 0,
       });
       setImagePreview(null);
