@@ -36,7 +36,12 @@ const UserDashboard: React.FC = () => {
     if (userId) {
       const fetchOrders = async () => {
         try {
-          const response = await fetch(`/api-vinos/orders/${userId}`);
+          const token = localStorage.getItem("token");
+          const response = await fetch(`/api-vinos/orders/${userId}`, {
+            headers: {
+              Authorization: `Basic: ${token}`,
+            },
+          });
           const data = await response.json();
 
           if (data && Array.isArray(data)) {
