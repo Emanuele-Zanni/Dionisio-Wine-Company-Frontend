@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { KeyIcon } from "@heroicons/react/24/solid";
+// import { KeyIcon } from "@heroicons/react/24/solid";
 
 enum UserRole {
   User = "user",
@@ -112,10 +112,10 @@ function Navbar() {
                   href={"/admin-dashboard"}
                   className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
                 >
-                   <KeyIcon className="h-6 w-6 text-white" />
+                  {/* <KeyIcon className="h-6 w-6 text-white" />
                   <span className="hidden md:inline">
                     Panel de Administrador
-                  </span>  
+                  </span> */}
                 </Link>
               </li>
             ) : null}

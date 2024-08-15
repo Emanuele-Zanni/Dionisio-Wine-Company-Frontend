@@ -20,10 +20,10 @@ const About = () => {
         <p className="text-xl text-center font-bold text-red-950"> Nuestro Equipo de Trabajo</p>
          </div>
     
-       <div className="mt-8 flex justify-center space-x-4">
+       <div className="mt-8 flex justify-center space-x-8">
                     <a href="https://www.linkedin.com/in/mar%C3%ADa-laura-arcucci/" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="/lau.jpeg" 
+                            src="https://media.licdn.com/dms/image/D4D03AQFAx3ifKgkqsQ/profile-displayphoto-shrink_800_800/0/1723141667743?e=1729123200&v=beta&t=OoPonW2QOG_0iYFc-kL7Cwz9iB63iLFZ9q2MdoVz4mQ" 
                             alt="Foto 1" 
                             width={80} 
                             height={80} 
@@ -50,7 +50,7 @@ const About = () => {
                     </a>
                     <a href="https://www.linkedin.com/in/emanuele-zanni/" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="" 
+                            src="/ema.png" 
                             alt="Foto 4" 
                             width={80} 
                             height={80} 
@@ -59,7 +59,7 @@ const About = () => {
                     </a>
                     <a href="https://www.linkedin.com/in/francisco-imeroni-010b77280/" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="" 
+                            src="/fran.jpeg" 
                             alt="Foto 5" 
                             width={80} 
                             height={80} 
