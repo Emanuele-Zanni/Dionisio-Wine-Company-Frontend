@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -35,7 +34,7 @@ const UserDashboard: React.FC = () => {
     if (userId) {
       const fetchOrders = async () => {
         try {
-          const token = localStorage.getItem('token')
+          const token = localStorage.getItem('token');
           const response = await fetch(`/api-vinos/orders/${userId}`, {
             headers: {
               'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
@@ -47,7 +46,15 @@ const UserDashboard: React.FC = () => {
           
           if (data && Array.isArray(data)) {
             console.log('Fetched Orders:', data);
-            setOrders(data);
+            setOrders(data.map((order: Order) => ({
+              ...order,
+              price: parseFloat(order.price || '0.00'),
+              details: order.details.map(detail => ({
+                ...detail,
+                price: parseFloat(detail.price || '0.00'),
+                total: parseFloat(detail.total || '0.00')
+              }))
+            })));
           } else {
             console.warn('No orders found or invalid response format:', data);
             setOrders([]);
@@ -64,26 +71,36 @@ const UserDashboard: React.FC = () => {
 
   // Función para aplicar filtros y sorting
   const applyFilters = (ordersToFilter: Order[]) => {
+    const normalizedFilters = {
+      category: filters.category.toLowerCase(),
+      store: filters.store.toLowerCase(),
+      name: filters.name.toLowerCase()
+    };
+
     const filtered = ordersToFilter.filter((order) => {
       const filteredDetails = order.details.filter((item) => {
+        const productCategory = item.product.category?.name.toLowerCase() || ''; // Normaliza a minúsculas
+        const productStore = item.product.store.toLowerCase() || '';
+        const productName = item.product.name.toLowerCase() || '';
+
         return (
-          (filters.category ? item.product.category.includes(filters.category) : true) &&
-          (filters.store ? item.product.store.includes(filters.store) : true) &&
-          (filters.name ? item.product.name.includes(filters.name) : true)
+          (normalizedFilters.category ? productCategory.includes(normalizedFilters.category) : true) &&
+          (normalizedFilters.store ? productStore.includes(normalizedFilters.store) : true) &&
+          (normalizedFilters.name ? productName.includes(normalizedFilters.name) : true)
         );
       });
-  
+
       return filteredDetails.length > 0;
     });
-  
+
     const sortedOrders = filtered.sort((a, b) => {
       if (sortOrder === 'asc') {
-        return a.price - b.price;
+        return (a.price || 0) - (b.price || 0);
       } else {
-        return b.price - a.price;
+        return (b.price || 0) - (a.price || 0);
       }
     });
-  
+
     setFilteredOrders(sortedOrders);
   };
 
@@ -109,103 +126,110 @@ const UserDashboard: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-center space-x-4 mb-4">
-        <div className="flex flex-col items-center">
-          <label htmlFor="sortOrder" className="font-semibold">Ordenar por:</label>
-          <select
-            id="sortOrder"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="p-2 border border-gray-300 rounded"
-          >
-            <option value="asc">Menor a mayor</option>
-            <option value="desc">Mayor a menor</option>
-          </select>
-        </div>
-        <div className="flex flex-col items-center">
-          <label htmlFor="category" className="font-semibold">Categoría:</label>
-          <input
-            type="text"
-            id="category"
-            name="category"
-            value={filters.category}
-            onChange={handleFilterChange}
-            className="p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="flex flex-col items-center">
-          <label htmlFor="store" className="font-semibold">Bodega:</label>
-          <input
-            type="text"
-            id="store"
-            name="store"
-            value={filters.store}
-            onChange={handleFilterChange}
-            className="p-2 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="flex flex-col items-center">
-          <label htmlFor="name" className="font-semibold">Nombre:</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={filters.name}
-            onChange={handleFilterChange}
-            className="p-2 border border-gray-300 rounded"
-          />
+      <div className="flex flex-col items-center mb-4 space-y-4">
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <div className="flex flex-col items-center">
+            <label htmlFor="sortOrder" className="font-semibold">Ordenar por:</label>
+            <select
+              id="sortOrder"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="p-2 border border-gray-300 rounded"
+            >
+              <option value="asc">Menor a mayor</option>
+              <option value="desc">Mayor a menor</option>
+            </select>
+          </div>
+          <div className="flex flex-col items-center">
+            <label htmlFor="category" className="font-semibold">Categoría:</label>
+            <input
+              type="text"
+              id="category"
+              name="category"
+              value={filters.category}
+              onChange={handleFilterChange}
+              className="p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="flex flex-col items-center">
+            <label htmlFor="store" className="font-semibold">Bodega:</label>
+            <input
+              type="text"
+              id="store"
+              name="store"
+              value={filters.store}
+              onChange={handleFilterChange}
+              className="p-2 border border-gray-300 rounded"
+            />
+          </div>
+          <div className="flex flex-col items-center">
+            <label htmlFor="name" className="font-semibold">Nombre:</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={filters.name}
+              onChange={handleFilterChange}
+              className="p-2 border border-gray-300 rounded"
+            />
+          </div>
         </div>
         <button
           onClick={() => applyFilters(orders)}
-          className="px-4 py-2 bg-[#FFD700] text-[#800020] rounded-lg mt-4 lg:mt-0"
+          className="px-4 py-2 bg-[#4b0026] text-white rounded-lg"
         >
           Aplicar Filtros
         </button>
       </div>
 
       <div className="flex flex-col items-center p-4 space-y-6">
-    {filteredOrders.length === 0 ? (
-      <div className="text-center text-gray-500">Aún no hay órdenes</div>
-    ) : (
-      <div className="space-y-4">
-        {filteredOrders.map((order) => (
-          <div
-            key={order.id}
-            className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition"
-          >
-            <div className="flex flex-col space-y-4">
-              {order.details && Array.isArray(order.details) ? (
-                order.details.map((detail, index) => (
-                  <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
-                    <img src={detail.product.imgUrl} alt={detail.product.name} className="w-16 h-16 mr-4"/>
-                    <div className="flex-1">
-                      <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
-                      <div>Nombre: {detail.product.name}</div>
-                      <div>Categoría: {detail.product.category}</div>
-                      <div>Bodega: {detail.product.store}</div>
-                      <div>Cantidad: {detail.quantity}</div>
-                      <div>Precio: ${detail.price ? Number(detail.price).toFixed(2) : "0.00"}</div>
-                      <div>Total: ${detail.total ? Number(detail.total).toFixed(2) : "0.00"}</div>
-                    </div>
+        {filteredOrders.length === 0 ? (
+          <div className="text-center text-gray-500">Aún no hay órdenes</div>
+        ) : (
+          <div className="space-y-4">
+            {filteredOrders.map((order) => (
+              <div
+                key={order.id}
+                className="border border-gray-200 rounded-lg p-4 shadow-sm hover:bg-gray-100 transition"
+              >
+                <div className="flex flex-col lg:flex-row items-start space-y-4 lg:space-y-0 lg:space-x-4">
+                  <div className="flex-1">
+                    {order.details && Array.isArray(order.details) ? (
+                      order.details.map((detail, index) => (
+                        <div key={index} className="flex items-start border-b border-gray-200 pb-4 mb-4">
+                          <div className="flex-1">
+                            <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
+                            <div>Nombre: {detail.product.name}</div>
+                            <div>Categoría: {detail.product.category?.name}</div>
+                            <div>Bodega: {detail.product.store}</div>
+                            <div>Cantidad: {detail.quantity}</div>
+                            <div>Precio: ${parseFloat(detail.price || '0.00').toFixed(2)}</div>
+                            <div>Total: ${parseFloat(detail.total || '0.00').toFixed(2)}</div>
+                          </div>
+                          <img
+                            src={detail.product.imgUrl}
+                            alt={detail.product.name}
+                            className="w-32 h-32 ml-4 object-cover"
+                          />
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center text-red-500">No se encontraron detalles para esta orden.</div>
+                    )}
                   </div>
-                ))
-              ) : (
-                <div className="text-center text-red-500">No se encontraron detalles para esta orden.</div>
-              )}
-            </div>
-            <div className="flex justify-between mt-4">
-              <span className="font-semibold">Orden: {order.id}</span>
-              <span className="font-semibold">Fecha: {new Date(order.createdAt).toLocaleDateString()}</span>
-              <span className="font-semibold">Total: ${order.price ? Number(order.price).toFixed(2) : "0.00"}</span>
-              <span className="font-semibold">Estado: {order.status}</span>
-            </div>
+                </div>
+                <div className="flex justify-between mt-4 border-t border-gray-200 pt-4">
+                  <span className="font-semibold">Orden: {order.id}</span>
+                  <span className="font-semibold">Fecha: {new Date(order.createdAt).toLocaleDateString()}</span>
+                  <span className="font-semibold">Total: ${parseFloat(order.price || '0.00').toFixed(2)}</span>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
-    )}
-  </div>
-  </div>
-);
+    </div>
+  );
 };
 
 export default withPageAuthRequired(UserDashboard);
