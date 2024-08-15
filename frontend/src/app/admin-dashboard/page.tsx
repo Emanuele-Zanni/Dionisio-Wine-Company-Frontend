@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import UserManagement from "@/components/UserManagement";
 import DiscountCodeGenerator from "@/components/Discount";
+import { ProductManagement } from "@/components/ProductManagement";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useUser();
@@ -548,6 +549,7 @@ const AdminDashboard: React.FC = () => {
       </div>
       <div>
         <UserManagement />
+        <ProductManagement />
       </div>
     </div>
   );
