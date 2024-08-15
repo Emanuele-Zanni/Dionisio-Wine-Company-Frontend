@@ -54,7 +54,14 @@ const ProductManagement = () => {
       });
 
     // Fetch categories
-    fetch('/api-vinos/categories') // Replace with the actual endpoint for categories
+    const token = localStorage.getItem('token'); // Obtener el token del localStorage
+
+  fetch('/api-vinos/categories', {
+    method: 'GET',
+    headers: {
+      'Authorization': `Basic ${token}`, // Agregar el encabezado de autorización con el token
+    },
+  }) // Replace with the actual endpoint for categories
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data.data)) {
