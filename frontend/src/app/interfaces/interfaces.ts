@@ -9,8 +9,9 @@ export interface Product {
   imgUrl: string;
   category: string; // Se asume que el ID de la categoría es un string
   store: string;
+  quantity: number;
+  total: number;
 }
-
 
 export interface User {
   id: string;
@@ -24,7 +25,6 @@ export interface User {
   isAdmin: boolean;
 }
 
-
 export interface Category {
   categoryId: string; // El ID de la categoría
   name: string;
@@ -33,35 +33,42 @@ export interface Category {
 export interface UserSession {
   token: string;
   userData: {
-      address: string;
-      email: string;
-      id: number;
-      name: string;
-      phone: string;
-      role: string;
-      orders: []
-  }
+    address: string;
+    email: string;
+    id: number;
+    name: string;
+    phone: string;
+    role: string;
+    orders: [];
+  };
 }
 
 export interface IOrder {
- id: number,
- status: string,
- date: Date,
- products: Product[]
+  id: number;
+  status: string;
+  date: Date;
+  products: Product[];
 }
 
-export  interface Filters {
+export interface Filters {
   category: string;
   store: string;
   name: string;
 }
 export interface Order {
+  status: any;
   id: string;
+  price: number;
+  details: Product[];
   total: number;
   createdAt: string; // Usa string para representar la fecha en formato ISO
-  items: Array<{ name: string; quantity: number; price: number; imageUrl: string }>;
+  items: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+    imageUrl: string;
+  }>;
 }
-
 
 export interface OrderItem {
   id: string;
@@ -72,5 +79,3 @@ export interface OrderItem {
   store: string; // Asumiendo que el item tiene una tienda o bodega
   imageUrl: string; // URL de la imagen del item
 }
-
-

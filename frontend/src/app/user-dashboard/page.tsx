@@ -1,27 +1,31 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useUser, withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { useState, useEffect } from "react";
+import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import { Filters, Order } from "../interfaces/interfaces";
 
 const UserDashboard: React.FC = () => {
   const { user, error, isLoading } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [filters, setFilters] = useState<Filters>({ category: '', store: '', name: '' });
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [filters, setFilters] = useState<Filters>({
+    category: "",
+    store: "",
+    name: "",
+  });
   const [userId, setUserId] = useState<string | null>(null);
 
   // Efecto para obtener el ID del usuario del token
   useEffect(() => {
     const fetchUserIdFromToken = () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
         try {
-          const decodedToken = JSON.parse(atob(token.split('.')[1]));
+          const decodedToken = JSON.parse(atob(token.split(".")[1]));
           setUserId(decodedToken.id); // Extrae el ID del usuario del token
         } catch (error) {
-          console.error('Error decoding token:', error);
+          console.error("Error decoding token:", error);
         }
       }
     };
@@ -36,22 +40,22 @@ const UserDashboard: React.FC = () => {
         try {
           const response = await fetch(`/api-vinos/orders/${userId}`);
           const data = await response.json();
-          
-          console.log('Full Response:', data); // Log completo de la respuesta
-          
+
+          console.log("Full Response:", data); // Log completo de la respuesta
+
           if (data && Array.isArray(data)) {
-            console.log('Fetched Orders:', data);
+            console.log("Fetched Orders:", data);
             setOrders(data);
           } else {
-            console.warn('No orders found or invalid response format:', data);
+            console.warn("No orders found or invalid response format:", data);
             setOrders([]);
             setFilteredOrders([]);
           }
         } catch (error) {
-          console.error('Error fetching orders:', error);
+          console.error("Error fetching orders:", error);
         }
       };
-  
+
       fetchOrders();
     }
   }, [userId]);
@@ -60,21 +64,29 @@ const UserDashboard: React.FC = () => {
   const applyFilters = (ordersToFilter: Order[]) => {
     const filtered = ordersToFilter.filter((order) => {
       return (
-        (filters.category ? order.details.some(item => item.category.includes(filters.category)) : true) &&
-        (filters.store ? order.details.some(item => item.store.includes(filters.store)) : true) &&
-        (filters.name ? order.details.some(item => item.name.includes(filters.name)) : true)
+        (filters.category
+          ? order.details.some((item) =>
+              item.category.includes(filters.category)
+            )
+          : true) &&
+        (filters.store
+          ? order.details.some((item) => item.store.includes(filters.store))
+          : true) &&
+        (filters.name
+          ? order.details.some((item) => item.name.includes(filters.name))
+          : true)
       );
     });
 
     const sortedOrders = filtered.sort((a, b) => {
-      if (sortOrder === 'asc') {
+      if (sortOrder === "asc") {
         return a.price - b.price;
       } else {
         return b.price - a.price;
       }
     });
 
-    console.log('Filtered and Sorted Orders:', sortedOrders); // Verifica cómo se están filtrando y ordenando las órdenes
+    console.log("Filtered and Sorted Orders:", sortedOrders); // Verifica cómo se están filtrando y ordenando las órdenes
     setFilteredOrders(sortedOrders);
   };
 
@@ -102,7 +114,9 @@ const UserDashboard: React.FC = () => {
 
       <div className="flex flex-wrap items-center justify-center space-x-4 mb-4">
         <div className="flex flex-col items-center">
-          <label htmlFor="sortOrder" className="font-semibold">Ordenar por:</label>
+          <label htmlFor="sortOrder" className="font-semibold">
+            Ordenar por:
+          </label>
           <select
             id="sortOrder"
             value={sortOrder}
@@ -114,7 +128,9 @@ const UserDashboard: React.FC = () => {
           </select>
         </div>
         <div className="flex flex-col items-center">
-          <label htmlFor="category" className="font-semibold">Categoría:</label>
+          <label htmlFor="category" className="font-semibold">
+            Categoría:
+          </label>
           <input
             type="text"
             id="category"
@@ -125,7 +141,9 @@ const UserDashboard: React.FC = () => {
           />
         </div>
         <div className="flex flex-col items-center">
-          <label htmlFor="store" className="font-semibold">Bodega:</label>
+          <label htmlFor="store" className="font-semibold">
+            Bodega:
+          </label>
           <input
             type="text"
             id="store"
@@ -136,7 +154,9 @@ const UserDashboard: React.FC = () => {
           />
         </div>
         <div className="flex flex-col items-center">
-          <label htmlFor="name" className="font-semibold">Nombre:</label>
+          <label htmlFor="name" className="font-semibold">
+            Nombre:
+          </label>
           <input
             type="text"
             id="name"
@@ -168,23 +188,45 @@ const UserDashboard: React.FC = () => {
                   {/* Verificar si order.details está definido y es un array */}
                   {order.details && Array.isArray(order.details) ? (
                     order.details.map((detail, index) => (
-                      <div key={index} className="flex items-center border-b border-gray-200 pb-4 mb-4">
+                      <div
+                        key={index}
+                        className="flex items-center border-b border-gray-200 pb-4 mb-4"
+                      >
                         <div className="flex-1">
-                          <div className="font-semibold text-lg">Detalles del producto {index + 1}</div>
+                          <div className="font-semibold text-lg">
+                            Detalles del producto {index + 1}
+                          </div>
                           <div>Cantidad: {detail.quantity}</div>
-                          <div>Precio: ${detail.price ? Number(detail.price).toFixed(2) : "0.00"}</div>
-                          <div>Total: ${detail.total ? Number(detail.total).toFixed(2) : "0.00"}</div>
+                          <div>
+                            Precio: $
+                            {detail.price
+                              ? Number(detail.price).toFixed(2)
+                              : "0.00"}
+                          </div>
+                          <div>
+                            Total: $
+                            {detail.total
+                              ? Number(detail.total).toFixed(2)
+                              : "0.00"}
+                          </div>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div className="text-center text-red-500">No se encontraron detalles para esta orden.</div>
+                    <div className="text-center text-red-500">
+                      No se encontraron detalles para esta orden.
+                    </div>
                   )}
                 </div>
                 <div className="flex justify-between mt-4">
                   <span className="font-semibold">Orden: {order.id}</span>
-                  <span className="font-semibold">Fecha: {new Date(order.createdAt).toLocaleDateString()}</span>
-                  <span className="font-semibold">Total: ${order.price ? Number(order.price).toFixed(2) : "0.00"}</span>
+                  <span className="font-semibold">
+                    Fecha: {new Date(order.createdAt).toLocaleDateString()}
+                  </span>
+                  <span className="font-semibold">
+                    Total: $
+                    {order.price ? Number(order.price).toFixed(2) : "0.00"}
+                  </span>
                   <span className="font-semibold">Estado: {order.status}</span>
                 </div>
               </div>
