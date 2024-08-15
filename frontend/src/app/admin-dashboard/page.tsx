@@ -7,11 +7,14 @@ import "sweetalert2/src/sweetalert2.scss";
 import { useRouter } from "next/navigation";
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import UserManagement from "@/components/UserManagement";
+import DiscountCodeGenerator from "@/components/Discount";
+import  ProductManagement from "@/components/ProductManagement";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useUser();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [newProduct, setNewProduct] = useState<Product>({
     name: "",
     description: "",
@@ -24,7 +27,7 @@ const AdminDashboard: React.FC = () => {
     total: 0,
   });
   const [newCategory, setNewCategory] = useState<string>("");
-  const [categoryToDelete, setCategoryToDelete] = useState<string>("");
+  const [categoryToUpdate, setCategoryToUpdate] = useState<string>("");
   const [errors, setErrors] = useState({
     name: "",
     description: "",
@@ -40,18 +43,22 @@ const AdminDashboard: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Obtener el rol del usuario desde localStorage
     const role = localStorage.getItem("role");
     if (role !== "admin" && role !== "superadmin") {
-      router.push("/api/auth/login"); // Redirige a la página de inicio de sesión
+      router.push("/api/auth/login");
       return;
     }
 
-    // Cargar datos de categorías y usuario
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("/api-vinos/categories");
-        setCategories(response.data.data);
+        const token = localStorage.getItem("token");
+        const response = await axios.get("/api-vinos/categories", {
+          headers: {
+            Authorization: `Basic: ${token}`,
+          },
+        });
+        setCategories(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -62,8 +69,14 @@ const AdminDashboard: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api-vinos/categories");
-      setCategories(response.data.data);
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/api-vinos/categories", {
+        headers: {
+          Authorization: `Basic: ${token}`,
+        },
+      });
+      setCategories(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -178,7 +191,7 @@ const AdminDashboard: React.FC = () => {
         total: 0,
       });
       setImagePreview(null);
-      fetchProducts(); // Recargar la lista de productos después de agregar uno nuevo
+      fetchProducts();
       console.log(response);
     } catch (error) {
       console.error("Error al crear producto:", error);
@@ -214,18 +227,18 @@ const AdminDashboard: React.FC = () => {
       );
       setNewCategory("");
       fetchCategories();
-      console.log(response); // Recargar la lista de categorías después de agregar una nueva
+      console.log(response);
     } catch (error) {
       console.error("Error al crear categoría:", error);
       Swal.fire("Error", "Hubo un problema al crear la categoría", "error");
     }
   };
 
-  const handleDeleteCategory = async () => {
-    if (categoryToDelete.trim() === "") {
+  const handleUpdateCategory = async () => {
+    if (!categoryToUpdate || !newCategoryName) {
       Swal.fire(
         "Error",
-        "El nombre de la categoría no puede estar vacío",
+        "Por favor, seleccione una categoría y ingrese un nuevo nombre",
         "error"
       );
       return;
@@ -234,45 +247,31 @@ const AdminDashboard: React.FC = () => {
     const token = localStorage.getItem("token");
 
     try {
-      // Obtener la lista de categorías
-      const response = await axios.get("/api-vinos/categories", {
-        headers: {
-          Authorization: `Basic: ${token}`,
-        },
-      });
-
-      const categories = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
-
-      // Encontrar el UUID de la categoría con el nombre proporcionado
-      const category = categories.find(
-        (cat: { name: string }) =>
-          cat.name.toLowerCase() === categoryToDelete.toLowerCase()
+      await axios.patch(
+        `/api-vinos/categories/update/${categoryToUpdate}`,
+        { name: newCategoryName },
+        {
+          headers: {
+            Authorization: `Basic: ${token}`,
+          },
+        }
       );
-
-      if (!category) {
-        Swal.fire("Error", "Categoría no encontrada", "error");
-        return;
-      }
-
-      const categoryId = category.categoryId;
-
-      // Realizar la solicitud de eliminación usando el UUID
-      await axios.delete(`/api-vinos/categories/${categoryId}`, {
-        headers: {
-          Authorization: `Basic: ${token}`,
-        },
-      });
 
       Swal.fire(
-        "¡Categoría eliminada!",
-        "La categoría ha sido eliminada exitosamente",
+        "¡Categoría actualizada!",
+        "La categoría ha sido actualizada exitosamente",
         "success"
       );
-      setCategoryToDelete("");
-      fetchCategories(); // Recargar la lista de categorías después de eliminar una
+      setCategoryToUpdate("");
+      setNewCategoryName("");
+      fetchCategories();
     } catch (error) {
-      console.error("Error al eliminar categoría:", error);
-      Swal.fire("Error", "Hubo un problema al eliminar la categoría", "error");
+      console.error("Error al actualizar categoría:", error);
+      Swal.fire(
+        "Error",
+        "Hubo un problema al actualizar la categoría",
+        "error"
+      );
     }
   };
 
@@ -385,11 +384,12 @@ const AdminDashboard: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded"
             >
               <option value="">Seleccione una categoría</option>
-              {categories.map((category) => (
-                <option key={category.categoryId} value={category.categoryId}>
-                  {category.name}
-                </option>
-              ))}
+              {categories &&
+                categories.map((category) => (
+                  <option key={category.categoryId} value={category.categoryId}>
+                    {category.name}
+                  </option>
+                ))}
             </select>
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category}</p>
@@ -469,28 +469,51 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold">Eliminar Categoría</h2>
+        <h2 className="text-2xl font-bold">Actualizar Categoría</h2>
         <div className="space-y-4">
           <div>
-            <label htmlFor="categoryToDelete" className="block font-semibold">
-              Nombre de la Categoría
+            <label htmlFor="categoryToUpdate" className="block font-semibold">
+              Seleccionar Categoría a actualizar
+            </label>
+            <select
+              id="categoryToUpdate"
+              value={categoryToUpdate}
+              onChange={(e) => setCategoryToUpdate(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded"
+            >
+              <option value="">Seleccione una categoría</option>
+              {categories &&
+                categories.map((category) => (
+                  <option key={category.categoryId} value={category.categoryId}>
+                    {category.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="newCategoryName" className="block font-semibold">
+              Ingresar nuevo nombre de la categoría
             </label>
             <input
               type="text"
-              id="categoryToDelete"
-              value={categoryToDelete}
-              onChange={(e) => setCategoryToDelete(e.target.value)}
+              id="newCategoryName"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             />
           </div>
           <button
             type="button"
-            onClick={handleDeleteCategory}
-            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+            onClick={handleUpdateCategory}
+            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           >
-            Eliminar Categoría
+            Actualizar Categoría
           </button>
         </div>
+      </div>
+
+      <div className="mb-6">
+        <DiscountCodeGenerator />
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
@@ -526,6 +549,7 @@ const AdminDashboard: React.FC = () => {
       </div>
       <div>
         <UserManagement />
+        <ProductManagement />
       </div>
     </div>
   );

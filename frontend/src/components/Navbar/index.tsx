@@ -80,14 +80,14 @@ function Navbar() {
                 Productos
               </Link>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
               >
                 Servicios
               </a>
-            </li>
+            </li> */}
             <li>
               <Link
                 href="/about-us"
@@ -112,10 +112,14 @@ function Navbar() {
                   href={"/admin-dashboard"}
                   className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
                 >
+<<<<<<< HEAD
                   {/* <KeyIcon className="h-6 w-6 text-white" />
                   <span className="hidden md:inline">
                     Panel de Administrador
                   </span> */}
+=======
+                   <KeyIcon className="h-6 w-6 text-white" /> 
+>>>>>>> 0fbe998e84eff7b824daeb67b9632117cee2f9f2
                 </Link>
               </li>
             ) : null}
