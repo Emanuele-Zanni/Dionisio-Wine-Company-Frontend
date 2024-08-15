@@ -80,14 +80,14 @@ function Navbar() {
                 Productos
               </Link>
             </li>
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="block py-2 px-3 text-white rounded hover:bg-[#800020] md:hover:bg-transparent md:border-0 md:hover:text-gray-400 md:p-0"
               >
                 Servicios
               </a>
-            </li>
+            </li> */}
             <li>
               <Link
                 href="/about-us"
