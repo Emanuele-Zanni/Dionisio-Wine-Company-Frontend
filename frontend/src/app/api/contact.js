@@ -22,8 +22,8 @@ export async function POST(req) {
     });
 
     const mailOptions = {
-      from: user.email,
-      to: "dionisiowinecompany@gmail.com",
+      from: process.env.NODEMAILER_EMAIL_USER,
+      to: process.env.NODEMAILER_EMAIL_USER,
       subject: "Formulario Contacto Dionisio",
       text: `Nombre: ${nombre}\nEmail: ${email}\n\nMensaje:\n${mensaje}`,
     };
