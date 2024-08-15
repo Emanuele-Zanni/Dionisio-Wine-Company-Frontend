@@ -39,16 +39,16 @@ const About = () => {
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.linkedin.com/in/eric-diaz-euka/" target="_blank" rel="noopener noreferrer">
                         <Image 
-                            src="" 
+                            src="https://media.licdn.com/dms/image/v2/D4D35AQGexYCq4aUqog/profile-framedphoto-shrink_800_800/profile-framedphoto-shrink_800_800/0/1710337977011?e=1724335200&v=beta&t=BmpDMwEMcw4CP9DOivNQtsCqQF4lRo6E-RkQs4xWIxg" 
                             alt="Foto 3" 
                             width={80} 
                             height={80} 
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.linkedin.com/in/emanuele-zanni/" target="_blank" rel="noopener noreferrer">
                         <Image 
                             src="" 
                             alt="Foto 4" 
@@ -57,7 +57,7 @@ const About = () => {
                             className="rounded-full object-cover"
                         />
                     </a>
-                    <a href="" target="_blank" rel="noopener noreferrer">
+                    <a href="https://www.linkedin.com/in/francisco-imeroni-010b77280/" target="_blank" rel="noopener noreferrer">
                         <Image 
                             src="" 
                             alt="Foto 5" 

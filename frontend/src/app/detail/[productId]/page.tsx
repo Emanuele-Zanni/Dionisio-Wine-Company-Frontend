@@ -111,3 +111,4 @@ function Detail({ params }: { params: { productId: string } }) {
 }
 
 export default Detail;
+

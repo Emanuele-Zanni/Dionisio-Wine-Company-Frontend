@@ -42,7 +42,7 @@ function Footer() {
                             
                             <ul className="text-white dark:text-gray-400 font-medium">
                                 <li className="mb-4">
-                                    <a href="https://github.com/laura-ml/Dionisio-Wine-Company-Frontend" target= "_blanck" className="hover:underline">Frontend</a>
+                                    <a href="https://github.com/Emanuele-Zanni/Dionisio-Wine-Company-Frontend" target= "_blanck" className="hover:underline">Frontend</a>
                                 </li>
                                 <li>
                                     <a href="https://github.com/Euka-e/Dionisio-Wine-Company-Backend" target= "_blanck" className="hover:underline">Backend</a>
