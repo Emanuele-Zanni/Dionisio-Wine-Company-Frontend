@@ -203,51 +203,53 @@ const ProductManagement = () => {
   
   return (
     <div className="p-4">
-      <h2 className="text-3xl font-bold text-center mb-8">Product Management</h2>
+  <h2 className="text-3xl font-bold text-center mb-8">Product Management</h2>
 
-      {/* Barra de Filtrado */}
-      <div className="mb-4 flex gap-4">
-        <input
-          type="text"
-          placeholder="Nombre"
-          className="p-2 border rounded"
-          value={filters.name}
-          onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Categoría"
-          className="p-2 border rounded"
-          value={filters.category}
-          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Bodega"
-          className="p-2 border rounded"
-          value={filters.store}
-          onChange={(e) => setFilters({ ...filters, store: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Product ID"
-          className="p-2 border rounded"
-          value={filters.productId}
-          onChange={(e) => setFilters({ ...filters, productId: e.target.value })}
-        />
-        <button
-          className="bg-blue-500 text-white p-2 rounded"
-          onClick={applyFilters}
-        >
-          Aplicar Filtros
-        </button>
-        <button
-          className="bg-gray-500 text-white p-2 rounded"
-          onClick={clearFilters}
-        >
-          Borrar Filtros
-        </button>
-      </div>
+  {/* Barra de Filtrado */}
+  <div className="flex flex-wrap justify-center gap-4 mb-4">
+    <input
+      type="text"
+      placeholder="Nombre"
+      className="p-2 border rounded bg-white"
+      value={filters.name}
+      onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+    />
+    <input
+      type="text"
+      placeholder="Categoría"
+      className="p-2 border rounded bg-white"
+      value={filters.category}
+      onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+    />
+    <input
+      type="text"
+      placeholder="Bodega"
+      className="p-2 border rounded bg-white"
+      value={filters.store}
+      onChange={(e) => setFilters({ ...filters, store: e.target.value })}
+    />
+    <input
+      type="text"
+      placeholder="Product ID"
+      className="p-2 border rounded bg-white"
+      value={filters.productId}
+      onChange={(e) => setFilters({ ...filters, productId: e.target.value })}
+    />
+    <button
+      className="bg-[#4b0026] text-white p-2 rounded hover:bg-[#a52a2a]"
+      onClick={applyFilters}
+    >
+      Aplicar Filtros
+    </button>
+    <button
+      className="bg-[#4b0026] text-white p-2 rounded hover:bg-[#a52a2a]"
+      onClick={clearFilters}
+    >
+      Borrar Filtros
+    </button>
+  </div>
+
+
 
       {/* Tarjetas de Productos */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -267,10 +269,10 @@ const ProductManagement = () => {
                 <p className="mt-2 text-sm text-gray-500">{product.description}</p>
               </div>
               <button
-                className="bg-red-500 text-white p-2 rounded self-end"
+                className="bg-red-500 text-white p-2 rounded self-end hover:bg-[#4b0025dc]"
                 onClick={() => handleAdjustClick(product)}
               >
-                Adjust
+                Ajustar
               </button>
             </div>
           ))}
@@ -286,7 +288,7 @@ const ProductManagement = () => {
             >
               &times;
             </button>
-            <h2 className="text-xl font-semibold mb-4">Adjust Product</h2>
+            <h2 className="text-xl font-semibold mb-4">Ajustar Producto</h2>
             <form onSubmit={(e) => e.preventDefault()}>
               <div className="mb-4">
                 <label className="block text-sm font-medium">Nombre</label>
