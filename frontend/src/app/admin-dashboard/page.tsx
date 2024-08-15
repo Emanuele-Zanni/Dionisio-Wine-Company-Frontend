@@ -218,6 +218,8 @@ const AdminDashboard: React.FC = () => {
       console.error('Error fetching products:', error);
     }
   };
+
+  
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
@@ -392,7 +394,7 @@ const AdminDashboard: React.FC = () => {
           ))}
         </ul>
       </div>
-      <div className="button-container flex space-x-4 mb-4">
+      <div className="button-container flex space-x-4 mb-4 ">
         <button
           onClick={() => setShowUserManagement(!showUserManagement)}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg"

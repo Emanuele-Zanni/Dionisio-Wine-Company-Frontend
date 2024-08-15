@@ -215,6 +215,8 @@ const AdminDashboard: React.FC = () => {
       console.error('Error fetching products:', error);
     }
   };
+
+  
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
