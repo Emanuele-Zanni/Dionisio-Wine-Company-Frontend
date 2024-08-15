@@ -51,7 +51,12 @@ const AdminDashboard: React.FC = () => {
     // Cargar datos de categorías y usuario
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("/api-vinos/categories");
+        const token = localStorage.getItem("token");
+        const response = await axios.get("/api-vinos/categories", {
+          headers: {
+            Authorization: `Basic: ${token}`,
+          },
+        });
         setCategories(response.data.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -63,7 +68,12 @@ const AdminDashboard: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api-vinos/categories");
+      const token = localStorage.getItem("token")
+      const response = await axios.get("/api-vinos/categories", {
+        headers: {
+          Authorization: `Basic: ${token}`,
+        },
+      });
       setCategories(response.data.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -495,8 +505,8 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       <div className="mb-6">
-    <DiscountCodeGenerator />
-        </div>
+        <DiscountCodeGenerator />
+      </div>
 
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold">Productos</h2>
