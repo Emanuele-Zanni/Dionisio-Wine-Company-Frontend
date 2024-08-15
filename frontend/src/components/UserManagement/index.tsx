@@ -71,7 +71,7 @@ const UserManagement = () => {
       return;
     }
 
-    fetch(`/api-vinos/users/${id}/role`, {
+    fetch(`/api-vinos/users/role/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
