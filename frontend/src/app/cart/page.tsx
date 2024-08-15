@@ -13,6 +13,8 @@ const Cart = () => {
   const router = useRouter();
   const [cart, setCart] = useState<ICart[]>([]);
   const [total, setTotal] = useState<number>(0);
+  const [discountCode, setDiscountCode] = useState<string>("");
+  const [discount, setDiscount] = useState<number>(0); // Se agregó el estado para el descuento
   const { user, error, isLoading } = useUser();
 
   useEffect(() => {
@@ -21,7 +23,6 @@ const Cart = () => {
       if (storedCart) {
         setCart(storedCart);
 
-        //! la Variable "item" estaba en type IProduct[]
         const totalCart = storedCart.reduce(
           (acc: number, item: ICart) => acc + item.price * (item.quantity || 1),
           0
@@ -31,7 +32,6 @@ const Cart = () => {
     }
   }, []);
 
-  //! la Variable "updatedCart" estaba con IProduct[]
   const updateLocalStorage = (updatedCart: ICart[]) => {
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
@@ -42,7 +42,7 @@ const Cart = () => {
     );
     setCart(updatedCart);
     const updatedTotal = updatedCart.reduce(
-      (acc: number, curr) => acc + curr.price * (curr.quantity || 1),
+      (acc: number, curr: ICart) => acc + curr.price * (curr.quantity || 1),
       0
     );
     setTotal(updatedTotal);
@@ -51,12 +51,6 @@ const Cart = () => {
 
   const handleClick = async () => {
     if (!user) {
-      // await Swal.fire({
-      //   icon: 'warning',
-      //   title: 'Inicia sesión para continuar con tu compra',
-      //   text: 'Serás redirigido a la página de inicio de sesión.',
-      //   confirmButtonText: 'Iniciar sesión',
-      // });
       router.push("/api/auth/login");
       return;
     }
@@ -126,7 +120,7 @@ const Cart = () => {
       });
 
       const totalCart = updatedCart.reduce(
-        (acc, curr) => acc + curr.price * (curr.quantity || 1),
+        (acc: number, curr: ICart) => acc + curr.price * (curr.quantity || 1),
         0
       );
       setTotal(totalCart);
@@ -142,7 +136,108 @@ const Cart = () => {
     return router.push("/api/auth/login");
   }
 
+  const handleApplyDiscount = async () => {
+    try {
+      const response = await fetch('/api-vinos/offers/apply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: discountCode }),
+      });
+  
+      const discountPercentage = await response.json();
+  
+      if (response.ok) {
+        const discountAmount = parseFloat(discountPercentage);
+  
+        if (isNaN(discountAmount) || discountAmount <= 0) {
+          throw new Error("El porcentaje de descuento no es válido");
+        }
+  
+        const cartItems: ICart[] = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+        const updatedCart = cartItems.map((item) => {
+          const discountedPrice = parseFloat(item.price.toString()) * (1 - discountAmount / 100);
+          return {
+            ...item,
+            price: parseFloat(discountedPrice.toFixed(2)),  // Actualiza el precio con el descuento aplicado
+          };
+        });
+  
+        const totalWithDiscount = updatedCart.reduce((acc, item) =>
+          acc + parseFloat(item.price.toString()) * (item.quantity || 1), 0
+        ).toFixed(2);
+  
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        setCart(updatedCart);
+        setTotal(parseFloat(totalWithDiscount));
+        setDiscount(discountAmount);
+  
+        Swal.fire({
+          icon: 'success',
+          title: 'Código aplicado',
+          text: `Descuento aplicado: ${discountAmount}%`,
+          confirmButtonText: 'Aceptar',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Código inválido',
+          text: 'El código de descuento no es válido o ha expirado.',
+          confirmButtonText: 'Aceptar',
+        });
+      }
+    } catch (error) {
+      console.error("Error aplicando el descuento:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al aplicar el descuento. Intenta nuevamente más tarde.',
+        confirmButtonText: 'Ok',
+      });
+    }
+  };
+
   const handleCheckout = async () => {
+    try {
+      const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      if (!cartItems || cartItems.length === 0) {
+        console.error("El carrito está vacío.");
+        return;
+      }
+
+      const response = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cartItems: cartItems.map((item: IProduct) => ({
+            productId: item.productId || '', 
+            name: item.name,
+            imgUrl: item.imgUrl,
+            price: parseFloat(item.price.toString()),
+            quantity: item.quantity || 1,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
+        window.location.href = data.url;
+      } else {
+        console.error('Error creando la sesión de checkout:', data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+/*   const handleCheckout = async () => {
     try {
       // Obtener el carrito desde localStorage
       const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -183,7 +278,7 @@ const Cart = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  }; */
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-6">
@@ -249,20 +344,27 @@ const Cart = () => {
             </p>
           )}
         </div>
+        <div className="flex mt-4 space-x-4">
+          <input 
+            type="text" 
+            value={discountCode} 
+            onChange={(e) => setDiscountCode(e.target.value)} 
+            placeholder="Código de descuento" 
+            className="p-2 border border-gray-300 rounded-md"
+          />
+          <button 
+            onClick={handleApplyDiscount} 
+            className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+          >
+            Aplicar
+          </button>
+        </div>
         <div className="mt-6 w-full flex flex-col md:flex-row items-center justify-between">
           <p className="text-xl mt-7 font-semibold text-gray-700 ">
             Total: ${total.toFixed(2)}
           </p>
-          {/* <button
-            onClick={handleClick}
-            disabled={cart.length === 0}
-            className={`w-full md:w-auto bg-red-800 hover:bg-red-500  text-white p-3 rounded-md mt-7  ${
-              cart.length === 0 ? "cursor-not-allowed opacity-50" : ""
-            }`}
-          >
-            Comprar
-          </button> */}
-        
+        </div>
+
         <button
           onClick={handleCheckout}
           disabled={cart.length === 0}
