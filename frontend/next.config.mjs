@@ -32,4 +32,9 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = {
+  nextConfig,
+  experimental: {
+    appDir: true,
+  },
+};
