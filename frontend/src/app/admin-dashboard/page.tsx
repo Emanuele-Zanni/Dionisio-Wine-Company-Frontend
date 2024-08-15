@@ -20,6 +20,8 @@ const AdminDashboard: React.FC = () => {
     imgUrl: "",
     category: "",
     store: "",
+    quantity: 0,
+    total: 0,
   });
   const [newCategory, setNewCategory] = useState<string>("");
   const [categoryToDelete, setCategoryToDelete] = useState<string>("");
@@ -172,6 +174,8 @@ const AdminDashboard: React.FC = () => {
         imgUrl: "",
         category: "",
         store: "",
+        quantity: 0,
+        total: 0,
       });
       setImagePreview(null);
       fetchProducts(); // Recargar la lista de productos después de agregar uno nuevo
