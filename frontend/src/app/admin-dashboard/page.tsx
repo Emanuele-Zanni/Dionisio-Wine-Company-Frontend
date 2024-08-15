@@ -287,8 +287,8 @@ const AdminDashboard: React.FC = () => {
         {user ? (
           <>
             <img
-              src={user.picture}
-              alt={user.name}
+              src={user.picture ?? "default-image.png"}
+              alt={user.name || "Default Name"}
               className="w-16 h-16 rounded-full"
             />
             <h1 className="text-3xl font-bold mt-2">{user.name}</h1>
