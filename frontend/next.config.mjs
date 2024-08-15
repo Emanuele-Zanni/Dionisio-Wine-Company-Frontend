@@ -1,7 +1,7 @@
 /**
  * @type {import('next').NextConfig}
  */
-const nextConfig = {
+export const nextConfig = {
   images: {
     domains: ["dummyimage.com"], // Permite imágenes desde dummyimage.com
     remotePatterns: [
@@ -32,9 +32,6 @@ const nextConfig = {
   },
 };
 
-module.exports = {
-  nextConfig,
-  experimental: {
-    appDir: true,
-  },
+export const experimental = {
+  appDir: true,
 };
