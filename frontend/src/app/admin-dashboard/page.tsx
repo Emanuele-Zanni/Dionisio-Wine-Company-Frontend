@@ -221,7 +221,7 @@ const AdminDashboard: React.FC = () => {
 
   
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="w-4/5 min-h-screen bg-gray-100 p-4">
       <div className="flex flex-col items-center mb-6">
       {user ? (
           <>
@@ -329,7 +329,7 @@ const AdminDashboard: React.FC = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            className="w-80 mx-auto bg-[#4b0026] text-white py-2 px-4 rounded block hover:bg-[#a52a2a]"
           >
             Crear Producto
           </button>
@@ -351,7 +351,7 @@ const AdminDashboard: React.FC = () => {
           <button
             type="button"
             onClick={handleAddCategory}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            className="w-80 mx-auto bg-[#4b0026] text-white py-2 px-4 rounded block hover:bg-[#a52a2a]"
           >
             Crear Categoría
           </button>
@@ -373,7 +373,7 @@ const AdminDashboard: React.FC = () => {
           <button
             type="button"
             onClick={handleDeleteCategory}
-            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+            className="w-80 mx-auto bg-red-500 text-white py-2 px-4 rounded block hover:bg-red-600"
           >
             Eliminar Categoría
           </button>
@@ -394,16 +394,16 @@ const AdminDashboard: React.FC = () => {
           ))}
         </ul>
       </div>
-      <div className="button-container flex space-x-4 mb-4 ">
+      <div className="button-container flex justify-center space-x-4 my-8 mx-auto">
         <button
           onClick={() => setShowUserManagement(!showUserManagement)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+          className="px-4 py-2 bg-[#4b0026] text-white rounded-lg hover:bg-[#a52a2a]"
         >
           {showUserManagement ? 'Ocultar Gestión de Usuarios' : 'Mostrar Gestión de Usuarios'}
         </button>
         <button
           onClick={() => setShowProductManagement(!showProductManagement)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+          className="px-4 py-2 bg-[#4b0026] text-white rounded-lg hover:bg-[#a52a2a]"
         >
           {showProductManagement ? 'Ocultar Gestión de Productos' : 'Mostrar Gestión de Productos'}
         </button>
@@ -420,9 +420,11 @@ const AdminDashboard: React.FC = () => {
           <UserManagement />
         </section>
       )}
+
     </div>
   );
 };
+
 export default AdminDashboard; 
 
 

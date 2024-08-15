@@ -183,7 +183,7 @@ function Navbar() {
               ) : (
                 <Link
                   className="text-white p-2 rounded hover:bg-[#800020]"
-                  href="/api/auth/login"
+                  href="/api/auth/login" 
                 >
                   Login
                 </Link>
