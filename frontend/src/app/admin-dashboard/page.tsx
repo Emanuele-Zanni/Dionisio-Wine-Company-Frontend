@@ -314,19 +314,28 @@ const AdminDashboard: React.FC = () => {
             />
             {errors.store && <p className="text-red-500 text-sm mt-1">{errors.store}</p>}
           </div>
-          <div>
-            <label htmlFor="imgUrl" className="block font-semibold">Imagen</label>
-            <input
-              type="file"
-              id="imgUrl"
-              name="imgUrl"
-              accept="image/jpeg, image/jpg"
-              onChange={handleImageChange}
-              className="w-full p-2 border border-gray-300 rounded"
-            />
-            {errors.imgUrl && <p className="text-red-500 text-sm mt-1">{errors.imgUrl}</p>}
-            {imagePreview && <img src={imagePreview} alt="Vista previa de la imagen" className="mt-2 w-32 h-32 object-cover" />}
-          </div>
+          <div className="mb-4">
+  <label htmlFor="imgUrl" className="block font-semibold mb-2">Imagen</label>
+  <div className="relative">
+    <input
+      type="file"
+      id="imgUrl"
+      name="imgUrl"
+      accept="image/jpeg, image/jpg"
+      onChange={handleImageChange}
+      className="absolute inset-0 opacity-0 cursor-pointer" // Oculta el input real
+    />
+    <label
+      htmlFor="imgUrl"
+      className="w-100 py-2 px-4 bg-[#4b0026] text-white rounded-lg cursor-pointer mx-auto flex items-center justify-center"
+    >
+      Seleccionar archivo
+    </label>
+  </div>
+  {errors.imgUrl && <p className="text-red-500 text-sm mt-1">{errors.imgUrl}</p>}
+  {imagePreview && <img src={imagePreview} alt="Vista previa de la imagen" className="mt-2 w-32 h-32 object-cover" />}
+</div>
+
           <button
             type="submit"
             className="w-80 mx-auto bg-[#4b0026] text-white py-2 px-4 rounded block hover:bg-[#a52a2a]"
@@ -373,7 +382,7 @@ const AdminDashboard: React.FC = () => {
           <button
             type="button"
             onClick={handleDeleteCategory}
-            className="w-80 mx-auto bg-red-500 text-white py-2 px-4 rounded block hover:bg-red-600"
+            className="w-80 mx-auto block bg-red-500 text-white py-2 px-4 rounded  hover:bg-red-600"  
           >
             Eliminar Categoría
           </button>
