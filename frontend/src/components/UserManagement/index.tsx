@@ -151,82 +151,88 @@ const UserManagement = () => {
     <div className="p-4">
       {/* Filtros */}
       <h2 className="text-3xl font-bold text-center mb-8">User Management</h2>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por email"
-          value={filters.email}
-          onChange={(e) => setFilters({ ...filters, email: e.target.value })}
-          className="p-2 border rounded mr-2"
-        />
-        <input
-          type="text"
-          placeholder="Buscar por nombre"
-          value={filters.name}
-          onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-          className="p-2 border rounded mr-2"
-        />
-        <input
-          type="text"
-          placeholder="Buscar por ID"
-          value={filters.id}
-          onChange={(e) => setFilters({ ...filters, id: e.target.value })}
-          className="p-2 border rounded mr-2"
-        />
-        <input
-          type="text"
-          placeholder="Buscar por rol"
-          value={filters.role}
-          onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-          className="p-2 border rounded mr-2"
-        />
-        <button
-          className="bg-blue-500 text-white p-2 rounded"
-          onClick={applyFilters}
-        >
-          Aplicar Filtros
-        </button>
-      </div>
+      <div className="flex justify-center mb-4">
+  <div className="flex space-x-2">
+    <input
+      type="text"
+      placeholder="Buscar por email"
+      value={filters.email}
+      onChange={(e) => setFilters({ ...filters, email: e.target.value })}
+      className="p-2 border rounded"
+    />
+    <input
+      type="text"
+      placeholder="Buscar por nombre"
+      value={filters.name}
+      onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+      className="p-2 border rounded"
+    />
+    <input
+      type="text"
+      placeholder="Buscar por ID"
+      value={filters.id}
+      onChange={(e) => setFilters({ ...filters, id: e.target.value })}
+      className="p-2 border rounded"
+    />
+    <input
+      type="text"
+      placeholder="Buscar por rol"
+      value={filters.role}
+      onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+      className="p-2 border rounded"
+    />
+    <button
+      className="bg-[#4b0026] text-white p-2 rounded"
+      onClick={applyFilters}
+    >
+      Aplicar Filtros
+    </button>
+  </div>
+</div>
+
 
       {/* Lista de usuarios */}
       <div className="space-y-4">
-        {filteredUsers.map(user => (
-          <div key={user.id} className="p-4 border rounded shadow-sm">
-            <h2 className="font-semibold text-xl">{user.name}</h2>
-            <p>Email: {user.email}</p>
-            <p>ID: {user.id}</p>
-            <p>Rol: {user.role}</p>
-            <div className="flex gap-2 mt-2">
-              <button
-                className="bg-green-500 text-white p-2 rounded"
-                onClick={() => {
-                  setSelectedUserId(user.id);
-                  fetchOrders(user.id);
-                }}
-              >
-                Ver Órdenes
-              </button>
-              <select
-                value={roleToUpdate?.id === user.id ? roleToUpdate?.newRole : user.role}
-                className="p-2 border rounded"
-                onChange={(e) => {
-                  const newRole = e.target.value;
-                  setRoleToUpdate({ id: user.id, newRole });
-                }}
-              >
-                {roles.map(role => (
-                  <option key={role} value={role}>{role}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        ))}
+  {filteredUsers.map(user => (
+    <div key={user.id} className="p-4 border rounded shadow-sm flex items-start space-x-4">
+      <div className="flex-1">
+        <h2 className="font-semibold text-xl">{user.name}</h2>
+        <p>Email: {user.email}</p>
+        <p>ID: {user.id}</p>
+        <p>Rol: {user.role}</p>
       </div>
+      <div className="flex flex-col items-end space-y-2">
+        <button
+          className="text-white bg-[#4b0026] rounded p-2 w-full max-w-[200px] h-10 flex items-center justify-center"
+          onClick={() => {
+            setSelectedUserId(user.id);
+            fetchOrders(user.id);
+          }}
+        >
+          Ver Órdenes
+        </button>
+        <select
+          value={roleToUpdate?.id === user.id ? roleToUpdate?.newRole : user.role}
+          className="p-2 border rounded w-full max-w-[200px] h-10"
+          onChange={(e) => {
+            const newRole = e.target.value;
+            setRoleToUpdate({ id: user.id, newRole });
+          }}
+        >
+          {roles.map(role => (
+            <option key={role} value={role}>{role}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  ))}
+</div>
+
 
       {/* Botón Guardar */}
       <div className="mt-4">
         <button
-          className="bg-blue-500 text-white p-2 rounded"
+          className=" text-white p-2 rounded mx-auto block bg-[#4b0026] align-middle"
           onClick={handleSaveClick}
         >
           Guardar Cambios
