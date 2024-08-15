@@ -3,11 +3,11 @@
  */
 const nextConfig = {
   images: {
-    domains: ['dummyimage.com'], // Permite imágenes desde dummyimage.com
+    domains: ["dummyimage.com"], // Permite imágenes desde dummyimage.com
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**', // Permite cualquier subdominio de cualquier dominio
+        protocol: "https",
+        hostname: "**", // Permite cualquier subdominio de cualquier dominio
       },
     ],
   },
@@ -18,9 +18,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api-vinos/:path*',
+        source: "/api-vinos/:path*",
 
-        destination: 'https://dionisio-wine-company-backend.onrender.com/:path*',
+        destination:
+          "https://66bd7da065ee9c58a33c6071--dionisiowines.netlify.app/:path*",
       },
     ];
   },
