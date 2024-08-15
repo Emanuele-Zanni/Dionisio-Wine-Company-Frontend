@@ -16,14 +16,13 @@ const UserDashboard: React.FC = () => {
   });
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Efecto para obtener el ID del usuario del token
   useEffect(() => {
     const fetchUserIdFromToken = () => {
       const token = localStorage.getItem("token");
       if (token) {
         try {
           const decodedToken = JSON.parse(atob(token.split(".")[1]));
-          setUserId(decodedToken.id); // Extrae el ID del usuario del token
+          setUserId(decodedToken.id);
         } catch (error) {
           console.error("Error decoding token:", error);
         }
@@ -33,7 +32,6 @@ const UserDashboard: React.FC = () => {
     fetchUserIdFromToken();
   }, []);
 
-  // Efecto para obtener las órdenes del usuario una vez que el userId esté disponible
   useEffect(() => {
     if (userId) {
       const fetchOrders = async () => {
@@ -41,10 +39,7 @@ const UserDashboard: React.FC = () => {
           const response = await fetch(`/api-vinos/orders/${userId}`);
           const data = await response.json();
 
-          console.log("Full Response:", data); // Log completo de la respuesta
-
           if (data && Array.isArray(data)) {
-            console.log("Fetched Orders:", data);
             setOrders(data);
           } else {
             console.warn("No orders found or invalid response format:", data);
@@ -60,7 +55,6 @@ const UserDashboard: React.FC = () => {
     }
   }, [userId]);
 
-  // Función para aplicar filtros y sorting
   const applyFilters = (ordersToFilter: Order[]) => {
     const filtered = ordersToFilter.filter((order) => {
       return (
@@ -86,19 +80,16 @@ const UserDashboard: React.FC = () => {
       }
     });
 
-    console.log("Filtered and Sorted Orders:", sortedOrders); // Verifica cómo se están filtrando y ordenando las órdenes
     setFilteredOrders(sortedOrders);
   };
 
-  // Manejar cambios en los filtros
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
-  // Aplicar filtros cuando los filtros cambien
   useEffect(() => {
     applyFilters(orders);
-  }, [filters, sortOrder, orders]); // Vuelve a aplicar los filtros y orden cuando alguno de estos cambie
+  }, [filters, sortOrder, orders]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
@@ -239,4 +230,3 @@ const UserDashboard: React.FC = () => {
 };
 
 export default withPageAuthRequired(UserDashboard);
-

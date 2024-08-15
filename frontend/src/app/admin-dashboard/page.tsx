@@ -41,14 +41,12 @@ const AdminDashboard: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Obtener el rol del usuario desde localStorage
     const role = localStorage.getItem("role");
     if (role !== "admin" && role !== "superadmin") {
-      router.push("/api/auth/login"); // Redirige a la página de inicio de sesión
+      router.push("/api/auth/login");
       return;
     }
 
-    // Cargar datos de categorías y usuario
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -57,7 +55,7 @@ const AdminDashboard: React.FC = () => {
             Authorization: `Basic: ${token}`,
           },
         });
-        setCategories(response.data.data);
+        setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -68,13 +66,13 @@ const AdminDashboard: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       const response = await axios.get("/api-vinos/categories", {
         headers: {
           Authorization: `Basic: ${token}`,
         },
       });
-      setCategories(response.data.data);
+      setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -189,7 +187,7 @@ const AdminDashboard: React.FC = () => {
         total: 0,
       });
       setImagePreview(null);
-      fetchProducts(); // Recargar la lista de productos después de agregar uno nuevo
+      fetchProducts();
       console.log(response);
     } catch (error) {
       console.error("Error al crear producto:", error);
@@ -225,7 +223,7 @@ const AdminDashboard: React.FC = () => {
       );
       setNewCategory("");
       fetchCategories();
-      console.log(response); // Recargar la lista de categorías después de agregar una nueva
+      console.log(response);
     } catch (error) {
       console.error("Error al crear categoría:", error);
       Swal.fire("Error", "Hubo un problema al crear la categoría", "error");
@@ -245,16 +243,14 @@ const AdminDashboard: React.FC = () => {
     const token = localStorage.getItem("token");
 
     try {
-      // Obtener la lista de categorías
       const response = await axios.get("/api-vinos/categories", {
         headers: {
           Authorization: `Basic: ${token}`,
         },
       });
 
-      const categories = response.data.data; // Asumiendo que la respuesta tiene un array de categorías en `data`
+      const categories = response.data.data;
 
-      // Encontrar el UUID de la categoría con el nombre proporcionado
       const category = categories.find(
         (cat: { name: string }) =>
           cat.name.toLowerCase() === categoryToDelete.toLowerCase()
@@ -267,7 +263,6 @@ const AdminDashboard: React.FC = () => {
 
       const categoryId = category.categoryId;
 
-      // Realizar la solicitud de eliminación usando el UUID
       await axios.delete(`/api-vinos/categories/${categoryId}`, {
         headers: {
           Authorization: `Basic: ${token}`,
@@ -280,7 +275,7 @@ const AdminDashboard: React.FC = () => {
         "success"
       );
       setCategoryToDelete("");
-      fetchCategories(); // Recargar la lista de categorías después de eliminar una
+      fetchCategories();
     } catch (error) {
       console.error("Error al eliminar categoría:", error);
       Swal.fire("Error", "Hubo un problema al eliminar la categoría", "error");
@@ -396,11 +391,12 @@ const AdminDashboard: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded"
             >
               <option value="">Seleccione una categoría</option>
-              {categories.map((category) => (
-                <option key={category.categoryId} value={category.categoryId}>
-                  {category.name}
-                </option>
-              ))}
+              {categories &&
+                categories.map((category) => (
+                  <option key={category.categoryId} value={category.categoryId}>
+                    {category.name}
+                  </option>
+                ))}
             </select>
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category}</p>
