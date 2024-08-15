@@ -56,26 +56,25 @@ const ProductManagement = () => {
     // Fetch categories
     const token = localStorage.getItem('token'); // Obtener el token del localStorage
 
-  fetch('/api-vinos/categories', {
-    method: 'GET',
-    headers: {
-      'Authorization': `Basic ${token}`, // Agregar el encabezado de autorización con el token
-    },
-  }) // Replace with the actual endpoint for categories
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data.data)) {
-          setCategories(data.data);
-        } else {
-          console.error('Data fetched is not an array:', data);
-          setCategories([]);
+    const fetchCategories = async () => {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await axios.get("/api-vinos/categories", {
+            headers: {
+              Authorization: `Basic: ${token}`,
+            },
+          });
+          setCategories(response.data);
+          console.log(response.data);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
         }
-      })
-      .catch((error) => {
-        console.error('Error fetching categories:', error);
-        setCategories([]);
-      });
-  }, []);
+      };
+  
+      fetchCategories();
+    }, []);
+  
+    
 
   useEffect(() => {
     if (imageFile) {
