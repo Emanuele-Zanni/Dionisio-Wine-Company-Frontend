@@ -37,24 +37,14 @@ const UserDashboard: React.FC = () => {
           const token = localStorage.getItem('token');
           const response = await fetch(`/api-vinos/orders/${userId}`, {
             headers: {
-              'Authorization': `Basic ${token}`, // Agregar el encabezado Authorization
+              'Authorization': `Bearer ${token}`, // Corregir el encabezado Authorization
             },
           });
           const data = await response.json();
-          
-          console.log('Full Response:', data); // Log completo de la respuesta
-          
+
           if (data && Array.isArray(data)) {
-            console.log('Fetched Orders:', data);
-            setOrders(data.map((order: Order) => ({
-              ...order,
-              price: parseFloat(order.price || '0.00'),
-              details: order.details.map(detail => ({
-                ...detail,
-                price: parseFloat(detail.price || '0.00'),
-                total: parseFloat(detail.total || '0.00')
-              }))
-            })));
+            setOrders(data);
+            setFilteredOrders(data); // Inicializa los pedidos filtrados con todos los pedidos
           } else {
             console.warn('No orders found or invalid response format:', data);
             setOrders([]);
@@ -64,41 +54,38 @@ const UserDashboard: React.FC = () => {
           console.error('Error fetching orders:', error);
         }
       };
-  
+
       fetchOrders();
     }
   }, [userId]);
 
   // Función para aplicar filtros y sorting
-  const applyFilters = (ordersToFilter: Order[]) => {
+  const applyFilters = () => {
     const normalizedFilters = {
       category: filters.category.toLowerCase(),
       store: filters.store.toLowerCase(),
-      name: filters.name.toLowerCase()
+      name: filters.name.toLowerCase(),
     };
 
-    const filtered = ordersToFilter.filter((order) => {
-      const filteredDetails = order.details.filter((item) => {
-        const productCategory = item.product.category?.name.toLowerCase() || ''; // Normaliza a minúsculas
+    const filtered = orders.filter((order) => {
+      return order.details.some((item) => {
+        const productCategory = item.product.category?.name.toLowerCase() || ''; 
         const productStore = item.product.store.toLowerCase() || '';
         const productName = item.product.name.toLowerCase() || '';
 
         return (
-          (normalizedFilters.category ? productCategory.includes(normalizedFilters.category) : true) &&
-          (normalizedFilters.store ? productStore.includes(normalizedFilters.store) : true) &&
-          (normalizedFilters.name ? productName.includes(normalizedFilters.name) : true)
+          (!normalizedFilters.category || productCategory.includes(normalizedFilters.category)) &&
+          (!normalizedFilters.store || productStore.includes(normalizedFilters.store)) &&
+          (!normalizedFilters.name || productName.includes(normalizedFilters.name))
         );
       });
-
-      return filteredDetails.length > 0;
     });
 
     const sortedOrders = filtered.sort((a, b) => {
-      if (sortOrder === 'asc') {
-        return (a.price || 0) - (b.price || 0);
-      } else {
-        return (b.price || 0) - (a.price || 0);
-      }
+      const priceA = parseFloat(a.price || '0');
+      const priceB = parseFloat(b.price || '0');
+
+      return sortOrder === 'asc' ? priceA - priceB : priceB - priceA;
     });
 
     setFilteredOrders(sortedOrders);
@@ -111,7 +98,7 @@ const UserDashboard: React.FC = () => {
 
   // Aplicar filtros cuando los filtros cambien
   useEffect(() => {
-    applyFilters(orders);
+    applyFilters();
   }, [filters, sortOrder, orders]); // Vuelve a aplicar los filtros y orden cuando alguno de estos cambie
 
   if (isLoading) return <div>Loading...</div>;
@@ -175,7 +162,7 @@ const UserDashboard: React.FC = () => {
           </div>
         </div>
         <button
-          onClick={() => applyFilters(orders)}
+          onClick={applyFilters} // Llamar a la función de filtrado explícitamente
           className="px-4 py-2 bg-[#4b0026] text-white rounded-lg"
         >
           Aplicar Filtros
@@ -217,11 +204,10 @@ const UserDashboard: React.FC = () => {
                       <div className="text-center text-red-500">No se encontraron detalles para esta orden.</div>
                     )}
                   </div>
-                </div>
-                <div className="flex justify-between mt-4 border-t border-gray-200 pt-4">
-                  <span className="font-semibold">Orden: {order.id}</span>
-                  <span className="font-semibold">Fecha: {new Date(order.createdAt).toLocaleDateString()}</span>
-                  <span className="font-semibold">Total: ${parseFloat(order.price || '0.00').toFixed(2)}</span>
+                  <div className="flex flex-col items-end">
+                    <div className="text-lg font-semibold text-red-950">Orden # {order.id}</div>
+                    <div className="text-lg font-semibold">Valor total: ${parseFloat(order.price || '0.00').toFixed(2)}</div>
+                  </div>
                 </div>
               </div>
             ))}
