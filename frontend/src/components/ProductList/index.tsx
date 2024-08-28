@@ -1,4 +1,4 @@
-import { IProduct, IProductListProps } from "@/interface";
+import { IProduct, IProductListProps } from "@/interfaces";
 import ProductsCard from "../ProductsCard";
 
 function ProductList({ products }: IProductListProps) {

@@ -1,10 +1,10 @@
 "use client";
 
-import { IProduct, IProductProps } from "@/interface";
+import { IProduct, IProductProps } from "@/interfaces";
 import Image from "next/image";
 import Link from "next/link";
-import { useUser } from '@auth0/nextjs-auth0/client';
-import Swal from 'sweetalert2';
+import { useUser } from "@auth0/nextjs-auth0/client";
+import Swal from "sweetalert2";
 
 function ProductsCard({ product }: IProductProps) {
   const { user } = useUser();
@@ -15,30 +15,32 @@ function ProductsCard({ product }: IProductProps) {
     if (user) {
       const cart: IProduct[] = JSON.parse(localStorage.getItem("cart") || "[]");
 
-      const productExists = cart.some((item: IProduct) => item.productId === product.productId);
+      const productExists = cart.some(
+        (item: IProduct) => item.productId === product.productId
+      );
 
       if (productExists) {
         Swal.fire({
-          icon: 'warning',
-          title: 'Producto ya en el carrito',
-          text: 'Este producto ya está en el carrito.',
+          icon: "warning",
+          title: "Producto ya en el carrito",
+          text: "Este producto ya está en el carrito.",
         });
       } else {
         cart.push(product);
         localStorage.setItem("cart", JSON.stringify(cart));
 
         Swal.fire({
-          icon: 'success',
-          title: 'Añadido al carrito',
-          text: 'El producto se ha añadido al carrito.',
+          icon: "success",
+          title: "Añadido al carrito",
+          text: "El producto se ha añadido al carrito.",
         });
       }
     } else {
       Swal.fire({
-        icon: 'warning',
-        title: 'Inicio de sesión requerido',
-        text: 'Necesitas iniciar sesión para añadir productos al carrito.',
-        confirmButtonText: 'Iniciar sesión',
+        icon: "warning",
+        title: "Inicio de sesión requerido",
+        text: "Necesitas iniciar sesión para añadir productos al carrito.",
+        confirmButtonText: "Iniciar sesión",
       }).then((result) => {
         if (result.isConfirmed) {
           window.location.href = "/api/auth/login";
@@ -46,7 +48,6 @@ function ProductsCard({ product }: IProductProps) {
       });
     }
   };
-
 
   return (
     <div className="border-2 border-[#800020] p-4 rounded-lg w-[250px] h-[400px] flex flex-col mx-auto bg-gradient-to-r from-[#4b0026] via-[#800020] to-[#a52a2a]">
@@ -75,23 +76,26 @@ function ProductsCard({ product }: IProductProps) {
         </div>
 
         <div className="flex w-full justify-between mt-auto space-x-2">
-          {user ? ( 
+          {user ? (
             <button
               className="px-4 py-2 bg-white text-[#800020] rounded-lg font-bold"
               onClick={handleAddToCart}
             >
               Comprar
             </button>
-          ) : ( 
-          <Link className="px-4 py-2 bg-white text-[#800020] rounded-lg" href="/cart">
-            Comprar
-          </Link>
+          ) : (
+            <Link
+              className="px-4 py-2 bg-white text-[#800020] rounded-lg"
+              href="/cart"
+            >
+              Comprar
+            </Link>
           )}
           <Link href={`/detail/${product.productId}`} passHref>
             <button className="flex-1 px-2 py-2 text-white underline">
               Detalles
             </button>
-          </Link> 
+          </Link>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ICart, IProduct } from "@/interface";
+import { ICart, IProduct } from "@/interfaces";
 import { useRouter } from "next/navigation";
 import { createrOrder } from "@/components/helpers/orders";
 import Image from "next/image";

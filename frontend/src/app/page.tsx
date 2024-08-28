@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Carrusel from "@/components/Carrusel";
 import ProductList from "@/components/ProductList";
-import { IProduct } from "@/interface";
+import { IProduct } from "@/interfaces";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import axios from "axios";
 import cookie from "js-cookie";

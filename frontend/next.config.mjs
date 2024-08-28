@@ -21,7 +21,8 @@ const nextConfig = {
         source: "/api-vinos/:path*",
 
         destination:
-          "https://dionisio-wine-company-backend.onrender.com/:path*",
+          "https://dionisio-wine-company-backend-8cjg.onrender.com/:path*",
+        //"https://dionisio-wine-company-backend.onrender.com/:path*",
       },
     ];
   },
