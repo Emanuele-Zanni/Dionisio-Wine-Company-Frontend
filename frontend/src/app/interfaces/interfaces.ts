@@ -9,8 +9,8 @@ export interface Product {
   imgUrl: string;
   category: string; // Se asume que el ID de la categoría es un string
   store: string;
-  quantity: number;
-  total: number;
+  // quantity: number;
+  // total: number;
 }
 
 export interface User {

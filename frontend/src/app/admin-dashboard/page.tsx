@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import UserManagement from "@/components/UserManagement";
 import DiscountCodeGenerator from "@/components/Discount";
-import  ProductManagement from "@/components/ProductManagement";
+import ProductManagement from "@/components/ProductManagement";
 
 const AdminDashboard: React.FC = () => {
   const { user } = useUser();
@@ -23,8 +23,8 @@ const AdminDashboard: React.FC = () => {
     imgUrl: "",
     category: "",
     store: "",
-    quantity: 0,
-    total: 0,
+    // quantity: 0,
+    // total: 0,
   });
   const [newCategory, setNewCategory] = useState<string>("");
   const [categoryToUpdate, setCategoryToUpdate] = useState<string>("");
@@ -187,8 +187,8 @@ const AdminDashboard: React.FC = () => {
         imgUrl: "",
         category: "",
         store: "",
-        quantity: 0,
-        total: 0,
+        // quantity: 0,
+        // total: 0,
       });
       setImagePreview(null);
       fetchProducts();
